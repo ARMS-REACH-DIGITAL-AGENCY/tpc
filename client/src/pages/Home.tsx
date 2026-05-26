@@ -20,14 +20,18 @@ import {
   ChevronLeft,
   Activity,
   UserCheck,
-  AlertCircle
+  AlertCircle,
+  TrendingUp,
+  Clock,
+  Layers,
+  FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 
-// Define the steps in the virtual live demo
+// Define the steps in the consumer-facing funnel
 type DemoStep = "CHIP_TAP" | "LANDING_PAGE" | "OPT_IN" | "QUIZ" | "OFFER" | "OUTCOME" | "FOLLOW_UP";
 
 // CRM Log entry type
@@ -39,20 +43,29 @@ interface LogEntry {
 }
 
 export default function Home() {
-  // Demo State
+  // Navigation tab
+  const [activeTab, setActiveTab] = useState<"funnel" | "portal" | "about">("funnel");
+  
+  // Funnel State
   const [currentStep, setCurrentStep] = useState<DemoStep>("CHIP_TAP");
   const [leadName, setLeadName] = useState("");
   const [leadEmail, setLeadEmail] = useState("");
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
   const [quizIndex, setQuizIndex] = useState(0);
   const [crmLogs, setCrmLogs] = useState<LogEntry[]>([]);
-  const [activeTab, setActiveTab] = useState<"strategy" | "demo" | "arms" | "pilot">("demo");
   const [voucherClaimed, setVoucherClaimed] = useState(false);
   const [acceptedOffer, setAcceptedOffer] = useState<boolean | null>(null);
-  const [simulatedTime, setSimulatedTime] = useState("0:00");
-  const [scanCount, setScanCount] = useState(42);
-  const [optInCount, setOptInCount] = useState(28);
-  const [memberCount, setMemberCount] = useState(12);
+
+  // Portal Stats State
+  const [scanCount, setScanCount] = useState(148);
+  const [optInCount, setOptInCount] = useState(96);
+  const [memberCount, setMemberCount] = useState(41);
+  const [recentLeads, setRecentLeads] = useState([
+    { name: "Marcus Vance", email: "marcus.v@golfclub.com", status: "Active Member", date: "Just now", value: "$150" },
+    { name: "Sarah Jenkins", email: "sjenkins@traveler.org", status: "Prospect (Plan B)", date: "10m ago", value: "$0" },
+    { name: "Robert Chen", email: "r.chen@capital.com", status: "Active Member", date: "1h ago", value: "$150" },
+    { name: "Emily Watson", email: "emily@watsongolf.com", status: "Prospect (Quiz)", date: "3h ago", value: "$0" }
+  ]);
 
   const logsEndRef = useRef<HTMLDivElement>(null);
 
@@ -78,19 +91,19 @@ export default function Home() {
 
   // Initial log population
   useEffect(() => {
-    addLog("ARMS CRM Engine Initialized & Listening...", "arms");
-    addLog("Source Campaign: 'First Call 75 Golf Wedge' active.", "info");
-    addLog("NFC Webhook Listener: Registered at /api/v1/scans/poker-chip", "arms");
+    addLog("ARMS Automated Relationship Management System Active", "arms");
+    addLog("Campaign Webhook Active: 'First Call 75 Golf Wedge'", "info");
+    addLog("NFC Webhook Listener: Listening at /api/v1/scans/poker-chip", "arms");
   }, []);
 
   // Handle virtual NFC chip tap
   const handleNfcTap = () => {
     addLog("⚡ NFC Chip Tap Detected! UID: 04:A1:D3:C2:5E:8F", "success");
-    addLog("ARMS Attribution: Source tagged as 'Physical NFC Poker Chip - Event Launch'", "arms");
-    addLog("Redirecting prospect to safe quiz landing page...", "info");
+    addLog("ARMS Attribution: Source tagged as 'Physical NFC Poker Chip'", "arms");
+    addLog("Redirecting prospect to secure Travel Protection Club landing page...", "info");
     setScanCount(prev => prev + 1);
     setCurrentStep("LANDING_PAGE");
-    toast.success("NFC Tap Simulated Successfully!");
+    toast.success("NFC Tap Simulated!");
   };
 
   // Handle email/name capture (Opt-In)
@@ -105,8 +118,15 @@ export default function Home() {
     addLog(`ARMS Sequence: Tagged with 'Golf_Wedge_2026' & 'Voucher_Unclaimed'`, "arms");
     addLog(`ARMS Action: Voucher code G75-TEMP-ACTIVATE reserved for 15 minutes`, "info");
     setOptInCount(prev => prev + 1);
+    
+    // Add to recent leads in portal
+    setRecentLeads(prev => [
+      { name: leadName, email: leadEmail, status: "Prospect (Quiz)", date: "Just now", value: "$0" },
+      ...prev.slice(0, 3)
+    ]);
+
     setCurrentStep("QUIZ");
-    toast.success("Voucher Reserved! Let's complete the quick travel planner profile.");
+    toast.success("Voucher Reserved! Let's complete your travel planner profile.");
   };
 
   // Quiz Questions definition
@@ -145,14 +165,13 @@ export default function Home() {
     if (quizIndex < quizQuestions.length - 1) {
       setQuizIndex(prev => prev + 1);
     } else {
-      // Quiz complete - calculate segmentation
       addLog("🎯 Quiz Completed! Analyzing traveler planning profile...", "success");
       
       const isPlanner = updatedAnswers["planner_mindset"] === "Always (I have written checklists)" || updatedAnswers["planner_mindset"] === "Usually";
       const hasFirstCallPlan = updatedAnswers["first_call_gap"] === "Yes, we have a clear emergency contact";
       
-      addLog(`ARMS Segmentation: Mindset classified as '${isPlanner ? "Planner (High Value)" : "Spontaneous"}'`, "arms");
-      addLog(`ARMS Segmentation: Family First-Call Status: '${hasFirstCallPlan ? "Protected" : "Unprepared (Vulnerable)"}'`, "arms");
+      addLog(`ARMS Segmentation: Mindset classified as '${isPlanner ? "Planner" : "Spontaneous"}'`, "arms");
+      addLog(`ARMS Segmentation: Family First-Call Status: '${hasFirstCallPlan ? "Protected" : "Unprepared"}'`, "arms");
       
       if (!hasFirstCallPlan) {
         addLog(`ARMS Trigger: Set dynamic landing page theme to 'Family Security & Peace of Mind'`, "arms");
@@ -175,12 +194,24 @@ export default function Home() {
       addLog("ARMS Action: Dispatched 'First Call Family Instruction Packet' PDF via email", "info");
       addLog("ARMS Fulfillment: Scheduled physical welcome packet & membership card delivery", "arms");
       setMemberCount(prev => prev + 1);
+      
+      // Update in recent leads
+      setRecentLeads(prev => prev.map(lead => 
+        lead.email === leadEmail ? { ...lead, status: "Active Member", value: "$150" } : lead
+      ));
+
       setCurrentStep("OUTCOME");
       toast.success("Membership Activated! $75 Voucher delivered.");
     } else {
       addLog("⚠️ Prospect hesitated on offer page (Clicked 'No thanks' or closed tab)", "warning");
       addLog("ARMS Trigger: Activated Abandoned Checkout Recovery Sequence", "arms");
       addLog("ARMS Delay: Scheduled Plan B Email Nurture Sequence (Trigger in 15 mins)", "arms");
+      
+      // Update in recent leads
+      setRecentLeads(prev => prev.map(lead => 
+        lead.email === leadEmail ? { ...lead, status: "Prospect (Plan B)" } : lead
+      ));
+
       setCurrentStep("FOLLOW_UP");
       toast.info("Plan B Nurture Sequence activated in ARMS CRM.");
     }
@@ -209,34 +240,28 @@ export default function Home() {
             </div>
             <div>
               <h1 className="font-serif-display text-lg font-bold tracking-wider text-[#1A331E]">GLOBAL 360</h1>
-              <p className="font-sans-ui text-xs uppercase tracking-widest text-[#C2B280] font-semibold">Pitch & Live Demo Deck</p>
+              <p className="font-sans-ui text-xs uppercase tracking-widest text-[#C2B280] font-semibold">Travel Protection Club</p>
             </div>
           </div>
           
           <nav className="flex items-center gap-2 bg-[#F1EFE6] p-1 rounded-sm border border-[#E6E2D3]">
             <button 
-              onClick={() => setActiveTab("demo")}
-              className={`px-4 py-1.5 text-xs uppercase tracking-wider font-semibold rounded-xs transition-all ${activeTab === "demo" ? "bg-[#1A331E] text-white shadow-xs" : "text-[#1A331E] hover:bg-[#E6E2D3]"}`}
+              onClick={() => setActiveTab("funnel")}
+              className={`px-4 py-1.5 text-xs uppercase tracking-wider font-semibold rounded-xs transition-all ${activeTab === "funnel" ? "bg-[#1A331E] text-white shadow-xs" : "text-[#1A331E] hover:bg-[#E6E2D3]"}`}
             >
-              Live Demo
+              Interactive Demo
             </button>
             <button 
-              onClick={() => setActiveTab("strategy")}
-              className={`px-4 py-1.5 text-xs uppercase tracking-wider font-semibold rounded-xs transition-all ${activeTab === "strategy" ? "bg-[#1A331E] text-white shadow-xs" : "text-[#1A331E] hover:bg-[#E6E2D3]"}`}
+              onClick={() => setActiveTab("portal")}
+              className={`px-4 py-1.5 text-xs uppercase tracking-wider font-semibold rounded-xs transition-all ${activeTab === "portal" ? "bg-[#1A331E] text-white shadow-xs" : "text-[#1A331E] hover:bg-[#E6E2D3]"}`}
             >
-              Strategy Deck
+              ARMS B2B Partner Portal
             </button>
             <button 
-              onClick={() => setActiveTab("arms")}
-              className={`px-4 py-1.5 text-xs uppercase tracking-wider font-semibold rounded-xs transition-all ${activeTab === "arms" ? "bg-[#1A331E] text-white shadow-xs" : "text-[#1A331E] hover:bg-[#E6E2D3]"}`}
+              onClick={() => setActiveTab("about")}
+              className={`px-4 py-1.5 text-xs uppercase tracking-wider font-semibold rounded-xs transition-all ${activeTab === "about" ? "bg-[#1A331E] text-white shadow-xs" : "text-[#1A331E] hover:bg-[#E6E2D3]"}`}
             >
-              ARMS Engine
-            </button>
-            <button 
-              onClick={() => setActiveTab("pilot")}
-              className={`px-4 py-1.5 text-xs uppercase tracking-wider font-semibold rounded-xs transition-all ${activeTab === "pilot" ? "bg-[#1A331E] text-white shadow-xs" : "text-[#1A331E] hover:bg-[#E6E2D3]"}`}
-            >
-              Pilot Plan
+              About the Club
             </button>
           </nav>
         </div>
@@ -245,8 +270,8 @@ export default function Home() {
       {/* Main Pitch/Demo Workspace */}
       <main className="flex-1 container py-8 px-6">
         
-        {/* TAB 1: LIVE DEMO SANDBOX */}
-        {activeTab === "demo" && (
+        {/* TAB 1: INTERACTIVE FUNNEL DEMO */}
+        {activeTab === "funnel" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
             {/* Left: Virtual iPhone/Prospect Experience (7 Cols) */}
@@ -312,7 +337,7 @@ export default function Home() {
                           className="h-full w-full object-cover"
                         />
                         <div className="absolute inset-0 z-20 flex flex-col justify-end p-4">
-                          <span className="text-[10px] uppercase tracking-widest text-[#C2B280] font-bold">First Call 75 x Golf Wedge</span>
+                          <span className="text-[10px] uppercase tracking-widest text-[#C2B280] font-bold">Exclusive Golf Invitation</span>
                           <h4 className="font-serif-display text-lg font-bold text-white leading-tight">Travel Protection Club</h4>
                         </div>
                       </div>
@@ -321,7 +346,7 @@ export default function Home() {
                         <div>
                           <div className="inline-flex items-center gap-1 bg-[#1A331E]/5 border border-[#1A331E]/10 px-2 py-1 rounded-xs mb-3">
                             <Sparkles className="h-3.5 w-3.5 text-[#C2B280]" />
-                            <span className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E]">NFC Exclusive Benefit</span>
+                            <span className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E]">Exclusive Benefit</span>
                           </div>
                           
                           <h5 className="font-serif-display text-base font-bold text-[#1A331E] mb-2 leading-snug">
@@ -466,7 +491,7 @@ export default function Home() {
 
                       <div className="p-5 space-y-4">
                         <div className="text-center">
-                          <span className="text-[10px] uppercase tracking-widest text-[#C2B280] font-bold">The Planner's Pivot</span>
+                          <span className="text-[10px] uppercase tracking-widest text-[#C2B280] font-bold">The Planner's Choice</span>
                           <h4 className="font-serif-display text-lg font-bold text-[#1A331E] leading-tight mt-0.5">
                             Your clubs deserve a way home. So do you.
                           </h4>
@@ -591,38 +616,38 @@ export default function Home() {
                         </div>
 
                         <div className="text-center">
-                          <span className="text-[10px] uppercase tracking-widest text-[#C2B280] font-bold">Plan B Activated</span>
-                          <h4 className="font-serif-display text-lg font-bold text-[#1A331E] mt-1 mb-2">Lead Saved in ARMS</h4>
+                          <span className="text-[10px] uppercase tracking-widest text-[#C2B280] font-bold">Voucher Reserved</span>
+                          <h4 className="font-serif-display text-lg font-bold text-[#1A331E] mt-1 mb-2">Voucher Reservation Active</h4>
                           <p className="text-xs text-[#4A5D4E] max-w-xs mx-auto">
-                            The prospect hesitated on the purchase, but because we captured <strong>{leadName}</strong>'s contact info early, the relationship is saved.
+                            The voucher reservation remains active for <strong>{leadName}</strong>. A temporary confirmation has been sent to <strong>{leadEmail}</strong>.
                           </p>
                         </div>
 
                         {/* Email Drip Box */}
                         <div className="bg-white border border-[#E6E2D3] p-4 rounded-xs text-left shadow-xs">
                           <div className="flex justify-between items-center border-b border-[#E6E2D3] pb-2 mb-2">
-                            <span className="text-[10px] font-bold text-[#1A331E]">Simulated Email Nurture Sequence</span>
-                            <span className="bg-[#1A331E]/10 text-[#1A331E] text-[8px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-xs">Plan B Drip</span>
+                            <span className="text-[10px] font-bold text-[#1A331E]">Scheduled Member Education</span>
+                            <span className="bg-[#1A331E]/10 text-[#1A331E] text-[8px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-xs">Drip Queue</span>
                           </div>
 
                           <div className="space-y-3 text-[10px] text-[#4A5D4E]">
                             <div className="border-l-2 border-[#C2B280] pl-2 py-0.5">
-                              <p className="font-bold text-[#1A331E]">Email 1 (Immediate): "Your $75 Voucher is Reserved"</p>
-                              <p className="text-[9px]">Gives them a gentle reminder that the voucher is still waiting, reducing friction.</p>
+                              <p className="font-bold text-[#1A331E]">Message 1 (Scheduled): "Your $75 Voucher is Reserved"</p>
+                              <p className="text-[9px]">A gentle reminder that the voucher credit is held and ready for activation.</p>
                             </div>
                             <div className="border-l-2 border-[#E6E2D3] pl-2 py-0.5">
-                              <p className="font-bold text-[#1A331E]/70">Email 2 (Day 1): "Your clubs have a way home. Do you?"</p>
-                              <p className="text-[9px]">The elegant pivot from club protection to human travel protection.</p>
+                              <p className="font-bold text-[#1A331E]/70">Message 2 (Scheduled): "Your clubs have a way home. Do you?"</p>
+                              <p className="text-[9px]">Connecting club-protection logistics with personal travel peace of mind.</p>
                             </div>
                             <div className="border-l-2 border-[#E6E2D3] pl-2 py-0.5">
-                              <p className="font-bold text-[#1A331E]/70">Email 3 (Day 3): "The true cost of being unprepared"</p>
-                              <p className="text-[9px]">Educational content on repatriation and first-call coordination.</p>
+                              <p className="font-bold text-[#1A331E]/70">Message 3 (Scheduled): "The true cost of being unprepared"</p>
+                              <p className="text-[9px]">Educational resource on travel safety and repatriation coordination.</p>
                             </div>
                           </div>
                         </div>
 
                         <div className="bg-[#F9F8F0] border border-[#E6E2D3] p-3 rounded-xs text-center text-[10px] text-[#4A5D4E]">
-                          💡 <strong>Marketing Insight:</strong> Capturing the email early turns a lost visitor into a long-term asset. We can retarget them with high-value education.
+                          💡 Your contact details have been safely stored in our relationship manager. You will receive helpful, non-intrusive traveler guides to assist your decision.
                         </div>
                       </div>
 
@@ -645,8 +670,8 @@ export default function Home() {
               {/* Mini Stats Card */}
               <Card className="double-border bg-[#F9F8F0]">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-bold tracking-wider text-[#1A331E]">PILOT SIMULATION METRICS</CardTitle>
-                  <CardDescription className="text-xs text-[#4A5D4E]">Real-time campaign performance attribution</CardDescription>
+                  <CardTitle className="text-sm font-bold tracking-wider text-[#1A331E]">LIVE CRM ATTRIBUTION</CardTitle>
+                  <CardDescription className="text-xs text-[#4A5D4E]">Real-time automation engine performance</CardDescription>
                 </CardHeader>
                 <CardContent className="grid grid-cols-3 gap-2 text-center">
                   <div className="bg-white p-2 rounded-xs border border-[#E6E2D3]">
@@ -706,46 +731,211 @@ export default function Home() {
               </Card>
               
               <div className="bg-[#F9F8F0] border border-[#E6E2D3] p-4 rounded-xs text-xs text-[#4A5D4E]">
-                <span className="font-bold text-[#1A331E] block mb-1">💡 Pitching Tip for Andrew:</span>
-                "Show him the screen on the left, but point to the screen on the right. Andrew needs to see that while the prospect experiences a beautiful, simple, country-club style quiz, the **ARMS engine** is automatically segmenting them, reserving vouchers, managing billing, and triggering automated follow-up drip sequences."
+                <span className="font-bold text-[#1A331E] block mb-1">💡 B2B Engine Insight:</span>
+                This panel demonstrates the real-time automation running behind the customer-facing mobile interface. Every scan, opt-in, quiz answer, and purchase decision is instantly tracked, segmented, and acted upon by the relationship manager.
               </div>
             </div>
 
           </div>
         )}
 
-        {/* TAB 2: STRATEGY DECK */}
-        {activeTab === "strategy" && (
+        {/* TAB 2: ARMS B2B PARTNER PORTAL */}
+        {activeTab === "portal" && (
+          <div className="space-y-8 max-w-5xl mx-auto">
+            
+            {/* Dashboard Hero */}
+            <div className="double-border bg-[#F9F8F0] p-8 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-[#1A331E]"></div>
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                  <span className="text-xs uppercase tracking-widest text-[#C2B280] font-bold block mb-1">Automated Relationship Management System</span>
+                  <h2 className="font-serif-display text-2xl font-bold text-[#1A331E] tracking-wide">
+                    B2B Partner Dashboard
+                  </h2>
+                  <p className="text-xs text-[#4A5D4E] font-serif-body">
+                    Operational analytics, member conversion pipelines, and partner attribution.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button className="bg-[#1A331E] hover:bg-[#2D4A32] text-white text-xs border border-[#C2B280] px-4 py-2 rounded-sm">
+                    Export Partner Report
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* High Level Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card className="border border-[#E6E2D3] bg-white">
+                <CardContent className="p-5">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-[10px] uppercase tracking-wider text-[#4A5D4E] font-bold">Total Scans</span>
+                    <Smartphone className="h-4 w-4 text-[#C2B280]" />
+                  </div>
+                  <span className="font-serif-display text-2xl font-bold text-[#1A331E] block">{scanCount}</span>
+                  <span className="text-[10px] text-[#2D6A4F] font-bold">↑ 12% from last week</span>
+                </CardContent>
+              </Card>
+
+              <Card className="border border-[#E6E2D3] bg-white">
+                <CardContent className="p-5">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-[10px] uppercase tracking-wider text-[#4A5D4E] font-bold">Opt-In Rate</span>
+                    <UserCheck className="h-4 w-4 text-[#C2B280]" />
+                  </div>
+                  <span className="font-serif-display text-2xl font-bold text-[#1A331E] block">
+                    {Math.round((optInCount / scanCount) * 100)}%
+                  </span>
+                  <span className="text-[10px] text-[#2D6A4F] font-bold">96 Captured Profiles</span>
+                </CardContent>
+              </Card>
+
+              <Card className="border border-[#E6E2D3] bg-white">
+                <CardContent className="p-5">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-[10px] uppercase tracking-wider text-[#4A5D4E] font-bold">Paid Conversions</span>
+                    <DollarSign className="h-4 w-4 text-[#C2B280]" />
+                  </div>
+                  <span className="font-serif-display text-2xl font-bold text-[#1A331E] block">
+                    {Math.round((memberCount / optInCount) * 100)}%
+                  </span>
+                  <span className="text-[10px] text-[#2D6A4F] font-bold">41 Active Members</span>
+                </CardContent>
+              </Card>
+
+              <Card className="border border-[#E6E2D3] bg-white">
+                <CardContent className="p-5">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-[10px] uppercase tracking-wider text-[#4A5D4E] font-bold">Total Revenue</span>
+                    <TrendingUp className="h-4 w-4 text-[#C2B280]" />
+                  </div>
+                  <span className="font-serif-display text-2xl font-bold text-[#1A331E] block">
+                    ${memberCount * 150}
+                  </span>
+                  <span className="text-[10px] text-[#4A5D4E] font-bold">Recurring Membership LTV</span>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Split Screen: Recent Leads & Campaign Flow */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              
+              {/* Recent Leads Table (7 Cols) */}
+              <Card className="lg:col-span-7 border border-[#E6E2D3] bg-white">
+                <CardHeader className="border-b border-[#E6E2D3] pb-3">
+                  <CardTitle className="text-sm font-bold text-[#1A331E]">RECENT RELATIONSHIP PIPELINE</CardTitle>
+                  <CardDescription className="text-xs text-[#4A5D4E]">Real-time contact status captured via NFC funnel</CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs text-left border-collapse">
+                      <thead>
+                        <tr className="bg-[#F9F8F0] border-b border-[#E6E2D3] text-[#1A331E] font-bold">
+                          <th className="py-3 px-4">Contact</th>
+                          <th className="py-3 px-4">Campaign Status</th>
+                          <th className="py-3 px-4">Time</th>
+                          <th className="py-3 px-4 text-right">Value</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#E6E2D3]/60 text-[#4A5D4E]">
+                        {recentLeads.map((lead, idx) => (
+                          <tr key={idx} className="hover:bg-[#FDFCF7]">
+                            <td className="py-3 px-4">
+                              <span className="font-bold text-[#1A331E] block">{lead.name}</span>
+                              <span className="text-[10px] text-[#4A5D4E]">{lead.email}</span>
+                            </td>
+                            <td className="py-3 px-4">
+                              <span className={`inline-block px-2 py-0.5 rounded-xs text-[9px] font-bold ${
+                                lead.status === "Active Member" ? "bg-[#2D6A4F]/10 text-[#2D6A4F]" :
+                                lead.status === "Prospect (Plan B)" ? "bg-[#C2B280]/20 text-[#1A331E]" : "bg-[#F1EFE6] text-[#4A5D4E]"
+                              }`}>
+                                {lead.status}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-[#4A5D4E]">{lead.date}</td>
+                            <td className="py-3 px-4 text-right font-bold text-[#1A331E]">{lead.value}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Campaign Flow Architecture (5 Cols) */}
+              <Card className="lg:col-span-5 border border-[#E6E2D3] bg-white">
+                <CardHeader className="border-b border-[#E6E2D3] pb-3">
+                  <CardTitle className="text-sm font-bold text-[#1A331E]">CAMPAIGN WORKFLOW CONFIG</CardTitle>
+                  <CardDescription className="text-xs text-[#4A5D4E]">Active relationship automation sequences</CardDescription>
+                </CardHeader>
+                <CardContent className="p-4 space-y-4">
+                  <div className="space-y-3">
+                    
+                    <div className="flex items-start gap-3 p-2.5 rounded-xs bg-[#F9F8F0] border border-[#E6E2D3]">
+                      <Clock className="h-4 w-4 text-[#1A331E] shrink-0 mt-0.5" />
+                      <div>
+                        <span className="text-[11px] font-bold text-[#1A331E] block">Webhook: Poker Chip Scan</span>
+                        <p className="text-[10px] text-[#4A5D4E]">Triggers instant redirection and registers unique partner attribution code.</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-2.5 rounded-xs bg-[#F9F8F0] border border-[#E6E2D3]">
+                      <Layers className="h-4 w-4 text-[#1A331E] shrink-0 mt-0.5" />
+                      <div>
+                        <span className="text-[11px] font-bold text-[#1A331E] block">Segmenter: Traveler Profiler</span>
+                        <p className="text-[10px] text-[#4A5D4E]">Evaluates travel frequency and emergency preparedness to tailor offer page messaging.</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-2.5 rounded-xs bg-[#F9F8F0] border border-[#E6E2D3]">
+                      <FileText className="h-4 w-4 text-[#1A331E] shrink-0 mt-0.5" />
+                      <div>
+                        <span className="text-[11px] font-bold text-[#1A331E] block">Plan B: Educational Drip Queue</span>
+                        <p className="text-[10px] text-[#4A5D4E]">Automated 3-part email sequence scheduled instantly upon early lead capture.</p>
+                      </div>
+                    </div>
+
+                  </div>
+                </CardContent>
+              </Card>
+
+            </div>
+
+          </div>
+        )}
+
+        {/* TAB 3: ABOUT THE CLUB */}
+        {activeTab === "about" && (
           <div className="space-y-8 max-w-4xl mx-auto">
             
-            {/* Strategy Cover */}
+            {/* About Cover */}
             <div className="double-border bg-[#F9F8F0] p-12 text-center relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1.5 bg-[#1A331E]"></div>
-              <span className="text-xs uppercase tracking-widest text-[#C2B280] font-bold block mb-2">The Go-To-Market Blueprint</span>
+              <span className="text-xs uppercase tracking-widest text-[#C2B280] font-bold block mb-2">Travel Protection Club</span>
               <h2 className="font-serif-display text-3xl font-bold text-[#1A331E] tracking-wide mb-4">
-                The Golf Wedge Acquisition Strategy
+                The Heritage of Responsible Travel
               </h2>
               <p className="text-sm text-[#4A5D4E] max-w-xl mx-auto font-serif-body leading-relaxed">
-                How we bypass the psychological barrier of repatriation sales using a high-value, country-club-aligned golf wedge powered by ARMS relationship automation.
+                The Travel Protection Club provides comprehensive medical repatriation, crisis coordination, and planning tools to ensure elite travelers and their families are fully protected anywhere in the world.
               </p>
             </div>
 
-            {/* Strategic Pillars */}
+            {/* Core Pillars */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card className="border border-[#E6E2D3] bg-white">
                 <CardHeader>
                   <div className="h-10 w-10 bg-[#1A331E]/5 rounded-sm flex items-center justify-center border border-[#1A331E]/10 mb-2">
-                    <Smartphone className="h-5 w-5 text-[#1A331E]" />
+                    <ShieldCheck className="h-5 w-5 text-[#1A331E]" />
                   </div>
-                  <CardTitle className="text-base font-bold text-[#1A331E]">The Hook</CardTitle>
-                  <CardDescription className="text-xs text-[#C2B280] font-bold uppercase tracking-wider">Tactile Curiosity</CardDescription>
+                  <CardTitle className="text-base font-bold text-[#1A331E]">Elite Repatriation</CardTitle>
+                  <CardDescription className="text-xs text-[#C2B280] font-bold uppercase tracking-wider">Complete Protection</CardDescription>
                 </CardHeader>
                 <CardContent className="text-xs text-[#4A5D4E] space-y-2">
                   <p>
-                    A physical NFC-enabled poker chip is handed out at high-end golf events, tournaments, or pro-shops.
+                    Guaranteed, seamless transportation back to your local hospital in the event of a medical emergency away from home.
                   </p>
                   <p>
-                    <strong>Why it works:</strong> It creates immediate tactile curiosity and promises a safe, concrete $75 shipping voucher credit.
+                    <strong>Why it matters:</strong> Standard health and travel insurance rarely cover the specialized logistics and astronomical costs of medical transport.
                   </p>
                 </CardContent>
               </Card>
@@ -753,17 +943,17 @@ export default function Home() {
               <Card className="border border-[#E6E2D3] bg-white">
                 <CardHeader>
                   <div className="h-10 w-10 bg-[#1A331E]/5 rounded-sm flex items-center justify-center border border-[#1A331E]/10 mb-2">
-                    <HelpCircle className="h-5 w-5 text-[#1A331E]" />
+                    <Users className="h-5 w-5 text-[#1A331E]" />
                   </div>
-                  <CardTitle className="text-base font-bold text-[#1A331E]">The Story</CardTitle>
-                  <CardDescription className="text-xs text-[#C2B280] font-bold uppercase tracking-wider">The Planner's Pivot</CardDescription>
+                  <CardTitle className="text-base font-bold text-[#1A331E]">First-Call Coordination</CardTitle>
+                  <CardDescription className="text-xs text-[#C2B280] font-bold uppercase tracking-wider">One Dedicated Line</CardDescription>
                 </CardHeader>
                 <CardContent className="text-xs text-[#4A5D4E] space-y-2">
                   <p>
-                    A short, non-threatening quiz identifies the traveler's habits and introduces the concept of repatriation.
+                    A single emergency number that handles all coordination, logistics, and family support during a travel crisis.
                   </p>
                   <p>
-                    <strong>Why it works:</strong> "Your clubs deserve a way home. So do you." It moves the conversation from equipment to family protection gently.
+                    <strong>Why it matters:</strong> It spares your loved ones the agonizing burden of managing complex transport logistics and paperwork during a crisis.
                   </p>
                 </CardContent>
               </Card>
@@ -773,264 +963,23 @@ export default function Home() {
                   <div className="h-10 w-10 bg-[#1A331E]/5 rounded-sm flex items-center justify-center border border-[#1A331E]/10 mb-2">
                     <Award className="h-5 w-5 text-[#1A331E]" />
                   </div>
-                  <CardTitle className="text-base font-bold text-[#1A331E]">The Offer</CardTitle>
-                  <CardDescription className="text-xs text-[#C2B280] font-bold uppercase tracking-wider">The Value Bridge</CardDescription>
+                  <CardTitle className="text-base font-bold text-[#1A331E]">Plan-Ahead Tools</CardTitle>
+                  <CardDescription className="text-xs text-[#C2B280] font-bold uppercase tracking-wider">Peace of Mind</CardDescription>
                 </CardHeader>
                 <CardContent className="text-xs text-[#4A5D4E] space-y-2">
                   <p>
-                    A $150 annual membership that includes full repatriation protection and instantly activates the $75 voucher.
+                    Includes physical membership cards, custom travel luggage tags, and written family emergency instruction guides.
                   </p>
                   <p>
-                    <strong>Why it works:</strong> If they use the voucher, the effective net cost of the peace-of-mind membership is only $75.
+                    <strong>Why it matters:</strong> True security is not just about coverage; it's about having a clear, actionable plan in place before you ever leave home.
                   </p>
                 </CardContent>
               </Card>
-            </div>
-
-            {/* Psychological Breakdown Table */}
-            <div className="bg-[#F9F8F0] border border-[#E6E2D3] p-6 rounded-xs space-y-4">
-              <h3 className="font-serif-display text-lg font-bold text-[#1A331E] border-b border-[#E6E2D3] pb-2">
-                Funnel Psychology: Reducing Friction
-              </h3>
-              
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-[#E6E2D3] text-[#1A331E] font-bold">
-                      <th className="py-2 pr-4">Funnel Stage</th>
-                      <th className="py-2 px-4">Traditional Threat</th>
-                      <th className="py-2 px-4">The Golf Wedge Bridge</th>
-                      <th className="py-2 pl-4">Psychological Result</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#E6E2D3]/60 text-[#4A5D4E]">
-                    <tr>
-                      <td className="py-3 pr-4 font-bold text-[#1A331E]">1. First Contact</td>
-                      <td className="py-3 px-4">Selling "repatriation/death services" cold.</td>
-                      <td className="py-3 px-4">A premium NFC poker chip offering a $75 golf travel voucher.</td>
-                      <td className="py-3 pl-4">High curiosity, low threat, high-value alignment.</td>
-                    </tr>
-                    <tr>
-                      <td className="py-3 pr-4 font-bold text-[#1A331E]">2. Lead Capture</td>
-                      <td className="py-3 px-4">Demanding sensitive personal/health data.</td>
-                      <td className="py-3 px-4">Name and email to secure the reserved voucher code.</td>
-                      <td className="py-3 pl-4">High opt-in rate; secures the contact for Plan B retargeting.</td>
-                    </tr>
-                    <tr>
-                      <td className="py-3 pr-4 font-bold text-[#1A331E]">3. Education</td>
-                      <td className="py-3 px-4">Graphic descriptions of emergency costs.</td>
-                      <td className="py-3 px-4">A short quiz: "Your clubs have a way home. Do you?"</td>
-                      <td className="py-3 pl-4">Self-recognition; prospect identifies as a responsible planner.</td>
-                    </tr>
-                    <tr>
-                      <td className="py-3 pr-4 font-bold text-[#1A331E]">4. Conversion</td>
-                      <td className="py-3 px-4">A $150 pure protection cost with no immediate benefit.</td>
-                      <td className="py-3 px-4">A $150 membership that instantly unlocks the $75 voucher.</td>
-                      <td className="py-3 pl-4">Perceived net cost of $75; converts impulse into active protection.</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
             </div>
 
             {/* Strategic Quote */}
             <div className="border-l-4 border-[#C2B280] pl-6 py-2 italic text-[#1A331E] font-serif-body text-sm bg-[#F9F8F0]/50 rounded-r-xs">
-              "We are not trying to change how people think about death. We are leveraging how smart travelers already think about logistics, planning, and protecting what they value."
-            </div>
-
-          </div>
-        )}
-
-        {/* TAB 3: ARMS AUTOMATION ENGINE */}
-        {activeTab === "arms" && (
-          <div className="space-y-8 max-w-4xl mx-auto">
-            
-            <div className="double-border bg-[#F9F8F0] p-8">
-              <div className="flex items-center gap-3 mb-2">
-                <Database className="h-6 w-6 text-[#1A331E]" />
-                <h2 className="font-serif-display text-xl font-bold text-[#1A331E]">ARMS: The Relationship Engine</h2>
-              </div>
-              <p className="text-xs text-[#4A5D4E] font-serif-body">
-                ARMS is the white-label automation system that operates behind the scenes. It tracks attribution, manages contact segmentation, runs email/SMS drip sequences, recovers abandoned checkouts, and handles member onboarding and renewals.
-              </p>
-            </div>
-
-            {/* Automation Workflow Diagram */}
-            <div className="bg-white border border-[#E6E2D3] p-6 rounded-xs space-y-6">
-              <h3 className="font-serif-display text-base font-bold text-[#1A331E] text-center">
-                ARMS End-to-End Automation Blueprint
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 relative">
-                
-                {/* Step 1 */}
-                <div className="bg-[#F9F8F0] p-4 rounded-xs border border-[#E6E2D3] text-center relative z-10">
-                  <div className="h-8 w-8 bg-[#1A331E] rounded-full flex items-center justify-center text-[#C2B280] text-xs font-bold mx-auto mb-2">1</div>
-                  <span className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E] block">NFC Tap / Scan</span>
-                  <p className="text-[10px] text-[#4A5D4E] mt-1">
-                    Attributes lead source & registers campaign webhook.
-                  </p>
-                </div>
-
-                {/* Step 2 */}
-                <div className="bg-[#F9F8F0] p-4 rounded-xs border border-[#E6E2D3] text-center relative z-10">
-                  <div className="h-8 w-8 bg-[#1A331E] rounded-full flex items-center justify-center text-[#C2B280] text-xs font-bold mx-auto mb-2">2</div>
-                  <span className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E] block">Opt-In Capture</span>
-                  <p className="text-[10px] text-[#4A5D4E] mt-1">
-                    Secures contact info before price resistance.
-                  </p>
-                </div>
-
-                {/* Step 3 */}
-                <div className="bg-[#F9F8F0] p-4 rounded-xs border border-[#E6E2D3] text-center relative z-10">
-                  <div className="h-8 w-8 bg-[#1A331E] rounded-full flex items-center justify-center text-[#C2B280] text-xs font-bold mx-auto mb-2">3</div>
-                  <span className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E] block">Quiz Segment</span>
-                  <p className="text-[10px] text-[#4A5D4E] mt-1">
-                    Profiles traveler habits and planning mindset.
-                  </p>
-                </div>
-
-                {/* Step 4 */}
-                <div className="bg-[#F9F8F0] p-4 rounded-xs border border-[#E6E2D3] text-center relative z-10">
-                  <div className="h-8 w-8 bg-[#1A331E] rounded-full flex items-center justify-center text-[#C2B280] text-xs font-bold mx-auto mb-2">4</div>
-                  <span className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E] block">The Offer</span>
-                  <p className="text-[10px] text-[#4A5D4E] mt-1">
-                    Presents $150 membership with $75 voucher credit.
-                  </p>
-                </div>
-
-                {/* Step 5 */}
-                <div className="bg-[#1A331E] p-4 rounded-xs border border-[#C2B280] text-center text-white relative z-10">
-                  <div className="h-8 w-8 bg-[#C2B280] rounded-full flex items-center justify-center text-[#1A331E] text-xs font-bold mx-auto mb-2">5</div>
-                  <span className="text-[10px] uppercase tracking-wider font-bold text-[#C2B280] block">Plan B Nurture</span>
-                  <p className="text-[10px] text-[#E6E2D3] mt-1">
-                    If they hesitate, ARMS drip sequence educates.
-                  </p>
-                </div>
-
-              </div>
-            </div>
-
-            {/* Core ARMS Functions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="border border-[#E6E2D3] bg-white">
-                <CardHeader>
-                  <CardTitle className="text-sm font-bold text-[#1A331E] flex items-center gap-2">
-                    <UserCheck className="h-4 w-4 text-[#C2B280]" />
-                    Lead Capture & Segmentation
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-xs text-[#4A5D4E] space-y-2">
-                  <p>
-                    ARMS captures contact details early, ensuring we never lose a prospect who scans the chip.
-                  </p>
-                  <p>
-                    The quiz results are instantly mapped to custom contact fields, segmenting leads by travel frequency and preparedness. This allows highly personalized follow-up campaigns.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border border-[#E6E2D3] bg-white">
-                <CardHeader>
-                  <CardTitle className="text-sm font-bold text-[#1A331E] flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-[#C2B280]" />
-                    Abandoned Checkout Recovery
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-xs text-[#4A5D4E] space-y-2">
-                  <p>
-                    If a prospect completes the quiz but abandons the offer page, ARMS triggers an automated checkout recovery sequence.
-                  </p>
-                  <p>
-                    Within 15 minutes, the prospect receives a gentle email/SMS reminding them that their $75 voucher is reserved and expires shortly, maintaining urgency.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-
-          </div>
-        )}
-
-        {/* TAB 4: PILOT PROPOSAL */}
-        {activeTab === "pilot" && (
-          <div className="space-y-8 max-w-4xl mx-auto">
-            
-            <div className="double-border bg-[#F9F8F0] p-8 text-center">
-              <span className="text-xs uppercase tracking-widest text-[#C2B280] font-bold block mb-1">Proposed Next Steps</span>
-              <h2 className="font-serif-display text-2xl font-bold text-[#1A331E] mb-2">The Minimum Viable Pilot</h2>
-              <p className="text-xs text-[#4A5D4E] max-w-xl mx-auto font-serif-body">
-                Let's invite Andrew into a controlled, measurable pilot to prove the golf wedge conversion economics before scaling the program.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
-              {/* Pilot Scope */}
-              <Card className="border border-[#E6E2D3] bg-white">
-                <CardHeader>
-                  <CardTitle className="text-base font-bold text-[#1A331E]">Pilot Scope & Deliverables</CardTitle>
-                  <CardDescription className="text-xs text-[#4A5D4E]">What we build for the pilot test</CardDescription>
-                </CardHeader>
-                <CardContent className="text-xs text-[#4A5D4E] space-y-3">
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-[#C2B280] shrink-0 mt-0.5" />
-                    <span><strong>100 NFC Poker Chips:</strong> Branded physical chips to distribute at a local partner course or regional tournament.</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-[#C2B280] shrink-0 mt-0.5" />
-                    <span><strong>The Quiz Funnel:</strong> A fully-optimized, mobile-first quiz funnel landing page (identical to this demo).</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-[#C2B280] shrink-0 mt-0.5" />
-                    <span><strong>ARMS Automation:</strong> Lead capture, contact segmentation, checkout recovery, and Plan B email drips.</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-[#C2B280] shrink-0 mt-0.5" />
-                    <span><strong>Attribution Dashboard:</strong> A simple dashboard in ARMS to measure scan-to-opt-in and opt-in-to-membership conversion.</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Success Metrics */}
-              <Card className="border border-[#E6E2D3] bg-white">
-                <CardHeader>
-                  <CardTitle className="text-base font-bold text-[#1A331E]">Key Success Metrics</CardTitle>
-                  <CardDescription className="text-xs text-[#4A5D4E]">How we judge the pilot's performance</CardDescription>
-                </CardHeader>
-                <CardContent className="text-xs text-[#4A5D4E] space-y-3">
-                  <div className="flex items-start gap-2">
-                    <BarChart3 className="h-4 w-4 text-[#1A331E] shrink-0 mt-0.5" />
-                    <span><strong>Scan-to-Opt-In Rate (Target: 35%+):</strong> Proves that the $75 voucher is a compelling, non-threatening hook.</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Users className="h-4 w-4 text-[#1A331E] shrink-0 mt-0.5" />
-                    <span><strong>Opt-In-to-Membership Rate (Target: 10%+):</strong> Proves the clubs-to-care story successfully makes the emotional pivot.</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <DollarSign className="h-4 w-4 text-[#1A331E] shrink-0 mt-0.5" />
-                    <span><strong>Customer Acquisition Cost (CAC):</strong> Measuring the net cost of acquisition against lifetime membership value.</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <RefreshCw className="h-4 w-4 text-[#1A331E] shrink-0 mt-0.5" />
-                    <span><strong>Plan B Recovery Rate (Target: 15%+):</strong> Proves the value of early lead capture and automated drip campaigns.</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-            </div>
-
-            {/* Call to Action Box */}
-            <div className="bg-[#1A331E] text-white p-8 rounded-xs text-center border border-[#C2B280]">
-              <h3 className="font-serif-display text-lg font-bold text-[#C2B280] mb-2">Ready to Pitch Andrew Tomorrow?</h3>
-              <p className="text-xs text-[#E6E2D3] max-w-lg mx-auto mb-6">
-                Use the "Live Demo" tab during your meeting to show Andrew the seamless transition from physical chip to ARMS-powered CRM logging. It's the most powerful way to prove the strategy works.
-              </p>
-              <Button 
-                onClick={() => setActiveTab("demo")}
-                className="bg-[#C2B280] hover:bg-[#D4C391] text-[#1A331E] font-sans-ui text-xs uppercase tracking-wider font-bold px-6 py-4 rounded-sm"
-              >
-                Open Live Demo Sandbox <ArrowRight className="ml-1 h-4 w-4" />
-              </Button>
+              "First Call 75 is more than just travel protection. It's being responsible. The savings, if ever needed, are astronomical, but the peace of mind is priceless."
             </div>
 
           </div>
@@ -1042,10 +991,10 @@ export default function Home() {
       <footer className="border-t border-[#E6E2D3] bg-[#F9F8F0] py-6 px-6 text-center text-xs text-[#4A5D4E]">
         <div className="container">
           <p className="font-sans-ui">
-            &copy; 2026 Global 360 & ARMS Reach. Confidential Pitch Materials.
+            &copy; 2026 Global 360 & ARMS. All rights reserved.
           </p>
-          <p className="text-[10px] text-[#C2B280] mt-1 font-semibold">
-            NEVER REFER TO ARMS BY ANY OTHER NAME. POWERED BY AUTOMATED RELATIONSHIP MANAGEMENT SYSTEM.
+          <p className="text-[10px] text-[#C2B280] mt-1 font-semibold uppercase tracking-wider">
+            Powered by Automated Relationship Management System
           </p>
         </div>
       </footer>
