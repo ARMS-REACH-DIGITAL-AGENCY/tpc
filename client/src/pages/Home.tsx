@@ -146,17 +146,17 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#1C2B21] font-sans antialiased flex flex-col justify-between overflow-x-hidden py-2 px-4">
+    <div className="min-h-screen bg-[#FDFBF7] text-[#1C2B21] font-sans antialiased flex flex-col justify-between overflow-x-hidden py-1 px-4">
       {/* Main Content Area - Centered, Tightened Spacing, Warm Sand Aesthetics */}
-      <main className="flex-1 max-w-md mx-auto w-full flex flex-col justify-center my-auto space-y-3">
+      <main className="flex-1 max-w-md mx-auto w-full flex flex-col justify-center my-auto space-y-2">
         {step === "OPT_IN" && (
-          <div className="space-y-3 w-full animate-fade-in">
+          <div className="space-y-2 w-full animate-fade-in">
             {/* Pure, Frictionless Opt-In Form Card - Sharp Corners, Rich Cream Background */}
             <Card className="border border-[#E8E4DC] shadow-[0_8px_30px_rgba(28,43,33,0.02)] bg-white rounded-none">
               <CardContent className="p-4 md:p-5 space-y-3">
                 <div className="text-center space-y-1.5">
                   <h1 className="text-base md:text-lg font-serif font-bold tracking-tight text-[#1C2B21] leading-snug">
-                    The next time your precious clubs need to get home safely... think of us!
+                    The next time your precious clubs need to get home safely... please think of us!
                   </h1>
                   <div className="h-[1px] w-12 bg-[#E5C158] mx-auto" />
                 </div>
@@ -220,40 +220,28 @@ export default function Home() {
 
             {/* Bottom Section: Grouped Co-branded Logos & Elegant Footnote */}
             <div className="space-y-2 pt-1">
-              {/* Row of Logos - SIGNIFICANTLY ENLARGED */}
-              <div className="flex items-center justify-center gap-8 md:gap-10 opacity-95">
-                {/* Logo 1: TPC */}
-                <div className="flex items-center gap-1.5">
-                  <Shield className="w-5 h-5 text-[#107C41] stroke-[2.5]" />
-                  <span className="text-[11px] font-extrabold tracking-widest text-[#1C2B21] uppercase">
-                    TPC
-                  </span>
-                </div>
-
-                {/* Divider */}
-                <div className="h-4 w-[1px] bg-[#E8E4DC]" />
-
-                {/* Logo 2: Ship Sticks */}
+              {/* Row of Logos - EXACTLY MATCHING USER MOCKUP SIZES */}
+              <div className="flex items-center justify-center gap-4 md:gap-6 opacity-100">
+                {/* Logo 1: High-Res TPC Shield */}
                 <img 
-                  src="/manus-storage/shipsticks_logo_cd6c897a.png" 
-                  alt="Ship Sticks" 
-                  className="h-7 md:h-8 object-contain"
+                  src="/manus-storage/57885_120b932a.png" 
+                  alt="Travel Protection Club" 
+                  className="h-14 md:h-16 object-contain"
                 />
 
-                {/* Divider */}
-                <div className="h-4 w-[1px] bg-[#E8E4DC]" />
+                {/* Logo 2: Dark Ship Sticks Banner */}
+                <img 
+                  src="/manus-storage/cropped_shipsticks_dark_9caa446b.png" 
+                  alt="Ship Sticks" 
+                  className="h-12 md:h-14 object-contain"
+                />
 
-                {/* Logo 3: ASB */}
-                <div className="flex items-center gap-1.5">
-                  <img 
-                    src="/manus-storage/ASB_logo_circle_37213318.png" 
-                    alt="ASB Logo" 
-                    className="h-7 w-7 md:h-8 md:w-8 object-contain rounded-full"
-                  />
-                  <span className="text-[11px] font-extrabold tracking-widest text-[#1C2B21] uppercase">
-                    ASB
-                  </span>
-                </div>
+                {/* Logo 3: Circular ASB Logo */}
+                <img 
+                  src="/manus-storage/cropped_asb_dark_f202b5ec.png" 
+                  alt="ASB Logo" 
+                  className="h-12 w-12 md:h-14 md:w-14 object-contain rounded-full"
+                />
               </div>
 
               {/* Text Footnote */}
