@@ -140,11 +140,15 @@ export default function Home() {
             className="h-7 object-contain"
           />
 
-          {/* Logo 3: Partner Logo Placeholder */}
-          <div className="flex items-center gap-1 text-[#A4B3A7] border border-dashed border-[#E8E4DC] px-2 py-1 rounded bg-[#FAF8F5]">
-            <Trophy className="w-3.5 h-3.5" />
-            <span className="text-[8px] font-bold tracking-wider uppercase">
-              Host Partner
+          {/* Logo 3: Partner Logo (American Solutions for Business) */}
+          <div className="flex items-center gap-1.5">
+            <img 
+              src="/manus-storage/ASB_logo_circle_f01132c3.png" 
+              alt="ASB Logo" 
+              className="h-7 w-7 object-contain rounded-full"
+            />
+            <span className="text-[8px] font-bold tracking-wider uppercase text-[#5C6B5E] hidden sm:inline-block">
+              ASB
             </span>
           </div>
         </div>
