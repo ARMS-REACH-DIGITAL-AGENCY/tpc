@@ -276,14 +276,12 @@ export default function Home() {
                   className="h-16 md:h-20 object-contain shrink-0"
                 />
 
-                {/* Logo 2: Dark Ship Sticks Banner (Aggressively cropped to completely remove 'COMPLEMENT OF' text) */}
-                <div className="h-10 md:h-13 overflow-hidden shrink-0 flex items-center justify-center">
-                  <img 
-                    src="/manus-storage/cropped_shipsticks_dark_9caa446b.png" 
-                    alt="Ship Sticks" 
-                    className="h-[150%] object-contain origin-top translate-y-[-12%]"
-                  />
-                </div>
+                {/* Logo 2: Clean Ship Sticks Banner (Physically cropped image, no text) */}
+                <img 
+                  src="/manus-storage/shipsticks_logo_clean_4636b04e.png" 
+                  alt="Ship Sticks" 
+                  className="h-10 md:h-13 object-contain shrink-0"
+                />
 
                 {/* Logo 3: Circular ASB Logo (Larger) */}
                 <div className="h-13 w-13 md:h-16 md:w-16 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-transparent">
@@ -451,13 +449,11 @@ export default function Home() {
                   alt="Travel Protection Club" 
                   className="h-16 md:h-20 object-contain shrink-0"
                 />
-                <div className="h-10 md:h-13 overflow-hidden shrink-0 flex items-center justify-center">
-                  <img 
-                    src="/manus-storage/cropped_shipsticks_dark_9caa446b.png" 
-                    alt="Ship Sticks" 
-                    className="h-[150%] object-contain origin-top translate-y-[-12%]"
-                  />
-                </div>
+                <img 
+                  src="/manus-storage/shipsticks_logo_clean_4636b04e.png" 
+                  alt="Ship Sticks" 
+                  className="h-10 md:h-13 object-contain shrink-0"
+                />
                 <div className="h-13 w-13 md:h-16 md:w-16 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-transparent">
                   <img 
                     src="/manus-storage/cropped_asb_dark_f202b5ec.png" 
@@ -713,13 +709,11 @@ export default function Home() {
                   alt="Travel Protection Club" 
                   className="h-16 md:h-20 object-contain shrink-0"
                 />
-                <div className="h-10 md:h-13 overflow-hidden shrink-0 flex items-center justify-center">
-                  <img 
-                    src="/manus-storage/cropped_shipsticks_dark_9caa446b.png" 
-                    alt="Ship Sticks" 
-                    className="h-[150%] object-contain origin-top translate-y-[-12%]"
-                  />
-                </div>
+                <img 
+                  src="/manus-storage/shipsticks_logo_clean_4636b04e.png" 
+                  alt="Ship Sticks" 
+                  className="h-10 md:h-13 object-contain shrink-0"
+                />
                 <div className="h-13 w-13 md:h-16 md:w-16 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-transparent">
                   <img 
                     src="/manus-storage/cropped_asb_dark_f202b5ec.png" 
