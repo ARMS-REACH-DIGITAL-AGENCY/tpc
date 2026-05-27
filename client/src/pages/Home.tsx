@@ -146,22 +146,22 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#1C2B21] font-sans antialiased flex flex-col justify-between overflow-x-hidden py-4 px-4">
+    <div className="min-h-screen bg-[#FDFBF7] text-[#1C2B21] font-sans antialiased flex flex-col justify-between overflow-x-hidden py-2 px-4">
       {/* Main Content Area - Centered, Tightened Spacing, Warm Sand Aesthetics */}
-      <main className="flex-1 max-w-md mx-auto w-full flex flex-col justify-center my-auto space-y-4">
+      <main className="flex-1 max-w-md mx-auto w-full flex flex-col justify-center my-auto space-y-3">
         {step === "OPT_IN" && (
-          <div className="space-y-4 w-full animate-fade-in">
+          <div className="space-y-3 w-full animate-fade-in">
             {/* Pure, Frictionless Opt-In Form Card - Sharp Corners, Rich Cream Background */}
             <Card className="border border-[#E8E4DC] shadow-[0_8px_30px_rgba(28,43,33,0.02)] bg-white rounded-none">
-              <CardContent className="p-5 md:p-6 space-y-4">
-                <div className="text-center space-y-2">
-                  <h1 className="text-lg md:text-xl font-serif font-bold tracking-tight text-[#1C2B21] leading-snug">
+              <CardContent className="p-4 md:p-5 space-y-3">
+                <div className="text-center space-y-1.5">
+                  <h1 className="text-base md:text-lg font-serif font-bold tracking-tight text-[#1C2B21] leading-snug">
                     The next time your precious clubs need to get home safely... think of us!
                   </h1>
                   <div className="h-[1px] w-12 bg-[#E5C158] mx-auto" />
                 </div>
 
-                <form onSubmit={handleOptInSubmit} className="space-y-3.5">
+                <form onSubmit={handleOptInSubmit} className="space-y-3">
                   <div className="space-y-1">
                     <Label htmlFor="name" className="text-[10px] font-bold text-[#5C6B5E] tracking-wider uppercase">
                       Full Name
@@ -209,7 +209,7 @@ export default function Home() {
                   <Button 
                     type="submit" 
                     disabled={isSubmitting}
-                    className="w-full min-h-11 py-2.5 px-4 bg-[#107C41] hover:bg-[#0C6233] active:scale-[0.98] transition-all text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md flex items-center justify-center gap-2 mt-2 cursor-pointer whitespace-normal text-center leading-normal"
+                    className="w-full min-h-11 py-2 px-4 bg-[#107C41] hover:bg-[#0C6233] active:scale-[0.98] transition-all text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md flex items-center justify-center gap-2 mt-1 cursor-pointer whitespace-normal text-center leading-normal"
                   >
                     <span>{isSubmitting ? "Securing..." : "ACTIVATE YOUR $75 SHIP STICKS REBATE NOW!"}</span>
                     <ArrowRight className="w-3.5 h-3.5 shrink-0" />
@@ -219,38 +219,38 @@ export default function Home() {
             </Card>
 
             {/* Bottom Section: Grouped Co-branded Logos & Elegant Footnote */}
-            <div className="space-y-3 pt-1">
-              {/* Row of Logos */}
-              <div className="flex items-center justify-center gap-6 md:gap-8 opacity-80">
+            <div className="space-y-2 pt-1">
+              {/* Row of Logos - SIGNIFICANTLY ENLARGED */}
+              <div className="flex items-center justify-center gap-8 md:gap-10 opacity-95">
                 {/* Logo 1: TPC */}
-                <div className="flex items-center gap-1">
-                  <Shield className="w-4 h-4 text-[#107C41] stroke-[2]" />
-                  <span className="text-[9px] font-bold tracking-widest text-[#1C2B21] uppercase">
+                <div className="flex items-center gap-1.5">
+                  <Shield className="w-5 h-5 text-[#107C41] stroke-[2.5]" />
+                  <span className="text-[11px] font-extrabold tracking-widest text-[#1C2B21] uppercase">
                     TPC
                   </span>
                 </div>
 
                 {/* Divider */}
-                <div className="h-3 w-[1px] bg-[#E8E4DC]" />
+                <div className="h-4 w-[1px] bg-[#E8E4DC]" />
 
                 {/* Logo 2: Ship Sticks */}
                 <img 
                   src="/manus-storage/shipsticks_logo_cd6c897a.png" 
                   alt="Ship Sticks" 
-                  className="h-5 object-contain"
+                  className="h-7 md:h-8 object-contain"
                 />
 
                 {/* Divider */}
-                <div className="h-3 w-[1px] bg-[#E8E4DC]" />
+                <div className="h-4 w-[1px] bg-[#E8E4DC]" />
 
                 {/* Logo 3: ASB */}
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   <img 
                     src="/manus-storage/ASB_logo_circle_37213318.png" 
                     alt="ASB Logo" 
-                    className="h-5 w-5 object-contain rounded-full"
+                    className="h-7 w-7 md:h-8 md:w-8 object-contain rounded-full"
                   />
-                  <span className="text-[9px] font-bold tracking-widest text-[#1C2B21] uppercase">
+                  <span className="text-[11px] font-extrabold tracking-widest text-[#1C2B21] uppercase">
                     ASB
                   </span>
                 </div>
