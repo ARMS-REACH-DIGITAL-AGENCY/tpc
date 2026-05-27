@@ -349,25 +349,24 @@ export default function Home() {
           <div className="w-full space-y-2 animate-fade-in">
             {/* Pure, borderless, warm-sand offer screen matching the landing page look and feel */}
             <Card className="border-0 shadow-none bg-transparent rounded-none">
-              <CardContent className="p-0 space-y-2">
+              <CardContent className="p-0 space-y-2.5">
                 {/* THE EMOTIONAL PIVOT HEADLINE - BOLD SANS-SERIF TYPOGRAPHY */}
-                <div className="text-center space-y-1">
+                <div className="text-center space-y-1.5">
                   <h1 className="text-xl md:text-2xl font-sans font-black tracking-tight text-black leading-snug">
-                    Your clubs deserve a way home. <br />
-                    So does your family.
+                    Good job — you now have a plan to get your clubs home safely.
                   </h1>
                   <div className="h-[2px] w-12 bg-[#E5C158] mx-auto my-1" />
                   
                   {/* EMOTIONAL TRANSFORMATIONAL MESSAGE */}
                   <p className="text-[10px] md:text-xs text-[#3A4A3D] font-bold max-w-sm mx-auto leading-normal px-1">
-                    Golfers plan how their clubs get home. First Call 75 helps your family know who to call first if something happens more than 75 miles from home.
+                    Travel Protection Club Members also have a plan that helps their family members know who to call first and what steps to take if something tragic happens to them more than 75 miles away from home.
                   </p>
                 </div>
 
                 {/* Clean, borderless value summary matching landing page styling */}
                 <div className="bg-[#FAF8F5] border border-[#E8E4DC] rounded-none overflow-hidden max-w-sm mx-auto">
                   <div className="bg-[#FAF8F5] border-b border-[#E8E4DC] p-2 text-[9px] font-bold text-[#5C6B5E] tracking-wider uppercase text-center">
-                    Your First-Year Offer
+                    Your First-Year Travel Protection Club Offer
                   </div>
                   <div className="divide-y divide-[#E8E4DC] text-[11px]">
                     <div className="grid grid-cols-2 p-2 text-[#1C2B21]">
@@ -385,10 +384,25 @@ export default function Home() {
                   </div>
                 </div>
 
+                {/* CTA Area */}
+                <div className="space-y-1.5 pt-0.5 max-w-sm mx-auto">
+                  <Button 
+                    onClick={() => setDemoStep("STRIPE_CHECKOUT")}
+                    className="w-full min-h-10 py-2 px-3 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-[10px] tracking-wider uppercase rounded-none shadow-sm flex items-center justify-center gap-1.5 cursor-pointer whitespace-normal text-center leading-normal active:scale-[0.97] transition-all"
+                  >
+                    <span>ACTIVATE MY MEMBERSHIP + $75 SHIPSTICKS CREDIT</span>
+                    <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+                  </Button>
+                  <p className="text-[9px] text-[#5C6B5E] text-center leading-normal max-w-sm mx-auto px-1">
+                    By activating your Travel Protection Club Membership, you unlock a $75 ShipSticks rebate credit toward a qualifying shipment. <br />
+                    <span className="text-[8px] text-[#A4B3A7] block mt-0.5">Effective first-year cost assumes rebate redemption. Terms apply.</span>
+                  </p>
+                </div>
+
                 {/* EMOTIONALLY TRANSFORMED BENEFITS LIST */}
                 <div className="space-y-1.5 pt-1 max-w-sm mx-auto">
                   <h3 className="text-[9px] font-bold text-[#5C6B5E] uppercase tracking-widest text-center">
-                    YOUR FAMILY'S FIRST-CALL PROTECTION PLAN:
+                    YOUR FAMILY’S FIRST-CALL PROTECTION PLAN INCLUDES:
                   </h3>
                   <div className="space-y-1.5">
                     <div className="flex gap-2 items-start bg-[#FAF8F5] p-2 border border-[#E8E4DC] rounded-none">
@@ -398,7 +412,7 @@ export default function Home() {
                       <div>
                         <h4 className="text-[10px] font-bold text-black uppercase tracking-wider">Away-From-Home Return Coordination</h4>
                         <p className="text-[9px] text-[#5C6B5E] leading-normal mt-0.5">
-                          If a covered member passes away more than 75 miles from home, the membership helps coordinate transportation back to the designated receiving funeral home, subject to plan terms.
+                          If a covered member passes away more than 75 miles from home, the membership helps coordinate transportation to the designated receiving funeral home, subject to plan terms and conditions.
                         </p>
                       </div>
                     </div>
@@ -409,7 +423,7 @@ export default function Home() {
                       <div>
                         <h4 className="text-[10px] font-bold text-black uppercase tracking-wider">One First Call for Your Family</h4>
                         <p className="text-[9px] text-[#5C6B5E] leading-normal mt-0.5">
-                          Your family receives one dedicated number to call first before making arrangements. That helps reduce confusion and gives them a clear process during a difficult moment.
+                          Your family receives one dedicated number to call before making arrangements, helping reduce confusion and providing a clear process during a difficult time.
                         </p>
                       </div>
                     </div>
@@ -420,53 +434,31 @@ export default function Home() {
                       <div>
                         <h4 className="text-[10px] font-bold text-black uppercase tracking-wider">$75 Golf Club Shipping Credit</h4>
                         <p className="text-[9px] text-[#5C6B5E] leading-normal mt-0.5">
-                          After membership activation, you receive a $75 credit toward a qualifying ShipSticks golf club shipment, subject to program terms.
+                          After membership activation, you receive a $75 rebate credit toward a qualifying ShipSticks golf club shipment, subject to program terms.
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                {/* Small note under table */}
-                <p className="text-[9px] text-[#5C6B5E] text-center leading-normal max-w-sm mx-auto px-1 pt-0.5">
-                  You pay $150 today. Your $75 golf club shipping credit is issued after paid membership activation and may be used toward a qualifying shipment. Effective first-year cost assumes the credit is redeemed. Terms apply.
-                </p>
-
-                {/* CTA Area */}
-                <div className="space-y-1.5 pt-1 max-w-sm mx-auto">
-                  <p className="text-[9px] text-[#5C6B5E] text-center leading-normal">
-                    By continuing, you can activate your Travel Protection Club membership and unlock your $75 golf club shipping credit.
-                  </p>
-                  <Button 
-                    onClick={() => setDemoStep("STRIPE_CHECKOUT")}
-                    className="w-full min-h-10 py-2 px-3 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-[10px] tracking-wider uppercase rounded-none shadow-sm flex items-center justify-center gap-1.5 cursor-pointer whitespace-normal text-center leading-normal"
-                  >
-                    <span>Activate My Membership + $75 Shipping Credit</span>
-                    <ChevronRight className="w-3.5 h-3.5 shrink-0" />
-                  </Button>
-                  <p className="text-[8px] text-[#A4B3A7] text-center italic">
-                    You will review membership details and terms before final purchase.
-                  </p>
-                </div>
               </CardContent>
             </Card>
 
             {/* Re-use bottom logos and footer on the offer screen to keep brand cohesion */}
-            <div className="space-y-1.5 pt-1">
-              <div className="flex items-center justify-center gap-2 md:gap-4 px-2">
+            <div className="space-y-1 pt-1.5">
+              <div className="flex items-center justify-center gap-3 md:gap-5 px-2">
                 <img 
                   src="/manus-storage/57885_120b932a.png" 
                   alt="Travel Protection Club" 
-                  className="h-10 md:h-13 object-contain shrink-0"
+                  className="h-16 md:h-20 object-contain shrink-0"
                 />
-                <div className="h-7 md:h-10 overflow-hidden shrink-0 flex items-center justify-center">
+                <div className="h-10 md:h-13 overflow-hidden shrink-0 flex items-center justify-center">
                   <img 
                     src="/manus-storage/cropped_shipsticks_dark_9caa446b.png" 
                     alt="Ship Sticks" 
-                    className="h-[125%] object-contain scale-[1.0] origin-top translate-y-[-5%]"
+                    className="h-[150%] object-contain origin-top translate-y-[-12%]"
                   />
                 </div>
-                <div className="h-9 w-9 md:h-11 md:w-11 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-transparent">
+                <div className="h-13 w-13 md:h-16 md:w-16 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-transparent">
                   <img 
                     src="/manus-storage/cropped_asb_dark_f202b5ec.png" 
                     alt="ASB Logo" 
@@ -475,10 +467,10 @@ export default function Home() {
                 </div>
               </div>
               <div className="text-center px-4">
-                <span className="text-[9px] text-[#5C6B5E] font-bold tracking-wider uppercase block leading-relaxed">
+                <span className="text-[9px] md:text-[10px] text-[#5C6B5E] font-bold tracking-wider uppercase block leading-relaxed">
                   Compliments of <br />
                   THE TRAVEL PROTECTION CLUB & ASB ATHLETICS <br />
-                  <span className="text-[#A4B3A7] font-medium text-[8px]">in conjunction with SHIP STICKS</span>
+                  <span className="text-[#A4B3A7] font-medium text-[8px] md:text-[9px]">in conjunction with SHIP STICKS</span>
                 </span>
               </div>
             </div>
