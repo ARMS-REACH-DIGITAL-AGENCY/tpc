@@ -128,65 +128,37 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-[#1C2B21] font-sans antialiased flex flex-col justify-between overflow-x-hidden">
-      {/* 1. Header with Official Ship Sticks Logo */}
-      <header className="border-b border-[#E8E4DC] bg-white py-2 px-4 sticky top-0 z-50 shadow-xs">
-        <div className="max-w-xl mx-auto flex items-center justify-between">
+      {/* 1. Header with ONLY Official Ship Sticks Logo */}
+      <header className="border-b border-[#E8E4DC] bg-white py-3 px-4 sticky top-0 z-50 shadow-xs">
+        <div className="max-w-xl mx-auto flex items-center justify-center">
           <img 
             src="https://d2xsxph8kpxj0f.cloudfront.net/310519663368558979/TncsUA3wJWw3btME2gSgvv/shipsticks_logo-EsmX8YxH468XGfG9G4e7Y7.png" 
             alt="Ship Sticks Logo" 
-            className="h-8 object-contain"
+            className="h-9 object-contain"
           />
-          <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#107C41] bg-[#EAF7EE] px-2.5 py-1 rounded-full uppercase tracking-wider">
-            <Shield className="w-3 h-3" />
-            Invitation Benefit
-          </div>
         </div>
       </header>
 
-      {/* 2. Main Content Area - Highly Optimized for Mobile (Zero Scrolling) */}
-      <main className="flex-1 py-4 px-4 max-w-xl mx-auto w-full flex flex-col justify-center">
+      {/* 2. Main Content Area - Extremely Clean, Minimalist, No Scrolling */}
+      <main className="flex-1 py-6 px-4 max-w-xl mx-auto w-full flex flex-col justify-center">
         {step === "OPT_IN" && (
           <div className="space-y-4 w-full animate-fade-in">
-            {/* Elegant Golf Course Hero Banner Image - Shrunk on Mobile */}
-            <div className="rounded-lg overflow-hidden shadow-sm border border-[#E8E4DC] relative h-28 md:h-36">
-              <img 
-                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663368558979/TncsUA3wJWw3btME2gSgvv/luxury_golf_bg-A89ErcbS3N7Dbe9S79e8E8.png" 
-                alt="Luxury Golf Course" 
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-4">
-                <div>
-                  <span className="text-[9px] font-bold text-[#E5C158] uppercase tracking-widest bg-black/40 px-2 py-0.5 rounded-sm">
-                    Exclusive Golf Invitation
-                  </span>
-                  <h1 className="text-sm md:text-lg font-serif font-bold text-white mt-1">
-                    Activate Your $75 Golf Travel Voucher
-                  </h1>
-                </div>
-              </div>
-            </div>
-
-            {/* Clean, Frictionless Opt-In Form Card */}
+            {/* Pure, Frictionless Opt-In Form Card */}
             <Card className="border border-[#E8E4DC] shadow-md bg-white overflow-hidden rounded-lg">
-              <CardContent className="p-4 md:p-6 space-y-4">
-                <div className="bg-[#FAF8F5] border border-[#E8E4DC] rounded-md p-3 flex items-start gap-2.5">
+              <CardContent className="p-5 space-y-4">
+                <div className="bg-[#FAF8F5] border border-[#E8E4DC] rounded-md p-3.5 flex items-start gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-[#107C41] shrink-0 mt-0.5" />
                   <div>
-                    <div className="flex items-center gap-1.5">
-                      <h3 className="text-[11px] font-bold text-[#1C2B21] uppercase tracking-wider">
-                        Instant Voucher Reservation
-                      </h3>
-                      <span className="text-[9px] font-semibold text-[#5C6B5E] bg-[#E8E4DC]/40 px-1.5 py-0.5 rounded-sm">
-                        via TPC
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-[#5C6B5E] mt-0.5 leading-relaxed">
-                      Secure your credit code first. Provided courtesy of the **Travel Protection Club**. Apply this $75 credit directly to your next golf club shipment.
+                    <h3 className="text-[11px] font-bold text-[#1C2B21] uppercase tracking-wider">
+                      Instant Voucher Reservation
+                    </h3>
+                    <p className="text-[10px] text-[#5C6B5E] mt-1 leading-relaxed">
+                      Secure your credit code first. Once registered, you can apply this $75 credit directly to your next golf club shipment.
                     </p>
                   </div>
                 </div>
 
-                <form onSubmit={handleOptInSubmit} className="space-y-3">
+                <form onSubmit={handleOptInSubmit} className="space-y-3.5">
                   <div className="space-y-1">
                     <Label htmlFor="name" className="text-[9px] font-bold text-[#5C6B5E] tracking-wider uppercase">
                       Full Name
@@ -242,6 +214,13 @@ export default function Home() {
                 </form>
               </CardContent>
             </Card>
+
+            {/* Clean, Modern TPC Footnote */}
+            <div className="text-center">
+              <span className="text-[9px] text-[#A4B3A7] font-medium tracking-wider uppercase">
+                An exclusive offer from the Travel Protection Club
+              </span>
+            </div>
           </div>
         )}
 
