@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, ChevronRight, Lock, ArrowRight, Shield, Check } from "lucide-react";
+import { CheckCircle2, ChevronRight, Lock, ArrowRight, Shield, Check, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 type DemoStep = "OPT_IN" | "QUIZ_INTRO" | "QUIZ" | "OFFER" | "STRIPE_CHECKOUT" | "SUCCESS";
@@ -23,7 +23,7 @@ export default function Home() {
   const [quizAnswers, setQuizAnswers] = useState<QuizAnswer[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [webhookUrl, setWebhookUrl] = useState(() => {
+  const [webhookUrl] = useState(() => {
     return localStorage.getItem("arms_webhook_url") || "";
   });
   const [stripeData, setStripeData] = useState({
@@ -78,12 +78,12 @@ export default function Home() {
             tag: "Golf_Wedge_Launch"
           })
         });
-        toast.success("Live contact pushed to YAT?STATS!");
+        toast.success("Voucher registered successfully!");
       } catch (err) {
         console.error("Webhook submit failed:", err);
       }
     } else {
-      toast.success("Contact captured in demo engine!");
+      toast.success("Voucher registered successfully!");
     }
 
     setIsSubmitting(false);
@@ -120,22 +120,33 @@ export default function Home() {
     toast.info("Demo card details pre-filled.");
   };
 
-  const saveWebhook = (url: string) => {
-    setWebhookUrl(url);
-    localStorage.setItem("arms_webhook_url", url);
-    toast.success("YAT?STATS Webhook URL updated!");
-  };
-
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-[#1C2B21] font-sans antialiased flex flex-col justify-between overflow-x-hidden">
-      {/* 1. Header with ONLY Official Ship Sticks Logo */}
+      {/* 1. Elegant Header with Three Logos (TPC, Ship Sticks, Partner) */}
       <header className="border-b border-[#E8E4DC] bg-white py-3 px-4 sticky top-0 z-50 shadow-xs">
-        <div className="max-w-xl mx-auto flex items-center justify-center">
+        <div className="max-w-xl mx-auto flex items-center justify-between">
+          {/* Logo 1: Travel Protection Club */}
+          <div className="flex items-center gap-1">
+            <Shield className="w-5 h-5 text-[#107C41]" />
+            <span className="text-[9px] font-extrabold text-[#1C2B21] tracking-wider uppercase leading-none">
+              TPC
+            </span>
+          </div>
+
+          {/* Logo 2: Ship Sticks (Center) */}
           <img 
             src="https://d2xsxph8kpxj0f.cloudfront.net/310519663368558979/TncsUA3wJWw3btME2gSgvv/shipsticks_logo-EsmX8YxH468XGfG9G4e7Y7.png" 
             alt="Ship Sticks Logo" 
-            className="h-9 object-contain"
+            className="h-7 object-contain"
           />
+
+          {/* Logo 3: Partner Logo Placeholder */}
+          <div className="flex items-center gap-1 text-[#A4B3A7] border border-dashed border-[#E8E4DC] px-2 py-1 rounded bg-[#FAF8F5]">
+            <Trophy className="w-3.5 h-3.5" />
+            <span className="text-[8px] font-bold tracking-wider uppercase">
+              Host Partner
+            </span>
+          </div>
         </div>
       </header>
 
@@ -524,29 +535,7 @@ export default function Home() {
         )}
       </main>
 
-      {/* 3. Collapsible YAT?STATS Integration Drawer */}
-      <footer className="bg-white border-t border-[#E8E4DC] p-3">
-        <div className="max-w-xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-[10px] text-[#5C6B5E]">
-            <span className="font-bold text-[#1C2B21]">Demo Controls:</span>
-            <span>Step: <strong className="text-[#107C41]">{step}</strong></span>
-          </div>
-
-          <div className="w-full md:w-auto flex items-center gap-2">
-            <Label htmlFor="webhook-url" className="text-[9px] font-bold text-[#5C6B5E] uppercase tracking-wider shrink-0">
-              YAT?STATS Webhook:
-            </Label>
-            <Input
-              id="webhook-url"
-              type="text"
-              placeholder="Paste Inbound Webhook URL here..."
-              value={webhookUrl}
-              onChange={(e) => saveWebhook(e.target.value)}
-              className="h-7 text-[10px] border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] w-full md:w-48 rounded-sm"
-            />
-          </div>
-        </div>
-      </footer>
+      {/* No footer or visible controls—100% clean consumer experience */}
     </div>
   );
 }
