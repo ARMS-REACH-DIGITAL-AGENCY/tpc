@@ -93,10 +93,14 @@ export default function Home() {
     setCrmLogs(prev => [newEntry, ...prev]);
   };
 
-  // Scroll to bottom of logs
+  // Scroll to bottom of logs (CONTAINED INSIDE THE CONSOLE BOX ONLY - NO WINDOW JUMPING)
   useEffect(() => {
     if (logsEndRef.current) {
-      logsEndRef.current.scrollIntoView({ behavior: "smooth" });
+      // Use parent container scroll instead of scrollIntoView to prevent window jumping
+      const parent = logsEndRef.current.parentElement;
+      if (parent) {
+        parent.scrollTop = parent.scrollHeight;
+      }
     }
   }, [crmLogs]);
 
@@ -564,7 +568,7 @@ export default function Home() {
                           </div>
                           <div className="flex gap-2">
                             <Sparkles className="h-4 w-4 text-[#C2B280] shrink-0 mt-0.5" />
-                            <span><strong>Plan-Ahead Checklist:</strong> Instantly receive your written family instruction guide and emergency wallet card.</span>
+                            <span><strong>Plan-Ahead Checklist:</strong> Instantly receive your written family emergency instruction guide and emergency wallet card.</span>
                           </div>
                         </div>
 
@@ -774,7 +778,7 @@ export default function Home() {
                             </div>
                             <div className="border-l-2 border-[#E6E2D3] pl-2 py-0.5">
                               <p className="font-bold text-[#1A331E]/70">Message 3 (Scheduled): "The true cost of being unprepared"</p>
-                              <p className="text-[9px]">Educational resource on travel safety and repatriation coordination.</p>
+                              <p className="text-[#9px]">Educational resource on travel safety and repatriation coordination.</p>
                             </div>
                           </div>
                         </div>
@@ -860,9 +864,8 @@ export default function Home() {
                   </div>
                 </CardHeader>
                 <CardContent className="p-4">
-                  <div className="h-[320px] overflow-y-auto space-y-3 text-[11px] leading-relaxed pr-1 flex flex-col-reverse">
-                    <div ref={logsEndRef} />
-                    {crmLogs.map((log) => (
+                  <div className="h-[320px] overflow-y-auto space-y-3 text-[11px] leading-relaxed pr-1 flex flex-col">
+                    {crmLogs.slice().reverse().map((log) => (
                       <div key={log.id} className="border-b border-[#2D4A32]/30 pb-2 animate-fadeIn">
                         <div className="flex items-center justify-between text-[10px] text-[#83B085] mb-0.5">
                           <span>[{log.timestamp}]</span>
@@ -883,6 +886,7 @@ export default function Home() {
                         </p>
                       </div>
                     ))}
+                    <div ref={logsEndRef} />
                   </div>
                 </CardContent>
               </Card>
