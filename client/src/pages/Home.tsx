@@ -266,25 +266,27 @@ export default function Home() {
             </Card>
 
             {/* Bottom Section: Grouped Co-branded Logos & Elegant Footnote */}
-            <div className="space-y-4 pt-4">
-              {/* Row of Logos - EXACTLY MATCHING USER MOCKUP SIZES (HUGE AND NO CONTAINERS) */}
+            <div className="space-y-1.5 pt-1">
+              {/* Row of Logos - Tightened vertical spacing, moved up, and cropped Ship Sticks text */}
               <div className="flex items-center justify-center gap-2 md:gap-4 px-2">
-                {/* Logo 1: High-Res TPC Shield (Larger) */}
+                {/* Logo 1: High-Res TPC Shield */}
                 <img 
                   src="/manus-storage/57885_120b932a.png" 
                   alt="Travel Protection Club" 
-                  className="h-20 md:h-24 object-contain shrink-0"
+                  className="h-14 md:h-18 object-contain shrink-0"
                 />
 
-                {/* Logo 2: Dark Ship Sticks Banner (Larger) */}
-                <img 
-                  src="/manus-storage/cropped_shipsticks_dark_9caa446b.png" 
-                  alt="Ship Sticks" 
-                  className="h-14 md:h-16 object-contain shrink-0"
-                />
+                {/* Logo 2: Dark Ship Sticks Banner (Cropped bottom 20% to remove duplicate 'complement of') */}
+                <div className="h-10 md:h-13 overflow-hidden shrink-0 flex items-center justify-center">
+                  <img 
+                    src="/manus-storage/cropped_shipsticks_dark_9caa446b.png" 
+                    alt="Ship Sticks" 
+                    className="h-[125%] object-contain scale-[1.0] origin-top translate-y-[-5%]"
+                  />
+                </div>
 
-                {/* Logo 3: Circular ASB Logo (Cleaned up, stray pixels cropped using overflow-hidden wrapper) */}
-                <div className="h-16 w-16 md:h-20 md:w-20 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-transparent">
+                {/* Logo 3: Circular ASB Logo */}
+                <div className="h-11 w-11 md:h-14 md:w-14 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-transparent">
                   <img 
                     src="/manus-storage/cropped_asb_dark_f202b5ec.png" 
                     alt="ASB Logo" 
@@ -294,7 +296,7 @@ export default function Home() {
               </div>
 
               {/* Text Footnote */}
-              <div className="text-center px-4 pt-1">
+              <div className="text-center px-4">
                 <span className="text-[9px] md:text-[10px] text-[#5C6B5E] font-bold tracking-wider uppercase block leading-relaxed">
                   COMPLEMENT of <br />
                   THE TRAVEL PROTECTION CLUB & ASB ATHLETICS <br />
@@ -435,19 +437,21 @@ export default function Home() {
             </Card>
 
             {/* Re-use bottom logos and footer on the offer screen to keep brand cohesion */}
-            <div className="space-y-4 pt-2">
+            <div className="space-y-1.5 pt-1">
               <div className="flex items-center justify-center gap-2 md:gap-4 px-2">
                 <img 
                   src="/manus-storage/57885_120b932a.png" 
                   alt="Travel Protection Club" 
-                  className="h-16 md:h-20 object-contain shrink-0"
+                  className="h-12 md:h-15 object-contain shrink-0"
                 />
-                <img 
-                  src="/manus-storage/cropped_shipsticks_dark_9caa446b.png" 
-                  alt="Ship Sticks" 
-                  className="h-11 md:h-13 object-contain shrink-0"
-                />
-                <div className="h-13 w-16 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-transparent">
+                <div className="h-8 md:h-11 overflow-hidden shrink-0 flex items-center justify-center">
+                  <img 
+                    src="/manus-storage/cropped_shipsticks_dark_9caa446b.png" 
+                    alt="Ship Sticks" 
+                    className="h-[125%] object-contain scale-[1.0] origin-top translate-y-[-5%]"
+                  />
+                </div>
+                <div className="h-10 w-10 md:h-12 md:w-12 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-transparent">
                   <img 
                     src="/manus-storage/cropped_asb_dark_f202b5ec.png" 
                     alt="ASB Logo" 
@@ -695,19 +699,21 @@ export default function Home() {
             </Card>
 
             {/* Bottom co-branded logos on final screen */}
-            <div className="space-y-4 pt-4">
+            <div className="space-y-1.5 pt-1">
               <div className="flex items-center justify-center gap-2 md:gap-4 px-2">
                 <img 
                   src="/manus-storage/57885_120b932a.png" 
                   alt="Travel Protection Club" 
-                  className="h-16 md:h-20 object-contain shrink-0"
+                  className="h-12 md:h-15 object-contain shrink-0"
                 />
-                <img 
-                  src="/manus-storage/cropped_shipsticks_dark_9caa446b.png" 
-                  alt="Ship Sticks" 
-                  className="h-11 md:h-13 object-contain shrink-0"
-                />
-                <div className="h-13 w-16 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-transparent">
+                <div className="h-8 md:h-11 overflow-hidden shrink-0 flex items-center justify-center">
+                  <img 
+                    src="/manus-storage/cropped_shipsticks_dark_9caa446b.png" 
+                    alt="Ship Sticks" 
+                    className="h-[125%] object-contain scale-[1.0] origin-top translate-y-[-5%]"
+                  />
+                </div>
+                <div className="h-10 w-10 md:h-12 md:w-12 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-transparent">
                   <img 
                     src="/manus-storage/cropped_asb_dark_f202b5ec.png" 
                     alt="ASB Logo" 
