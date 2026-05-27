@@ -316,7 +316,7 @@ export default function Home() {
 
             <Card className="border border-[#E8E4DC] shadow-[0_12px_40px_rgba(28,43,33,0.03)] bg-white rounded-none overflow-hidden">
               <CardContent className="p-5 space-y-4">
-                <h2 className="text-sm md:text-base font-serif font-bold text-[#1C2B21] leading-snug">
+                <h2 className="text-sm md:text-base font-sans font-bold text-[#1C2B21] leading-snug">
                   {quizQuestions[currentQuestionIndex].question}
                 </h2>
 
@@ -338,44 +338,44 @@ export default function Home() {
         )}
 
         {step === "OFFER" && (
-          <div className="w-full space-y-3 animate-fade-in">
-            <Card className="border border-[#E5C158] shadow-[0_16px_48px_rgba(28,43,33,0.06)] bg-white rounded-none overflow-hidden relative">
-              <div className="absolute top-0 right-0 bg-[#E5C158] text-[#1C2B21] font-bold text-[8px] tracking-widest uppercase px-2 py-0.5 rounded-none">
-                Exclusive Package
-              </div>
+          <div className="w-full space-y-4 animate-fade-in">
+            {/* Pure, borderless, warm-sand offer screen matching the landing page look and feel */}
+            <Card className="border-0 shadow-none bg-transparent rounded-none">
+              <CardContent className="p-0 space-y-4">
+                {/* THE EMOTIONAL PIVOT HEADLINE - BOLD SANS-SERIF TYPOGRAPHY */}
+                <div className="text-center space-y-2">
+                  <h1 className="text-xl md:text-2xl font-sans font-black tracking-tight text-black leading-snug">
+                    Your clubs are not the only thing <br />
+                    that needs a plan to get home.
+                  </h1>
+                  <div className="h-[2px] w-16 bg-[#E5C158] mx-auto my-2" />
+                  
+                  {/* EMOTIONAL TRANSFORMATIONAL MESSAGE */}
+                  <p className="text-xs md:text-sm text-[#3A4A3D] font-medium max-w-sm mx-auto leading-relaxed px-1">
+                    This cost-effective solution is the logical, and right thing to do. 
+                    It's as simple as accepting our offer. Here's what you're getting in return...
+                  </p>
+                </div>
 
-              <div className="bg-[#1C2B21] text-white p-5 text-center">
-                <span className="text-xs font-bold text-[#E5C158] tracking-widest uppercase">
-                  Travel Protection Club
-                </span>
-                <h2 className="text-base font-serif font-bold tracking-tight mt-0.5">
-                  Activate Your TPC Membership
-                </h2>
-                <p className="text-[11px] text-[#A4B3A7] mt-1 max-w-xs mx-auto leading-relaxed">
-                  Your travel profile qualifies you for our exclusive member bundle. Spend less time worrying, and more time playing.
-                </p>
-              </div>
-
-              <CardContent className="p-4 space-y-4">
-                {/* Value Comparison Table */}
-                <div className="border border-[#E8E4DC] rounded-none overflow-hidden">
-                  <div className="grid grid-cols-3 bg-[#FAF8F5] border-b border-[#E8E4DC] p-2.5 text-[9px] font-bold text-[#5C6B5E] tracking-wider uppercase">
+                {/* Clean, borderless value summary matching landing page styling */}
+                <div className="bg-[#FAF8F5] border border-[#E8E4DC] rounded-none overflow-hidden">
+                  <div className="grid grid-cols-3 bg-[#FAF8F5] border-b border-[#E8E4DC] p-3 text-[9px] font-bold text-[#5C6B5E] tracking-wider uppercase">
                     <span>Benefit Item</span>
                     <span className="text-center">Standard Value</span>
                     <span className="text-right text-[#107C41]">Your Bundle</span>
                   </div>
-                  <div className="divide-y divide-[#E8E4DC] text-[11px]">
-                    <div className="grid grid-cols-3 p-2.5 text-[#1C2B21]">
+                  <div className="divide-y divide-[#E8E4DC] text-xs">
+                    <div className="grid grid-cols-3 p-3 text-[#1C2B21]">
                       <span className="font-semibold">1-Yr TPC Travel Membership</span>
                       <span className="text-center text-[#5C6B5E] line-through">$150.00</span>
                       <span className="text-right font-bold text-[#107C41]">$150.00</span>
                     </div>
-                    <div className="grid grid-cols-3 p-2.5 text-[#1C2B21] bg-[#EAF7EE]/10">
+                    <div className="grid grid-cols-3 p-3 text-[#1C2B21] bg-[#EAF7EE]/10">
                       <span className="font-semibold text-[#107C41]">Ship Sticks Voucher Credit</span>
                       <span className="text-center text-[#5C6B5E]">-</span>
                       <span className="text-right font-bold text-[#107C41]">-$75.00 Rebate</span>
                     </div>
-                    <div className="grid grid-cols-3 p-2.5 bg-[#FAF8F5] font-bold text-xs text-[#1C2B21]">
+                    <div className="grid grid-cols-3 p-3 bg-[#FAF8F5] font-bold text-xs text-[#1C2B21]">
                       <span>Net Effective Cost</span>
                       <span className="text-center text-[#5C6B5E]">$150.00</span>
                       <span className="text-right text-[#107C41]">$75.00</span>
@@ -383,52 +383,82 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Core Pillars List */}
-                <div className="space-y-2">
-                  <h3 className="text-[9px] font-bold text-[#5C6B5E] uppercase tracking-widest">
-                    What is Included in Your Membership:
+                {/* EMOTIONALLY TRANSFORMED BENEFITS LIST */}
+                <div className="space-y-3 pt-1">
+                  <h3 className="text-[10px] font-bold text-[#5C6B5E] uppercase tracking-widest text-center">
+                    YOUR GUARANTEED FAMILY RETURN PLAN:
                   </h3>
-                  <div className="grid grid-cols-1 gap-2">
-                    <div className="flex gap-2 items-start">
-                      <div className="p-0.5 bg-[#EAF7EE] rounded-full text-[#107C41] shrink-0 mt-0.5">
-                        <Check className="w-3 h-3" />
+                  <div className="space-y-3">
+                    <div className="flex gap-3 items-start bg-[#FAF8F5] p-3 border border-[#E8E4DC] rounded-none">
+                      <div className="p-1 bg-[#EAF7EE] rounded-full text-[#107C41] shrink-0 mt-0.5">
+                        <Check className="w-3.5 h-3.5" />
                       </div>
                       <div>
-                        <h4 className="text-[11px] font-bold text-[#1C2B21]">Elite Medical Repatriation</h4>
-                        <p className="text-[10px] text-[#5C6B5E] leading-relaxed">
-                          We pay to fly you and your equipment back to your home hospital in a crisis.
+                        <h4 className="text-xs font-bold text-black uppercase tracking-wider">Ultimate Emergency Repatriation</h4>
+                        <p className="text-[11px] text-[#5C6B5E] leading-relaxed mt-0.5">
+                          If an unexpected crisis happens away from home, we coordinate and pay to fly **YOU** safely back to your loved ones and your home hospital. 
                         </p>
                       </div>
                     </div>
-                    <div className="flex gap-2 items-start">
-                      <div className="p-0.5 bg-[#EAF7EE] rounded-full text-[#107C41] shrink-0 mt-0.5">
-                        <Check className="w-3 h-3" />
+                    <div className="flex gap-3 items-start bg-[#FAF8F5] p-3 border border-[#E8E4DC] rounded-none">
+                      <div className="p-1 bg-[#EAF7EE] rounded-full text-[#107C41] shrink-0 mt-0.5">
+                        <Check className="w-3.5 h-3.5" />
                       </div>
                       <div>
-                        <h4 className="text-[11px] font-bold text-[#1C2B21]">First-Call Emergency Response</h4>
-                        <p className="text-[10px] text-[#5C6B5E] leading-relaxed">
-                          One dedicated number connects you instantly to global crisis experts.
+                        <h4 className="text-xs font-bold text-black uppercase tracking-wider">Immediate Family Peace of Mind</h4>
+                        <p className="text-[11px] text-[#5C6B5E] leading-relaxed mt-0.5">
+                          Your family receives a single, dedicated emergency number. They won't have to scramble or wonder who to call—we handle all crisis logistics instantly.
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Terms Acceptance & CTA */}
-                <div className="space-y-2 pt-0.5">
-                  <p className="text-[9px] text-[#5C6B5E] text-center leading-relaxed">
-                    By clicking below, you agree to join the Travel Protection Club and pay the $150 first-year membership fee. Once confirmed, your $75 Ship Sticks voucher will be instantly issued.
+                {/* CTA Area */}
+                <div className="space-y-2 pt-2">
+                  <p className="text-[10px] text-[#5C6B5E] text-center leading-relaxed">
+                    By clicking below, you secure your TPC travel protection plan and instantly unlock your $75 Ship Sticks rebate code.
                   </p>
                   <Button 
                     onClick={() => setDemoStep("STRIPE_CHECKOUT")}
-                    className="w-full h-11 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="w-full min-h-12 py-3 px-4 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md flex items-center justify-center gap-2 cursor-pointer whitespace-normal text-center leading-normal"
                   >
-                    Accept Offer & Proceed to Checkout
-                    <ChevronRight className="w-3.5 h-3.5" />
+                    <span>ACCEPT OFFER & PROCEED TO CHECKOUT</span>
+                    <ChevronRight className="w-4 h-4 shrink-0" />
                   </Button>
                 </div>
               </CardContent>
             </Card>
+
+            {/* Re-use bottom logos and footer on the offer screen to keep brand cohesion */}
+            <div className="space-y-4 pt-2">
+              <div className="flex items-center justify-center gap-2 md:gap-4 px-2">
+                <img 
+                  src="/manus-storage/57885_120b932a.png" 
+                  alt="Travel Protection Club" 
+                  className="h-16 md:h-20 object-contain shrink-0"
+                />
+                <img 
+                  src="/manus-storage/cropped_shipsticks_dark_9caa446b.png" 
+                  alt="Ship Sticks" 
+                  className="h-11 md:h-13 object-contain shrink-0"
+                />
+                <div className="h-13 w-16 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-transparent">
+                  <img 
+                    src="/manus-storage/cropped_asb_dark_f202b5ec.png" 
+                    alt="ASB Logo" 
+                    className="h-[105%] w-[105%] object-cover scale-[0.95]"
+                  />
+                </div>
+              </div>
+              <div className="text-center px-4">
+                <span className="text-[9px] text-[#5C6B5E] font-bold tracking-wider uppercase block leading-relaxed">
+                  COMPLEMENT of <br />
+                  THE TRAVEL PROTECTION CLUB & ASB ATHLETICS <br />
+                  <span className="text-[#A4B3A7] font-medium text-[8px]">in conjunction with SHIP STICKS</span>
+                </span>
+              </div>
+            </div>
           </div>
         )}
 
