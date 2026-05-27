@@ -308,8 +308,8 @@ export default function Home() {
         )}
 
         {step === "QUIZ" && (
-          <div className="w-full space-y-3 animate-fade-in">
-            <div className="flex justify-between items-center text-[10px] font-bold text-[#5C6B5E] uppercase tracking-wider px-1">
+          <div className="w-full space-y-2 animate-fade-in">
+            <div className="flex justify-between items-center text-[10px] font-bold text-[#5C6B5E] uppercase tracking-wider px-1 pt-1">
               <span>Golf Travel Planner</span>
               <span>Question {currentQuestionIndex + 1} of {quizQuestions.length}</span>
             </div>
@@ -320,18 +320,20 @@ export default function Home() {
               />
             </div>
 
-            <Card className="border border-[#E8E4DC] shadow-[0_12px_40px_rgba(28,43,33,0.03)] bg-white rounded-none overflow-hidden">
-              <CardContent className="p-5 space-y-4">
-                <h2 className="text-sm md:text-base font-sans font-bold text-[#1C2B21] leading-snug">
+            {/* Clean, borderless card container blending seamlessly into the warm sand background */}
+            <Card className="border-0 shadow-none bg-transparent rounded-none">
+              <CardContent className="p-2.5 space-y-4">
+                {/* EXTRA BOLD HEADLINE MATCHING LANDING PAGE AND USER SCREENSHOT */}
+                <h2 className="text-2xl md:text-3xl font-sans font-black tracking-tight text-black text-center leading-tight max-w-xs mx-auto pt-2">
                   {quizQuestions[currentQuestionIndex].question}
                 </h2>
 
-                <div className="space-y-2">
+                <div className="space-y-2 max-w-sm mx-auto pt-2">
                   {quizQuestions[currentQuestionIndex].options.map((option, idx) => (
                     <button
                       key={idx}
                       onClick={() => handleQuizAnswer(option)}
-                      className="w-full p-3 text-left border border-[#E8E4DC] hover:border-[#107C41] hover:bg-[#EAF7EE]/20 active:scale-[0.99] transition-all rounded-none text-xs font-semibold text-[#1C2B21] flex items-center justify-between group cursor-pointer"
+                      className="w-full p-3 text-left border border-[#E8E4DC] hover:border-[#107C41] hover:bg-[#EAF7EE]/20 active:scale-[0.99] transition-all rounded-none text-xs font-bold text-[#1C2B21] flex items-center justify-between group cursor-pointer bg-white"
                     >
                       <span>{option}</span>
                       <ChevronRight className="w-3.5 h-3.5 text-[#A4B3A7] group-hover:text-[#107C41] transition-colors" />
