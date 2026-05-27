@@ -53,8 +53,8 @@ export default function Home() {
   
   // Funnel State
   const [currentStep, setCurrentStep] = useState<DemoStep>("CHIP_TAP");
-  const [leadName, setLeadName] = useState("");
-  const [leadEmail, setLeadEmail] = useState("");
+  const [leadName, setLeadName] = useState("Andrew Miller"); // Default fallback
+  const [leadEmail, setLeadEmail] = useState("andrew@armsreach.com"); // Default fallback
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
   const [quizIndex, setQuizIndex] = useState(0);
   const [crmLogs, setCrmLogs] = useState<LogEntry[]>([]);
@@ -66,12 +66,6 @@ export default function Home() {
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCvc, setCardCvc] = useState("");
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-
-  // Real Integration webhook URL (for YAT?STATS)
-  const [webhookUrl, setWebhookUrl] = useState(() => {
-    return localStorage.getItem("arms_webhook_url") || "";
-  });
-  const [isSendingToLiveWebhook, setIsSendingToLiveWebhook] = useState(false);
 
   // Portal Stats State
   const [scanCount, setScanCount] = useState(148);
@@ -85,18 +79,6 @@ export default function Home() {
   ]);
 
   const logsEndRef = useRef<HTMLDivElement>(null);
-
-  // Save webhook to local storage
-  const saveWebhook = (url: string) => {
-    setWebhookUrl(url);
-    localStorage.setItem("arms_webhook_url", url);
-    if (url) {
-      addLog(`🔌 YAT?STATS Integration: Inbound Webhook URL saved.`, "success");
-      toast.success("Webhook URL saved locally!");
-    } else {
-      addLog(`🔌 YAT?STATS Integration: Live Webhook cleared. Reverting to simulation.`, "warning");
-    }
-  };
 
   // Helper to add CRM logs with simulated timestamps
   const addLog = (event: string, type: "info" | "success" | "warning" | "arms" = "info") => {
@@ -121,50 +103,10 @@ export default function Home() {
   // Initial log population
   useEffect(() => {
     addLog("ARMS Automated Relationship Management System Active", "arms");
-    addLog("Campaign Webhook Active: 'First Call 75 Golf Wedge'", "info");
+    addLog("Campaign Form Active: 'Global360Assurance' (Native HighLevel Embed)", "success");
     addLog("NFC Webhook Listener: Listening at /api/v1/scans/poker-chip", "arms");
-    if (webhookUrl) {
-      addLog(`🔌 Live Webhook configured for YAT?STATS sub-account!`, "success");
-    } else {
-      addLog("💡 Tip: Enter your YAT?STATS inbound webhook URL in the settings panel below to push real contacts!", "info");
-    }
+    addLog("Ready to capture native submissions directly to YAT?STATS sub-account!", "info");
   }, []);
-
-  // Send real lead data to user's webhook
-  const sendLeadToLiveWebhook = async (name: string, email: string, step: string, status: string, answers: any = {}) => {
-    if (!webhookUrl) return;
-
-    setIsSendingToLiveWebhook(true);
-    addLog(`📤 Pushing live contact data to YAT?STATS webhook...`, "arms");
-
-    try {
-      const response = await fetch(webhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          funnel_step: step,
-          status,
-          campaign: "Global 360 First Call 75",
-          source: "NFC Poker Chip",
-          quiz_answers: answers,
-          timestamp: new Date().toISOString()
-        }),
-        mode: "no-cors" // HighLevel/Zapier webhooks often don't return CORS headers, no-cors is safer for fire-and-forget
-      });
-
-      addLog(`⚡ Live Webhook: Contact '${name}' successfully pushed to YAT?STATS!`, "success");
-      toast.success("Live contact pushed to YAT?STATS!");
-    } catch (error) {
-      console.error("Webhook error:", error);
-      addLog(`❌ Webhook dispatch failed. Please verify your YAT?STATS webhook URL.`, "warning");
-    } finally {
-      setIsSendingToLiveWebhook(false);
-    }
-  };
 
   // Handle virtual NFC chip tap
   const handleNfcTap = () => {
@@ -176,34 +118,38 @@ export default function Home() {
     toast.success("NFC Tap Simulated!");
   };
 
-  // Handle email/name capture (Opt-In)
-  const handleOptInSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!leadName || !leadEmail) {
-      toast.error("Please enter a name and email to secure your voucher.");
-      return;
-    }
-    
-    addLog(`👤 Lead Captured: ${leadName} (${leadEmail})`, "success");
-    addLog(`ARMS Database: Created contact record with status 'Prospect'`, "arms");
-    addLog(`ARMS Sequence: Tagged with 'Golf_Wedge_2026' & 'Voucher_Unclaimed'`, "arms");
-    addLog(`ARMS Action: Voucher code G75-TEMP-ACTIVATE reserved for 15 minutes`, "info");
+  // Listen for HighLevel Form Submission messages via postMessage (HighLevel forms dispatch events)
+  useEffect(() => {
+    const handleFormMessage = (e: MessageEvent) => {
+      // HighLevel form submit events usually contain 'formSubmit' or are dispatched from their domain
+      if (e.data && (e.data.type === "formSubmit" || (typeof e.data === "string" && e.data.includes("formSubmit")))) {
+        addLog("👤 Native Form Submitted! Contact captured directly in YAT?STATS CRM.", "success");
+        addLog("ARMS Action: Tagged with 'Golf_Wedge_2026' & 'Voucher_Unclaimed'", "arms");
+        addLog("ARMS Action: Voucher code G75-TEMP-ACTIVATE reserved for 15 minutes", "info");
+        
+        setOptInCount(prev => prev + 1);
+        
+        // Auto-advance to quiz
+        setTimeout(() => {
+          setCurrentStep("QUIZ");
+          toast.success("Form Received! Proceeding to travel quiz...");
+        }, 1500);
+      }
+    };
+
+    window.addEventListener("message", handleFormMessage);
+    return () => window.removeEventListener("message", handleFormMessage);
+  }, []);
+
+  // Manual bypass in case postMessage isn't caught (for seamless demo flow)
+  const handleManualFormProceed = () => {
+    addLog("👤 Lead Submitted (Live Form). Contact captured directly in YAT?STATS CRM.", "success");
+    addLog("ARMS Action: Tagged with 'Golf_Wedge_2026' & 'Voucher_Unclaimed'", "arms");
+    addLog("ARMS Action: Voucher code G75-TEMP-ACTIVATE reserved for 15 minutes", "info");
     
     setOptInCount(prev => prev + 1);
-    
-    // Add to recent leads in portal
-    setRecentLeads(prev => [
-      { name: leadName, email: leadEmail, status: "Prospect (Quiz)", date: "Just now", value: "$0" },
-      ...prev.slice(0, 3)
-    ]);
-
-    // Send to live webhook if configured
-    if (webhookUrl) {
-      sendLeadToLiveWebhook(leadName, leadEmail, "Opt-In", "Prospect");
-    }
-
     setCurrentStep("QUIZ");
-    toast.success("Voucher Reserved! Let's complete your travel planner profile.");
+    toast.success("Proceeding to Travel Quiz!");
   };
 
   // Quiz Questions definition
@@ -250,10 +196,6 @@ export default function Home() {
       addLog(`ARMS Segmentation: Mindset classified as '${isPlanner ? "Planner" : "Spontaneous"}'`, "arms");
       addLog(`ARMS Segmentation: Family First-Call Status: '${hasFirstCallPlan ? "Protected" : "Unprepared"}'`, "arms");
       
-      if (webhookUrl) {
-        sendLeadToLiveWebhook(leadName, leadEmail, "Quiz Completed", "Segmented Prospect", updatedAnswers);
-      }
-
       if (!hasFirstCallPlan) {
         addLog(`ARMS Trigger: Set dynamic landing page theme to 'Family Security & Peace of Mind'`, "arms");
       } else {
@@ -275,15 +217,6 @@ export default function Home() {
       addLog("ARMS Trigger: Activated Abandoned Checkout Recovery Sequence", "arms");
       addLog("ARMS Delay: Scheduled Plan B Email Nurture Sequence (Trigger in 15 mins)", "arms");
       
-      if (webhookUrl) {
-        sendLeadToLiveWebhook(leadName, leadEmail, "Offer Declined", "Abandoned Checkout (Plan B)", quizAnswers);
-      }
-
-      // Update in recent leads
-      setRecentLeads(prev => prev.map(lead => 
-        lead.email === leadEmail ? { ...lead, status: "Prospect (Plan B)" } : lead
-      ));
-
       setCurrentStep("FOLLOW_UP");
       toast.info("Plan B Nurture Sequence activated in ARMS CRM.");
     }
@@ -320,15 +253,6 @@ export default function Home() {
       
       setMemberCount(prev => prev + 1);
       
-      if (webhookUrl) {
-        sendLeadToLiveWebhook(leadName, leadEmail, "Payment Completed", "Active Member", quizAnswers);
-      }
-
-      // Update in recent leads
-      setRecentLeads(prev => prev.map(lead => 
-        lead.email === leadEmail ? { ...lead, status: "Active Member", value: "$150" } : lead
-      ));
-
       setCurrentStep("OUTCOME");
       toast.success("Payment Captured! Membership Activated.");
     }, 2000);
@@ -337,8 +261,6 @@ export default function Home() {
   // Reset the demo
   const resetDemo = () => {
     setCurrentStep("CHIP_TAP");
-    setLeadName("");
-    setLeadEmail("");
     setQuizAnswers({});
     setQuizIndex(0);
     setAcceptedOffer(null);
@@ -497,58 +419,42 @@ export default function Home() {
                     </div>
                   )}
 
-                  {/* SCREEN STATE 3: OPT-IN FORM */}
+                  {/* SCREEN STATE 3: NATIVE YAT?STATS FORM EMBED */}
                   {currentStep === "OPT_IN" && (
-                    <div className="flex-1 flex flex-col p-6 justify-between bg-[#FDFCF7]">
-                      <div>
-                        <div className="w-full bg-[#E6E2D3] h-1.5 rounded-full mb-6 overflow-hidden">
+                    <div className="flex-1 flex flex-col p-4 justify-between bg-[#FDFCF7] min-h-[500px]">
+                      <div className="flex-1 flex flex-col">
+                        <div className="w-full bg-[#E6E2D3] h-1 rounded-full mb-3 overflow-hidden">
                           <div className="bg-[#1A331E] h-full w-1/4"></div>
                         </div>
                         
-                        <h4 className="font-serif-display text-lg font-bold text-[#1A331E] mb-2">Secure Your Voucher</h4>
-                        <p className="text-xs text-[#4A5D4E] mb-6">
-                          Enter your details below to reserve your $75 travel shipping voucher and unlock your personalized travel protection profile.
+                        <h4 className="font-serif-display text-sm font-bold text-[#1A331E] mb-1">Secure Your Voucher</h4>
+                        <p className="text-[10px] text-[#4A5D4E] mb-3">
+                          Fill out your official YAT?STATS sub-account form below. This will instantly log you as an active prospect.
                         </p>
 
-                        <form onSubmit={handleOptInSubmit} className="space-y-4">
-                          <div className="space-y-1">
-                            <label className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E]">Full Name</label>
-                            <input 
-                              type="text" 
-                              required
-                              value={leadName}
-                              onChange={(e) => setLeadName(e.target.value)}
-                              placeholder="e.g., Andrew Miller" 
-                              className="w-full bg-white border border-[#E6E2D3] px-3 py-2.5 rounded-xs text-xs focus:outline-hidden focus:ring-1 focus:ring-[#1A331E]"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <label className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E]">Email Address</label>
-                            <input 
-                              type="email" 
-                              required
-                              value={leadEmail}
-                              onChange={(e) => setLeadEmail(e.target.value)}
-                              placeholder="e.g., andrew@armsreach.com" 
-                              className="w-full bg-white border border-[#E6E2D3] px-3 py-2.5 rounded-xs text-xs focus:outline-hidden focus:ring-1 focus:ring-[#1A331E]"
-                            />
-                          </div>
-                          
-                          <div className="flex items-start gap-2 pt-2">
-                            <input type="checkbox" defaultChecked required className="mt-0.5 accent-[#1A331E]" id="consent" />
-                            <label htmlFor="consent" className="text-[10px] text-[#4A5D4E] leading-tight">
-                              I agree to receive the voucher code and consent to relationship updates from the Travel Protection Club.
-                            </label>
-                          </div>
-                        </form>
+                        {/* Real HighLevel/ARMS Iframe Form */}
+                        <div className="flex-1 bg-white border border-[#E6E2D3] rounded-xs overflow-hidden min-h-[360px] relative">
+                          <iframe
+                            src="https://api.armsreachdigital.com/widget/form/H634urGOeGS6U0BpCfBS"
+                            style={{ width: "100%", height: "100%", border: "none" }}
+                            id="inline-H634urGOeGS6U0BpCfBS" 
+                            title="Global360Assurance"
+                          ></iframe>
+                        </div>
                       </div>
 
-                      <Button 
-                        onClick={handleOptInSubmit}
-                        className="w-full bg-[#1A331E] hover:bg-[#2D4A32] text-white border border-[#C2B280] py-4 rounded-sm font-sans-ui text-xs uppercase tracking-wider font-bold mt-4"
-                      >
-                        Reserve & Continue <ChevronRight className="ml-1 h-4 w-4" />
-                      </Button>
+                      {/* Manual Proceed Trigger in case postMessage fails */}
+                      <div className="mt-3 pt-2 border-t border-[#E6E2D3] flex flex-col gap-1.5">
+                        <button 
+                          onClick={handleManualFormProceed}
+                          className="w-full bg-[#1A331E] hover:bg-[#2D4A32] text-white text-[11px] uppercase tracking-wider font-bold py-2.5 rounded-xs transition-all flex items-center justify-center gap-1"
+                        >
+                          I've Submitted! Proceed to Quiz <ChevronRight className="h-3.5 w-3.5" />
+                        </button>
+                        <span className="text-[9px] text-[#4A5D4E] text-center block">
+                          💡 <em>After hitting "Submit" on the form above, click this button to proceed with the demo.</em>
+                        </span>
+                      </div>
                     </div>
                   )}
 
@@ -603,7 +509,7 @@ export default function Home() {
                     <div className="flex-1 flex flex-col p-0 bg-[#FDFCF7] overflow-y-auto max-h-[580px]">
                       {/* Top banner highlighting voucher reserved */}
                       <div className="bg-[#1A331E] text-white p-4 text-center border-b border-[#C2B280]">
-                        <span className="text-[9px] uppercase tracking-widest text-[#C2B280] font-bold block mb-0.5">Voucher Reserved for {leadName}</span>
+                        <span className="text-[9px] uppercase tracking-widest text-[#C2B280] font-bold block mb-0.5">Voucher Reserved for You</span>
                         <h5 className="font-serif-display text-sm font-bold text-white tracking-wide">
                           $75 Credit Ready to Activate
                         </h5>
@@ -800,7 +706,7 @@ export default function Home() {
                           <span className="text-[10px] uppercase tracking-widest text-[#C2B280] font-bold">Welcome to the Club</span>
                           <h4 className="font-serif-display text-xl font-bold text-[#1A331E] mt-1 mb-2">Membership Activated!</h4>
                           <p className="text-xs text-[#4A5D4E] max-w-xs mx-auto">
-                            Thank you, {leadName}. Your first-year Travel Protection Club membership is active. Your family is now fully protected.
+                            Thank you. Your first-year Travel Protection Club membership is active. Your family is now fully protected.
                           </p>
                         </div>
 
@@ -811,7 +717,7 @@ export default function Home() {
                             SS-GOLF-75-ACTIVE
                           </span>
                           <p className="text-[9px] text-[#4A5D4E] mt-2">
-                            Copy this code to use on your next golf travel shipment. An activation link has been sent to <strong>{leadEmail}</strong>.
+                            Copy this code to use on your next golf travel shipment. An activation link has been sent to your email.
                           </p>
                         </div>
 
@@ -846,7 +752,7 @@ export default function Home() {
                           <span className="text-[10px] uppercase tracking-widest text-[#C2B280] font-bold">Voucher Reserved</span>
                           <h4 className="font-serif-display text-lg font-bold text-[#1A331E] mt-1 mb-2">Voucher Reservation Active</h4>
                           <p className="text-xs text-[#4A5D4E] max-w-xs mx-auto">
-                            The voucher reservation remains active for <strong>{leadName}</strong>. A temporary confirmation has been sent to <strong>{leadEmail}</strong>.
+                            The voucher reservation remains active. A temporary confirmation has been sent to your email.
                           </p>
                         </div>
 
@@ -894,41 +800,27 @@ export default function Home() {
             {/* Right: ARMS Automation Log Console (5 Cols) */}
             <div className="lg:col-span-5 space-y-6">
               
-              {/* Webhook Configuration Panel (for YAT?STATS) */}
+              {/* Native Form Info Card */}
               <Card className="border border-[#C2B280] bg-[#F9F8F0] shadow-md">
                 <CardHeader className="pb-2">
                   <div className="flex items-center gap-2">
-                    <Code className="h-4 w-4 text-[#1A331E]" />
-                    <CardTitle className="text-xs uppercase tracking-wider font-bold text-[#1A331E]">YAT?STATS Webhook Integration</CardTitle>
+                    <CheckCircle2 className="h-4 w-4 text-[#1A331E]" />
+                    <CardTitle className="text-xs uppercase tracking-wider font-bold text-[#1A331E]">YAT?STATS Form Active</CardTitle>
                   </div>
                   <CardDescription className="text-[11px] text-[#4A5D4E]">
-                    Wire up the demo to your real sub-account to push live contact records!
+                    Your native form is embedded and fully operational!
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3 pt-1">
-                  <div className="space-y-1">
-                    <label className="text-[9px] uppercase tracking-wider font-bold text-[#1A331E] block">Inbound Webhook Trigger URL</label>
-                    <div className="flex gap-2">
-                      <input 
-                        type="text" 
-                        value={webhookUrl}
-                        onChange={(e) => saveWebhook(e.target.value)}
-                        placeholder="e.g., https://services.leadconnectorhq.com/hooks/..." 
-                        className="flex-1 bg-white border border-[#E6E2D3] px-2.5 py-1.5 rounded-xs text-[11px] focus:outline-hidden"
-                      />
-                      {webhookUrl && (
-                        <button 
-                          onClick={() => saveWebhook("")}
-                          className="text-[10px] text-red-600 font-bold hover:underline shrink-0"
-                        >
-                          Clear
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  <p className="text-[10px] text-[#4A5D4E] leading-relaxed">
-                    💡 <strong>How to get this:</strong> Inside your YAT?STATS sub-account, create an <strong>Automation Workflow</strong>. Set the trigger to <strong>Inbound Webhook</strong>, copy the generated Webhook URL, and paste it here!
+                  <p className="text-[11px] text-[#4A5D4E] leading-relaxed">
+                    🎉 <strong>No Webhooks Required!</strong> By embedding your native form (`Global360Assurance`), any submissions made inside the mobile simulator on the left will <strong>instantly appear in your YAT?STATS Contacts tab</strong>. 
                   </p>
+                  <div className="bg-white p-2.5 rounded-xs border border-[#E6E2D3] text-[10px] text-[#4A5D4E] space-y-1">
+                    <span className="font-bold text-[#1A331E] block">Integration Details:</span>
+                    <div>• <strong>Form ID:</strong> H634urGOeGS6U0BpCfBS</div>
+                    <div>• <strong>Sub-account:</strong> YAT?STATS</div>
+                    <div>• <strong>Type:</strong> Native Free Form (Bypasses LC Premium charges)</div>
+                  </div>
                 </CardContent>
               </Card>
 
@@ -1003,7 +895,7 @@ export default function Home() {
         {activeTab === "portal" && (
           <div className="space-y-8 max-w-5xl mx-auto">
             
-            {/* NEW ADDITION: CLIENT-FACING GLOBAL 360 BANNER AD INSIDE YAT?STATS */}
+            {/* CLIENT-FACING GLOBAL 360 BANNER AD INSIDE YAT?STATS */}
             <div className="relative rounded-sm overflow-hidden border-2 border-[#C2B280] bg-[#1A331E] text-white p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
               {/* Background accent styling */}
               <div className="absolute top-0 right-0 h-full w-1/3 bg-radial from-[#C2B280]/20 to-transparent pointer-events-none"></div>
@@ -1170,8 +1062,8 @@ export default function Home() {
                     <div className="flex items-start gap-3 p-2.5 rounded-xs bg-[#F9F8F0] border border-[#E6E2D3]">
                       <Clock className="h-4 w-4 text-[#1A331E] shrink-0 mt-0.5" />
                       <div>
-                        <span className="text-[11px] font-bold text-[#1A331E] block">Webhook: Poker Chip Scan</span>
-                        <p className="text-[10px] text-[#4A5D4E]">Triggers instant redirection and registers unique partner attribution code.</p>
+                        <span className="text-[11px] font-bold text-[#1A331E] block">Trigger: Form Submitted</span>
+                        <p className="text-[10px] text-[#4A5D4E]">Triggers when a golfer submits the native 'Global360Assurance' form.</p>
                       </div>
                     </div>
 
