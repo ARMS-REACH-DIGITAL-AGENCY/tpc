@@ -24,15 +24,17 @@ import {
   TrendingUp,
   Clock,
   Layers,
-  FileText
+  FileText,
+  CreditCard,
+  Lock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 
-// Define the steps in the consumer-facing funnel
-type DemoStep = "CHIP_TAP" | "LANDING_PAGE" | "OPT_IN" | "QUIZ" | "OFFER" | "OUTCOME" | "FOLLOW_UP";
+// Define the steps in the consumer-facing funnel (including secure payment capture)
+type DemoStep = "CHIP_TAP" | "LANDING_PAGE" | "OPT_IN" | "QUIZ" | "OFFER" | "STRIPE_CHECKOUT" | "OUTCOME" | "FOLLOW_UP";
 
 // CRM Log entry type
 interface LogEntry {
@@ -55,6 +57,12 @@ export default function Home() {
   const [crmLogs, setCrmLogs] = useState<LogEntry[]>([]);
   const [voucherClaimed, setVoucherClaimed] = useState(false);
   const [acceptedOffer, setAcceptedOffer] = useState<boolean | null>(null);
+
+  // Stripe Card Form State
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvc, setCardCvc] = useState("");
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   // Portal Stats State
   const [scanCount, setScanCount] = useState(148);
@@ -187,21 +195,8 @@ export default function Home() {
   const handleOfferDecision = (accepted: boolean) => {
     setAcceptedOffer(accepted);
     if (accepted) {
-      addLog("💳 Membership Purchased! $150 transaction authorized.", "success");
-      addLog("ARMS Billing: Generated invoice #INV-2026-0089", "arms");
-      addLog("ARMS CRM: Upgraded contact status to 'Active Member'", "arms");
-      addLog("ARMS Action: Delivered $75 ShipSticks-style Voucher code: SS-GOLF-75-ACTIVE", "success");
-      addLog("ARMS Action: Dispatched 'First Call Family Instruction Packet' PDF via email", "info");
-      addLog("ARMS Fulfillment: Scheduled physical welcome packet & membership card delivery", "arms");
-      setMemberCount(prev => prev + 1);
-      
-      // Update in recent leads
-      setRecentLeads(prev => prev.map(lead => 
-        lead.email === leadEmail ? { ...lead, status: "Active Member", value: "$150" } : lead
-      ));
-
-      setCurrentStep("OUTCOME");
-      toast.success("Membership Activated! $75 Voucher delivered.");
+      addLog("🛒 Offer Accepted! Redirecting to secure Stripe Checkout...", "info");
+      setCurrentStep("STRIPE_CHECKOUT");
     } else {
       addLog("⚠️ Prospect hesitated on offer page (Clicked 'No thanks' or closed tab)", "warning");
       addLog("ARMS Trigger: Activated Abandoned Checkout Recovery Sequence", "arms");
@@ -217,6 +212,47 @@ export default function Home() {
     }
   };
 
+  // Pre-fill card for quick presentation
+  const prefillDemoCard = () => {
+    setCardNumber("4242 •••• •••• 4242");
+    setCardExpiry("12/28");
+    setCardCvc("424");
+    addLog("💳 Pre-filled demo credit card credentials", "info");
+    toast.info("Demo card pre-filled.");
+  };
+
+  // Process Simulated Payment
+  const handlePaymentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cardNumber || !cardExpiry || !cardCvc) {
+      toast.error("Please enter your card details.");
+      return;
+    }
+
+    setIsProcessingPayment(true);
+    addLog("🔒 Initiating secure card authorization via Stripe API...", "info");
+    
+    setTimeout(() => {
+      setIsProcessingPayment(false);
+      addLog("💳 Stripe: Charge authorized successfully! Amount: $150.00 USD", "success");
+      addLog("ARMS Billing: Generated invoice #INV-2026-0089", "arms");
+      addLog("ARMS CRM: Upgraded contact status to 'Active Member'", "arms");
+      addLog("ARMS Action: Delivered $75 ShipSticks-style Voucher code: SS-GOLF-75-ACTIVE", "success");
+      addLog("ARMS Action: Dispatched 'First Call Family Instruction Packet' PDF via email", "info");
+      addLog("ARMS Fulfillment: Scheduled physical welcome packet & membership card delivery", "arms");
+      
+      setMemberCount(prev => prev + 1);
+      
+      // Update in recent leads
+      setRecentLeads(prev => prev.map(lead => 
+        lead.email === leadEmail ? { ...lead, status: "Active Member", value: "$150" } : lead
+      ));
+
+      setCurrentStep("OUTCOME");
+      toast.success("Payment Captured! Membership Activated.");
+    }, 2000);
+  };
+
   // Reset the demo
   const resetDemo = () => {
     setCurrentStep("CHIP_TAP");
@@ -226,6 +262,9 @@ export default function Home() {
     setQuizIndex(0);
     setAcceptedOffer(null);
     setVoucherClaimed(false);
+    setCardNumber("");
+    setCardExpiry("");
+    setCardCvc("");
     addLog("🔄 Virtual Demo Reset. Ready for next simulation.", "info");
   };
 
@@ -557,6 +596,113 @@ export default function Home() {
                             No thanks, I will forfeit my $75 voucher credit
                           </button>
                         </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SCREEN STATE 5.5: STRIPE SECURE CHECKOUT */}
+                  {currentStep === "STRIPE_CHECKOUT" && (
+                    <div className="flex-1 flex flex-col p-6 justify-between bg-white">
+                      <div>
+                        {/* Stripe Header */}
+                        <div className="flex items-center justify-between border-b border-[#E6E2D3] pb-4 mb-5">
+                          <div className="flex items-center gap-1.5">
+                            <div className="bg-[#635BFF] text-white p-1 rounded-xs">
+                              <CreditCard className="h-4 w-4" />
+                            </div>
+                            <span className="text-xs font-bold text-[#1E2022] font-sans-ui tracking-wide">Secure Checkout</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-[10px] text-[#4A5D4E]">
+                            <Lock className="h-3 w-3 text-[#2D6A4F]" />
+                            <span className="font-semibold text-[#2D6A4F]">Stripe SSL</span>
+                          </div>
+                        </div>
+
+                        <div className="mb-4">
+                          <span className="text-[9px] uppercase tracking-widest text-[#4A5D4E] font-bold block">Payable Amount</span>
+                          <span className="font-serif-display text-2xl font-bold text-[#1A331E]">$150.00</span>
+                          <span className="text-[10px] text-[#2D6A4F] font-semibold block mt-0.5">
+                            ✓ $75 Rebate Voucher reserved & attached
+                          </span>
+                        </div>
+
+                        {/* Credit Card Form */}
+                        <form onSubmit={handlePaymentSubmit} className="space-y-4">
+                          <div className="space-y-1">
+                            <div className="flex justify-between items-center">
+                              <label className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E]">Card Number</label>
+                              <button 
+                                type="button" 
+                                onClick={prefillDemoCard}
+                                className="text-[9px] text-[#635BFF] hover:underline font-bold"
+                              >
+                                Pre-fill Demo Card
+                              </button>
+                            </div>
+                            <div className="relative">
+                              <input 
+                                type="text" 
+                                required
+                                value={cardNumber}
+                                onChange={(e) => setCardNumber(e.target.value)}
+                                placeholder="4242 4242 4242 4242" 
+                                className="w-full bg-white border border-[#E6E2D3] pl-10 pr-3 py-2.5 rounded-xs text-xs focus:outline-hidden focus:ring-1 focus:ring-[#635BFF]"
+                              />
+                              <CreditCard className="absolute left-3 top-3 h-4 w-4 text-[#A3ACB9]" />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <label className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E]">Expiry Date</label>
+                              <input 
+                                type="text" 
+                                required
+                                value={cardExpiry}
+                                onChange={(e) => setCardExpiry(e.target.value)}
+                                placeholder="MM/YY" 
+                                className="w-full bg-white border border-[#E6E2D3] px-3 py-2.5 rounded-xs text-xs focus:outline-hidden focus:ring-1 focus:ring-[#635BFF] text-center"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E]">CVC / CVV</label>
+                              <input 
+                                type="text" 
+                                required
+                                value={cardCvc}
+                                onChange={(e) => setCardCvc(e.target.value)}
+                                placeholder="123" 
+                                className="w-full bg-white border border-[#E6E2D3] px-3 py-2.5 rounded-xs text-xs focus:outline-hidden focus:ring-1 focus:ring-[#635BFF] text-center"
+                              />
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+
+                      <div className="space-y-3 mt-6">
+                        <Button 
+                          onClick={handlePaymentSubmit}
+                          disabled={isProcessingPayment}
+                          className="w-full bg-[#635BFF] hover:bg-[#5249E0] text-white py-4 rounded-sm font-sans-ui text-xs uppercase tracking-wider font-bold shadow-md flex items-center justify-center gap-2"
+                        >
+                          {isProcessingPayment ? (
+                            <>
+                              <RefreshCw className="h-4 w-4 animate-spin" />
+                              Processing Securely...
+                            </>
+                          ) : (
+                            <>
+                              <Lock className="h-3.5 w-3.5" />
+                              Authorize $150.00 Payment
+                            </>
+                          )}
+                        </Button>
+                        <button 
+                          onClick={() => setCurrentStep("OFFER")}
+                          className="w-full text-center text-[10px] text-[#4A5D4E] hover:text-[#1A331E] font-semibold py-1"
+                        >
+                          ← Return to Offer Details
+                        </button>
                       </div>
                     </div>
                   )}
