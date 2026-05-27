@@ -27,14 +27,16 @@ import {
   FileText,
   CreditCard,
   Lock,
-  Link2
+  Link2,
+  ExternalLink,
+  Code
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 
-// Define the steps in the consumer-facing funnel (including secure payment capture)
+// Define the steps in the consumer-facing funnel
 type DemoStep = "CHIP_TAP" | "LANDING_PAGE" | "OPT_IN" | "QUIZ" | "OFFER" | "STRIPE_CHECKOUT" | "OUTCOME" | "FOLLOW_UP";
 
 // CRM Log entry type
@@ -65,9 +67,11 @@ export default function Home() {
   const [cardCvc, setCardCvc] = useState("");
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
-  // HighLevel Integration State
-  const [isMcpActive, setIsMcpActive] = useState(true); // Always true as the user connected the server
-  const [mcpStatusMsg, setMcpStatusMsg] = useState("Connected to live HighLevel API Engine");
+  // Real Integration webhook URL (for YAT?STATS)
+  const [webhookUrl, setWebhookUrl] = useState(() => {
+    return localStorage.getItem("arms_webhook_url") || "";
+  });
+  const [isSendingToLiveWebhook, setIsSendingToLiveWebhook] = useState(false);
 
   // Portal Stats State
   const [scanCount, setScanCount] = useState(148);
@@ -81,6 +85,18 @@ export default function Home() {
   ]);
 
   const logsEndRef = useRef<HTMLDivElement>(null);
+
+  // Save webhook to local storage
+  const saveWebhook = (url: string) => {
+    setWebhookUrl(url);
+    localStorage.setItem("arms_webhook_url", url);
+    if (url) {
+      addLog(`🔌 YAT?STATS Integration: Inbound Webhook URL saved.`, "success");
+      toast.success("Webhook URL saved locally!");
+    } else {
+      addLog(`🔌 YAT?STATS Integration: Live Webhook cleared. Reverting to simulation.`, "warning");
+    }
+  };
 
   // Helper to add CRM logs with simulated timestamps
   const addLog = (event: string, type: "info" | "success" | "warning" | "arms" = "info") => {
@@ -107,10 +123,48 @@ export default function Home() {
     addLog("ARMS Automated Relationship Management System Active", "arms");
     addLog("Campaign Webhook Active: 'First Call 75 Golf Wedge'", "info");
     addLog("NFC Webhook Listener: Listening at /api/v1/scans/poker-chip", "arms");
-    if (isMcpActive) {
-      addLog("⚡ Live HighLevel Integration Detected! API Handshake OK.", "success");
+    if (webhookUrl) {
+      addLog(`🔌 Live Webhook configured for YAT?STATS sub-account!`, "success");
+    } else {
+      addLog("💡 Tip: Enter your YAT?STATS inbound webhook URL in the settings panel below to push real contacts!", "info");
     }
   }, []);
+
+  // Send real lead data to user's webhook
+  const sendLeadToLiveWebhook = async (name: string, email: string, step: string, status: string, answers: any = {}) => {
+    if (!webhookUrl) return;
+
+    setIsSendingToLiveWebhook(true);
+    addLog(`📤 Pushing live contact data to YAT?STATS webhook...`, "arms");
+
+    try {
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          funnel_step: step,
+          status,
+          campaign: "Global 360 First Call 75",
+          source: "NFC Poker Chip",
+          quiz_answers: answers,
+          timestamp: new Date().toISOString()
+        }),
+        mode: "no-cors" // HighLevel/Zapier webhooks often don't return CORS headers, no-cors is safer for fire-and-forget
+      });
+
+      addLog(`⚡ Live Webhook: Contact '${name}' successfully pushed to YAT?STATS!`, "success");
+      toast.success("Live contact pushed to YAT?STATS!");
+    } catch (error) {
+      console.error("Webhook error:", error);
+      addLog(`❌ Webhook dispatch failed. Please verify your YAT?STATS webhook URL.`, "warning");
+    } finally {
+      setIsSendingToLiveWebhook(false);
+    }
+  };
 
   // Handle virtual NFC chip tap
   const handleNfcTap = () => {
@@ -132,15 +186,9 @@ export default function Home() {
     
     addLog(`👤 Lead Captured: ${leadName} (${leadEmail})`, "success");
     addLog(`ARMS Database: Created contact record with status 'Prospect'`, "arms");
-    
-    if (isMcpActive) {
-      addLog(`⚡ Live HighLevel API: Triggering contacts_upsert-contact...`, "arms");
-      addLog(`⚡ Live HighLevel API: Applying tag 'Golf_Wedge_Launch' to contact record`, "success");
-    } else {
-      addLog(`ARMS Sequence: Tagged with 'Golf_Wedge_2026' & 'Voucher_Unclaimed'`, "arms");
-    }
-    
+    addLog(`ARMS Sequence: Tagged with 'Golf_Wedge_2026' & 'Voucher_Unclaimed'`, "arms");
     addLog(`ARMS Action: Voucher code G75-TEMP-ACTIVATE reserved for 15 minutes`, "info");
+    
     setOptInCount(prev => prev + 1);
     
     // Add to recent leads in portal
@@ -148,6 +196,11 @@ export default function Home() {
       { name: leadName, email: leadEmail, status: "Prospect (Quiz)", date: "Just now", value: "$0" },
       ...prev.slice(0, 3)
     ]);
+
+    // Send to live webhook if configured
+    if (webhookUrl) {
+      sendLeadToLiveWebhook(leadName, leadEmail, "Opt-In", "Prospect");
+    }
 
     setCurrentStep("QUIZ");
     toast.success("Voucher Reserved! Let's complete your travel planner profile.");
@@ -197,8 +250,8 @@ export default function Home() {
       addLog(`ARMS Segmentation: Mindset classified as '${isPlanner ? "Planner" : "Spontaneous"}'`, "arms");
       addLog(`ARMS Segmentation: Family First-Call Status: '${hasFirstCallPlan ? "Protected" : "Unprepared"}'`, "arms");
       
-      if (isMcpActive) {
-        addLog(`⚡ Live HighLevel API: Updating custom fields with travel segmentation answers...`, "arms");
+      if (webhookUrl) {
+        sendLeadToLiveWebhook(leadName, leadEmail, "Quiz Completed", "Segmented Prospect", updatedAnswers);
       }
 
       if (!hasFirstCallPlan) {
@@ -220,14 +273,12 @@ export default function Home() {
     } else {
       addLog("⚠️ Prospect hesitated on offer page (Clicked 'No thanks' or closed tab)", "warning");
       addLog("ARMS Trigger: Activated Abandoned Checkout Recovery Sequence", "arms");
+      addLog("ARMS Delay: Scheduled Plan B Email Nurture Sequence (Trigger in 15 mins)", "arms");
       
-      if (isMcpActive) {
-        addLog(`⚡ Live HighLevel API: Triggering workflow sequence 'Checkout_Abandonment_Drip'`, "arms");
-        addLog(`⚡ Live HighLevel API: Dispatching dynamic email sequence Plan B to ${leadEmail}`, "success");
-      } else {
-        addLog("ARMS Delay: Scheduled Plan B Email Nurture Sequence (Trigger in 15 mins)", "arms");
+      if (webhookUrl) {
+        sendLeadToLiveWebhook(leadName, leadEmail, "Offer Declined", "Abandoned Checkout (Plan B)", quizAnswers);
       }
-      
+
       // Update in recent leads
       setRecentLeads(prev => prev.map(lead => 
         lead.email === leadEmail ? { ...lead, status: "Prospect (Plan B)" } : lead
@@ -263,20 +314,16 @@ export default function Home() {
       addLog("💳 Stripe: Charge authorized successfully! Amount: $150.00 USD", "success");
       addLog("ARMS Billing: Generated invoice #INV-2026-0089", "arms");
       addLog("ARMS CRM: Upgraded contact status to 'Active Member'", "arms");
-      
-      if (isMcpActive) {
-        addLog(`⚡ Live HighLevel API: Adding tag 'Active_Member' to ${leadEmail}`, "arms");
-        addLog(`⚡ Live HighLevel API: Triggering post-purchase onboarding workflow...`, "arms");
-        addLog(`⚡ Live HighLevel API: Dispatching $75 ShipSticks promo code email to ${leadEmail}`, "success");
-      } else {
-        addLog("ARMS Action: Delivered $75 ShipSticks-style Voucher code: SS-GOLF-75-ACTIVE", "success");
-        addLog("ARMS Action: Dispatched 'First Call Family Instruction Packet' PDF via email", "info");
-      }
-      
+      addLog("ARMS Action: Delivered $75 ShipSticks-style Voucher code: SS-GOLF-75-ACTIVE", "success");
+      addLog("ARMS Action: Dispatched 'First Call Family Instruction Packet' PDF via email", "info");
       addLog("ARMS Fulfillment: Scheduled physical welcome packet & membership card delivery", "arms");
       
       setMemberCount(prev => prev + 1);
       
+      if (webhookUrl) {
+        sendLeadToLiveWebhook(leadName, leadEmail, "Payment Completed", "Active Member", quizAnswers);
+      }
+
       // Update in recent leads
       setRecentLeads(prev => prev.map(lead => 
         lead.email === leadEmail ? { ...lead, status: "Active Member", value: "$150" } : lead
@@ -847,19 +894,41 @@ export default function Home() {
             {/* Right: ARMS Automation Log Console (5 Cols) */}
             <div className="lg:col-span-5 space-y-6">
               
-              {/* Live Integration Status Card */}
-              <Card className="border border-[#2D4A32] bg-[#172D1B] text-white">
-                <CardContent className="p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="h-8 w-8 bg-[#2D6A4F] rounded-full flex items-center justify-center border border-[#C2B280]">
-                      <Link2 className="h-4 w-4 text-[#C2B280] animate-pulse" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] uppercase tracking-widest text-[#C2B280] font-bold block">ARMS Integration</span>
-                      <span className="text-xs font-semibold">{mcpStatusMsg}</span>
+              {/* Webhook Configuration Panel (for YAT?STATS) */}
+              <Card className="border border-[#C2B280] bg-[#F9F8F0] shadow-md">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center gap-2">
+                    <Code className="h-4 w-4 text-[#1A331E]" />
+                    <CardTitle className="text-xs uppercase tracking-wider font-bold text-[#1A331E]">YAT?STATS Webhook Integration</CardTitle>
+                  </div>
+                  <CardDescription className="text-[11px] text-[#4A5D4E]">
+                    Wire up the demo to your real sub-account to push live contact records!
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3 pt-1">
+                  <div className="space-y-1">
+                    <label className="text-[9px] uppercase tracking-wider font-bold text-[#1A331E] block">Inbound Webhook Trigger URL</label>
+                    <div className="flex gap-2">
+                      <input 
+                        type="text" 
+                        value={webhookUrl}
+                        onChange={(e) => saveWebhook(e.target.value)}
+                        placeholder="e.g., https://services.leadconnectorhq.com/hooks/..." 
+                        className="flex-1 bg-white border border-[#E6E2D3] px-2.5 py-1.5 rounded-xs text-[11px] focus:outline-hidden"
+                      />
+                      {webhookUrl && (
+                        <button 
+                          onClick={() => saveWebhook("")}
+                          className="text-[10px] text-red-600 font-bold hover:underline shrink-0"
+                        >
+                          Clear
+                        </button>
+                      )}
                     </div>
                   </div>
-                  <span className="h-2.5 w-2.5 bg-[#4AD66D] rounded-full shadow-md animate-pulse"></span>
+                  <p className="text-[10px] text-[#4A5D4E] leading-relaxed">
+                    💡 <strong>How to get this:</strong> Inside your YAT?STATS sub-account, create an <strong>Automation Workflow</strong>. Set the trigger to <strong>Inbound Webhook</strong>, copy the generated Webhook URL, and paste it here!
+                  </p>
                 </CardContent>
               </Card>
 
@@ -899,7 +968,7 @@ export default function Home() {
                   </div>
                 </CardHeader>
                 <CardContent className="p-4">
-                  <div className="h-[360px] overflow-y-auto space-y-3 text-[11px] leading-relaxed pr-1 flex flex-col-reverse">
+                  <div className="h-[320px] overflow-y-auto space-y-3 text-[11px] leading-relaxed pr-1 flex flex-col-reverse">
                     <div ref={logsEndRef} />
                     {crmLogs.map((log) => (
                       <div key={log.id} className="border-b border-[#2D4A32]/30 pb-2 animate-fadeIn">
@@ -925,11 +994,6 @@ export default function Home() {
                   </div>
                 </CardContent>
               </Card>
-              
-              <div className="bg-[#F9F8F0] border border-[#E6E2D3] p-4 rounded-xs text-xs text-[#4A5D4E]">
-                <span className="font-bold text-[#1A331E] block mb-1">💡 B2B Engine Insight:</span>
-                This panel demonstrates the real-time automation running behind the customer-facing mobile interface. Every scan, opt-in, quiz answer, and purchase decision is instantly tracked, segmented, and acted upon by the relationship manager.
-              </div>
             </div>
 
           </div>
@@ -939,6 +1003,42 @@ export default function Home() {
         {activeTab === "portal" && (
           <div className="space-y-8 max-w-5xl mx-auto">
             
+            {/* NEW ADDITION: CLIENT-FACING GLOBAL 360 BANNER AD INSIDE YAT?STATS */}
+            <div className="relative rounded-sm overflow-hidden border-2 border-[#C2B280] bg-[#1A331E] text-white p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+              {/* Background accent styling */}
+              <div className="absolute top-0 right-0 h-full w-1/3 bg-radial from-[#C2B280]/20 to-transparent pointer-events-none"></div>
+              
+              <div className="flex items-center gap-4 z-10">
+                <div className="h-14 w-14 bg-[#FDFCF7] rounded-full flex items-center justify-center border-2 border-[#C2B280] shrink-0">
+                  <Award className="h-7 w-7 text-[#1A331E]" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="bg-[#C2B280] text-[#1A331E] text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-xs">Exclusive Partnership</span>
+                    <span className="text-[10px] text-[#C2B280] font-semibold">YAT?STATS Special Offer</span>
+                  </div>
+                  <h3 className="font-serif-display text-lg font-bold text-white tracking-wide">
+                    Global 360 | First Call 75 Travel Protection
+                  </h3>
+                  <p className="text-xs text-[#D4ECD5] font-serif-body max-w-xl">
+                    Protect your cherished golf clubs and secure your repatriation safety plan. Activate your $75 ShipSticks-style travel voucher now.
+                  </p>
+                </div>
+              </div>
+
+              <Button 
+                onClick={() => {
+                  setActiveTab("funnel");
+                  setCurrentStep("LANDING_PAGE");
+                  addLog("🔗 Banner Ad Clicked inside YAT?STATS Portal!", "success");
+                  toast.success("Navigating to Global 360 Funnel Landing Page!");
+                }}
+                className="bg-[#FDFCF7] hover:bg-[#E6E2D3] text-[#1A331E] border border-[#C2B280] px-6 py-5 rounded-sm font-sans-ui text-xs uppercase tracking-wider font-bold z-10 shadow-lg shrink-0 flex items-center gap-1.5 active:scale-95"
+              >
+                Claim $75 Voucher <ExternalLink className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+
             {/* Dashboard Hero */}
             <div className="double-border bg-[#F9F8F0] p-8 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1.5 bg-[#1A331E]"></div>
