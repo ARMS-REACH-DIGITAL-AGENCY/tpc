@@ -467,38 +467,38 @@ export default function Home() {
         )}
 
         {step === "STRIPE_CHECKOUT" && (
-          <div className="w-full max-w-sm mx-auto space-y-3 animate-fade-in">
-            <Card className="border border-[#E8E4DC] shadow-[0_12px_40px_rgba(28,43,33,0.03)] bg-white rounded-none overflow-hidden">
-              <div className="bg-[#FAF8F5] border-b border-[#E8E4DC] p-3.5 flex items-center justify-between">
+          <div className="w-full max-w-sm mx-auto space-y-2 animate-fade-in">
+            <Card className="border border-[#E8E4DC] shadow-[0_8px_30px_rgba(28,43,33,0.02)] bg-white rounded-none overflow-hidden">
+              <div className="bg-[#FAF8F5] border-b border-[#E8E4DC] p-2.5 flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5 text-[#107C41]" />
-                  <span className="text-xs font-bold text-[#1C2B21] tracking-wider uppercase">Secure Stripe Checkout</span>
+                  <Lock className="w-3 h-3 text-[#107C41]" />
+                  <span className="text-[10px] font-bold text-[#1C2B21] tracking-wider uppercase">Secure Stripe Checkout</span>
                 </div>
-                <div className="text-[9px] font-bold text-[#107C41] bg-[#EAF7EE] px-2 py-0.5 rounded-none">
+                <div className="text-[8px] font-bold text-[#107C41] bg-[#EAF7EE] px-1.5 py-0.5 rounded-none">
                   SSL Encrypted
                 </div>
               </div>
 
-              <CardContent className="p-4 space-y-3.5">
-                {/* Order Summary */}
-                <div className="bg-[#FAF8F5] border border-[#E8E4DC] rounded-none p-3.5 space-y-1.5">
-                  <div className="flex justify-between text-xs text-[#5C6B5E]">
-                    <span>1-Year TPC Membership</span>
+              <CardContent className="p-3 space-y-2.5">
+                {/* Compact Order Summary */}
+                <div className="bg-[#FAF8F5] border border-[#E8E4DC] rounded-none p-2.5 space-y-1">
+                  <div className="flex justify-between text-[11px] text-[#5C6B5E]">
+                    <span>1-Yr TPC Membership</span>
                     <span>$150.00</span>
                   </div>
-                  <div className="flex justify-between text-xs text-[#107C41] font-bold">
+                  <div className="flex justify-between text-[11px] text-[#107C41] font-bold">
                     <span>Ship Sticks Voucher</span>
                     <span>-$75.00 Rebate Held</span>
                   </div>
-                  <div className="border-t border-[#E8E4DC] pt-1.5 flex justify-between text-sm font-bold text-[#1C2B21]">
+                  <div className="border-t border-[#E8E4DC] pt-1 flex justify-between text-xs font-bold text-[#1C2B21]">
                     <span>Total Due Today</span>
                     <span>$150.00</span>
                   </div>
                 </div>
 
-                <form onSubmit={handleStripeSubmit} className="space-y-3.5">
-                  <div className="space-y-1">
-                    <Label htmlFor="cardNumber" className="text-[10px] font-bold text-[#5C6B5E] uppercase tracking-wider">Card Number</Label>
+                <form onSubmit={handleStripeSubmit} className="space-y-2.5">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="cardNumber" className="text-[9px] font-bold text-[#5C6B5E] uppercase tracking-wider">Card Number</Label>
                     <Input
                       id="cardNumber"
                       type="text"
@@ -506,13 +506,13 @@ export default function Home() {
                       value={stripeData.cardNumber}
                       onChange={(e) => setStripeData({ ...stripeData, cardNumber: e.target.value })}
                       required
-                      className="h-10 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] rounded-none transition-all"
+                      className="h-9 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] rounded-none transition-all"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <Label htmlFor="expiry" className="text-[10px] font-bold text-[#5C6B5E] uppercase tracking-wider">Expiration</Label>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="expiry" className="text-[9px] font-bold text-[#5C6B5E] uppercase tracking-wider">Expiration</Label>
                       <Input
                         id="expiry"
                         type="text"
@@ -520,11 +520,11 @@ export default function Home() {
                         value={stripeData.expiry}
                         onChange={(e) => setStripeData({ ...stripeData, expiry: e.target.value })}
                         required
-                        className="h-10 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] rounded-none transition-all"
+                        className="h-9 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] rounded-none transition-all"
                       />
                     </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="cvc" className="text-[10px] font-bold text-[#5C6B5E] uppercase tracking-wider">CVC</Label>
+                    <div className="space-y-0.5">
+                      <Label htmlFor="cvc" className="text-[9px] font-bold text-[#5C6B5E] uppercase tracking-wider">CVC</Label>
                       <Input
                         id="cvc"
                         type="text"
@@ -532,23 +532,23 @@ export default function Home() {
                         value={stripeData.cvc}
                         onChange={(e) => setStripeData({ ...stripeData, cvc: e.target.value })}
                         required
-                        className="h-10 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] rounded-none transition-all"
+                        className="h-9 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] rounded-none transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="flex gap-3 pt-1">
+                  <div className="flex gap-2.5 pt-0.5">
                     <Button
                       type="button"
                       variant="outline"
                       onClick={prefillStripeDemo}
-                      className="flex-1 h-10 border-[#E8E4DC] text-[10px] font-bold text-[#5C6B5E] hover:bg-[#FAF8F5] active:scale-[0.98] rounded-none transition-all cursor-pointer"
+                      className="flex-1 h-9 border-[#E8E4DC] text-[9px] font-bold text-[#5C6B5E] hover:bg-[#FAF8F5] active:scale-[0.98] rounded-none transition-all cursor-pointer"
                     >
                       Pref-fill Demo Card
                     </Button>
                     <Button
                       type="submit"
-                      className="flex-1 h-10 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-[10px] tracking-wider uppercase rounded-none shadow-md active:scale-[0.98] transition-all cursor-pointer"
+                      className="flex-1 h-9 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-[9px] tracking-wider uppercase rounded-none shadow-sm active:scale-[0.98] transition-all cursor-pointer"
                     >
                       Authorize
                     </Button>
