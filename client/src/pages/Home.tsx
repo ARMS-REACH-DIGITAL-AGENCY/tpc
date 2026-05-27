@@ -278,7 +278,7 @@ export default function Home() {
 
                 {/* Logo 2: Clean Ship Sticks Banner (Physically cropped image, no text) */}
                 <img 
-                  src="/manus-storage/shipsticks_logo_clean_4636b04e.png" 
+                  src="/manus-storage/shipsticks_logo_perfect_58eb9e96.png" 
                   alt="Ship Sticks" 
                   className="h-10 md:h-13 object-contain shrink-0"
                 />
@@ -450,7 +450,7 @@ export default function Home() {
                   className="h-16 md:h-20 object-contain shrink-0"
                 />
                 <img 
-                  src="/manus-storage/shipsticks_logo_clean_4636b04e.png" 
+                  src="/manus-storage/shipsticks_logo_perfect_58eb9e96.png" 
                   alt="Ship Sticks" 
                   className="h-10 md:h-13 object-contain shrink-0"
                 />
@@ -710,7 +710,7 @@ export default function Home() {
                   className="h-16 md:h-20 object-contain shrink-0"
                 />
                 <img 
-                  src="/manus-storage/shipsticks_logo_clean_4636b04e.png" 
+                  src="/manus-storage/shipsticks_logo_perfect_58eb9e96.png" 
                   alt="Ship Sticks" 
                   className="h-10 md:h-13 object-contain shrink-0"
                 />
