@@ -185,14 +185,14 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#1C2B21] font-sans antialiased flex flex-col justify-between overflow-x-hidden py-1 px-4">
+    <div className="min-h-screen bg-[#FDFBF7] text-[#1C2B21] font-sans antialiased flex flex-col justify-between overflow-x-hidden pt-1 pb-4 px-4">
       {/* Main Content Area - Centered, Tightened Spacing, Warm Sand Aesthetics */}
       <main className="flex-1 max-w-md mx-auto w-full flex flex-col justify-center my-auto space-y-2">
         {step === "OPT_IN" && (
-          <div className="space-y-3 w-full animate-fade-in">
+          <div className="space-y-4 w-full animate-fade-in">
             {/* Pure, Frictionless Opt-In Form Card - Sharp Corners, Rich Cream Background, NO BORDERS */}
             <Card className="border-0 shadow-none bg-transparent rounded-none">
-              <CardContent className="p-2 md:p-3 space-y-4">
+              <CardContent className="p-0 space-y-4">
                 <div className="text-center space-y-2">
                   {/* BOLD SANS-SERIF HEADLINE - EXACTLY AS SHOWN IN USER MOCKUP */}
                   <h1 className="text-2xl md:text-3xl font-sans font-black tracking-tight text-black leading-tight">
@@ -204,7 +204,7 @@ export default function Home() {
                   <div className="h-[2px] w-16 bg-[#E5C158] mx-auto mt-2" />
                 </div>
 
-                <form onSubmit={handleOptInSubmit} className="space-y-4 pt-2">
+                <form onSubmit={handleOptInSubmit} className="space-y-4 pt-1">
                   <div className="space-y-1">
                     <Label htmlFor="name" className="text-[10px] font-bold text-[#5C6B5E] tracking-wider uppercase">
                       Full Name
@@ -262,7 +262,7 @@ export default function Home() {
             </Card>
 
             {/* Bottom Section: Grouped Co-branded Logos & Elegant Footnote */}
-            <div className="space-y-3 pt-2">
+            <div className="space-y-4 pt-4">
               {/* Row of Logos - EXACTLY MATCHING USER MOCKUP SIZES (HUGE AND NO CONTAINERS) */}
               <div className="flex items-center justify-center gap-2 md:gap-4 px-2">
                 {/* Logo 1: High-Res TPC Shield (Larger) */}
@@ -279,16 +279,18 @@ export default function Home() {
                   className="h-14 md:h-16 object-contain shrink-0"
                 />
 
-                {/* Logo 3: Circular ASB Logo (Larger) */}
-                <img 
-                  src="/manus-storage/cropped_asb_dark_f202b5ec.png" 
-                  alt="ASB Logo" 
-                  className="h-16 w-16 md:h-20 md:w-24 object-contain shrink-0 rounded-full"
-                />
+                {/* Logo 3: Circular ASB Logo (Cleaned up, stray pixels cropped using overflow-hidden wrapper) */}
+                <div className="h-16 w-16 md:h-20 md:w-20 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-transparent">
+                  <img 
+                    src="/manus-storage/cropped_asb_dark_f202b5ec.png" 
+                    alt="ASB Logo" 
+                    className="h-[105%] w-[105%] object-cover scale-[0.95]"
+                  />
+                </div>
               </div>
 
               {/* Text Footnote */}
-              <div className="text-center px-4">
+              <div className="text-center px-4 pt-1">
                 <span className="text-[9px] md:text-[10px] text-[#5C6B5E] font-bold tracking-wider uppercase block leading-relaxed">
                   COMPLEMENT of <br />
                   THE TRAVEL PROTECTION CLUB & ASB ATHLETICS <br />
