@@ -266,7 +266,7 @@ export default function Home() {
             </Card>
 
             {/* Bottom Section: Grouped Co-branded Logos & Elegant Footnote */}
-            <div className="space-y-1 pt-1.5">
+            <div className="space-y-0.5 mt-[-4px]">
               {/* Row of Logos - Moved up closer to CTA, enlarged logos, and aggressively cropped out the 'COMPLEMENT OF' text from the Ship Sticks image */}
               <div className="flex items-center justify-center gap-3 md:gap-5 px-2">
                 {/* Logo 1: High-Res TPC Shield (Larger) */}
@@ -280,7 +280,7 @@ export default function Home() {
                 <img 
                   src="/manus-storage/shipsticks_logo_perfect_58eb9e96.png" 
                   alt="Ship Sticks" 
-                  className="h-10 md:h-13 object-contain shrink-0"
+                  className="h-12 md:h-15 object-contain shrink-0"
                 />
 
                 {/* Logo 3: Circular ASB Logo (Larger) */}
@@ -442,7 +442,7 @@ export default function Home() {
             </Card>
 
             {/* Re-use bottom logos and footer on the offer screen to keep brand cohesion */}
-            <div className="space-y-1 pt-1.5">
+            <div className="space-y-0.5 mt-[-4px]">
               <div className="flex items-center justify-center gap-3 md:gap-5 px-2">
                 <img 
                   src="/manus-storage/57885_120b932a.png" 
@@ -452,7 +452,7 @@ export default function Home() {
                 <img 
                   src="/manus-storage/shipsticks_logo_perfect_58eb9e96.png" 
                   alt="Ship Sticks" 
-                  className="h-10 md:h-13 object-contain shrink-0"
+                  className="h-12 md:h-15 object-contain shrink-0"
                 />
                 <div className="h-13 w-13 md:h-16 md:w-16 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-transparent">
                   <img 
@@ -702,7 +702,7 @@ export default function Home() {
             </Card>
 
             {/* Bottom co-branded logos on final screen */}
-            <div className="space-y-1 pt-1.5">
+            <div className="space-y-0.5 mt-[-4px]">
               <div className="flex items-center justify-center gap-3 md:gap-5 px-2">
                 <img 
                   src="/manus-storage/57885_120b932a.png" 
@@ -712,7 +712,7 @@ export default function Home() {
                 <img 
                   src="/manus-storage/shipsticks_logo_perfect_58eb9e96.png" 
                   alt="Ship Sticks" 
-                  className="h-10 md:h-13 object-contain shrink-0"
+                  className="h-12 md:h-15 object-contain shrink-0"
                 />
                 <div className="h-13 w-13 md:h-16 md:w-16 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-transparent">
                   <img 
