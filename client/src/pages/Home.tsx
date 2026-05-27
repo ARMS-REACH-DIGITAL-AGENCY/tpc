@@ -55,6 +55,35 @@ export default function Home() {
     }
   ];
 
+  // Reusable helper to send lead updates to YAT?STATS/ARMS Webhook at different funnel steps
+  const sendLeadToLiveWebhook = async (funnelStep: string, status: string, answers: any = {}) => {
+    if (!webhookUrl) return;
+    try {
+      await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          funnel_step: funnelStep,
+          status: status,
+          campaign: "Global 360 First Call 75",
+          source: "ShipSticks_TPC_Launch",
+          tag: "Golf_Wedge_Launch",
+          quiz_answers: answers,
+          timestamp: new Date().toISOString()
+        }),
+        mode: "no-cors" // no-cors is safer for HighLevel/Zapier webhooks to prevent CORS blockages
+      });
+      console.log(`Live Webhook Success: Pushed step '${funnelStep}' to ARMS.`);
+    } catch (err) {
+      console.error("Live Webhook Error:", err);
+    }
+  };
+
   const handleOptInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email) {
@@ -64,51 +93,61 @@ export default function Home() {
 
     setIsSubmitting(true);
 
+    // Push Opt-In Stage to ARMS
     if (webhookUrl) {
-      try {
-        await fetch(webhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          mode: "no-cors",
-          body: JSON.stringify({
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            source: "ShipSticks_TPC_Launch",
-            tag: "Golf_Wedge_Launch"
-          })
-        });
-        toast.success("Contact info saved!");
-      } catch (err) {
-        console.error("Webhook submit failed:", err);
-      }
-    } else {
-      toast.success("Contact info saved!");
+      await sendLeadToLiveWebhook("Opt-In", "Prospect");
     }
-
+    
+    toast.success("Contact info saved!");
     setIsSubmitting(false);
     // Go directly to the quiz questions!
     setDemoStep("QUIZ");
   };
 
-  const handleQuizAnswer = (answer: string) => {
+  const handleQuizAnswer = async (answer: string) => {
     const updatedAnswers = [...quizAnswers, { questionId: quizQuestions[currentQuestionIndex].id, answer }];
     setQuizAnswers(updatedAnswers);
 
     if (currentQuestionIndex < quizQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
+      // Quiz completed! Format answers as key-value pairs for the webhook payload
+      const formattedAnswers = updatedAnswers.reduce((acc, curr) => {
+        acc[curr.questionId] = curr.answer;
+        return acc;
+      }, {} as Record<string, string>);
+
+      // Push Quiz Completed Stage to ARMS
+      if (webhookUrl) {
+        await sendLeadToLiveWebhook("Quiz Completed", "Segmented Prospect", formattedAnswers);
+      }
+
       setDemoStep("OFFER");
     }
   };
 
-  const handleStripeSubmit = (e: React.FormEvent) => {
+  const handleStripeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!stripeData.cardNumber || !stripeData.expiry || !stripeData.cvc) {
       toast.error("Please enter your card details.");
       return;
     }
+
+    setIsSubmitting(true);
+
+    // Format quiz answers for the final payload
+    const formattedAnswers = quizAnswers.reduce((acc, curr) => {
+      acc[curr.questionId] = curr.answer;
+      return acc;
+    }, {} as Record<string, string>);
+
+    // Push Payment Completed Stage to ARMS
+    if (webhookUrl) {
+      await sendLeadToLiveWebhook("Payment Completed", "Active Member", formattedAnswers);
+    }
+
     toast.success("Payment Authorized Successfully!");
+    setIsSubmitting(false);
     setDemoStep("SUCCESS");
   };
 
@@ -465,7 +504,7 @@ export default function Home() {
                       onClick={prefillStripeDemo}
                       className="flex-1 h-10 border-[#E8E4DC] text-[10px] font-bold text-[#5C6B5E] hover:bg-[#FAF8F5] active:scale-[0.98] rounded-none transition-all cursor-pointer"
                     >
-                      Pre-fill Demo Card
+                      Pref-fill Demo Card
                     </Button>
                     <Button
                       type="submit"
