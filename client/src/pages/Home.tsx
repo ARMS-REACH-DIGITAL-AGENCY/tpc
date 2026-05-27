@@ -360,29 +360,23 @@ export default function Home() {
                   
                   {/* EMOTIONAL TRANSFORMATIONAL MESSAGE */}
                   <p className="text-[10px] md:text-xs text-[#3A4A3D] font-bold max-w-sm mx-auto leading-normal px-1">
-                    Your clubs aren’t the only thing that needs a plan to get home. 
-                    First Call 75 helps your family know who to call first if something happens more than 75 miles from home.
+                    Golfers plan how their clubs get home. First Call 75 helps your family know who to call first if something happens more than 75 miles from home.
                   </p>
                 </div>
 
                 {/* Clean, borderless value summary matching landing page styling */}
                 <div className="bg-[#FAF8F5] border border-[#E8E4DC] rounded-none overflow-hidden max-w-sm mx-auto">
-                  <div className="grid grid-cols-2 bg-[#FAF8F5] border-b border-[#E8E4DC] p-2 text-[9px] font-bold text-[#5C6B5E] tracking-wider uppercase">
-                    <span>What You Get</span>
-                    <span className="text-right">Details / Value</span>
+                  <div className="bg-[#FAF8F5] border-b border-[#E8E4DC] p-2 text-[9px] font-bold text-[#5C6B5E] tracking-wider uppercase text-center">
+                    Your First-Year Offer
                   </div>
                   <div className="divide-y divide-[#E8E4DC] text-[11px]">
                     <div className="grid grid-cols-2 p-2 text-[#1C2B21]">
-                      <span className="font-semibold">1-Yr Travel Protection Membership</span>
+                      <span className="font-semibold">1-Year Travel Protection Club Membership</span>
                       <span className="text-right font-bold">$150.00</span>
                     </div>
                     <div className="grid grid-cols-2 p-2 text-[#1C2B21] bg-[#EAF7EE]/10">
-                      <span className="font-semibold text-[#107C41]">$75 Golf Club Shipping Credit</span>
-                      <span className="text-right font-bold text-[#107C41]">Issued after activation</span>
-                    </div>
-                    <div className="grid grid-cols-2 p-2 bg-[#FAF8F5] font-bold text-[11px] text-[#1C2B21]">
-                      <span>You Pay Today</span>
-                      <span className="text-right text-[#107C41]">$150.00</span>
+                      <span className="font-semibold text-[#107C41]">Golf Club Shipping Credit</span>
+                      <span className="text-right font-bold text-[#107C41]">-$75.00</span>
                     </div>
                     <div className="grid grid-cols-2 p-2 bg-[#FAF8F5] font-bold text-[11px] text-[#1C2B21]">
                       <span>Effective First-Year Cost After Credit</span>
@@ -433,16 +427,21 @@ export default function Home() {
                   </div>
                 </div>
 
+                {/* Small note under table */}
+                <p className="text-[9px] text-[#5C6B5E] text-center leading-normal max-w-sm mx-auto px-1 pt-0.5">
+                  You pay $150 today. Your $75 golf club shipping credit is issued after paid membership activation and may be used toward a qualifying shipment. Effective first-year cost assumes the credit is redeemed. Terms apply.
+                </p>
+
                 {/* CTA Area */}
                 <div className="space-y-1.5 pt-1 max-w-sm mx-auto">
                   <p className="text-[9px] text-[#5C6B5E] text-center leading-normal">
-                    This is not just a shipping offer. It is a travel protection membership. The golf shipping credit simply makes the first year easier to activate.
+                    By continuing, you can activate your Travel Protection Club membership and unlock your $75 golf club shipping credit.
                   </p>
                   <Button 
                     onClick={() => setDemoStep("STRIPE_CHECKOUT")}
                     className="w-full min-h-10 py-2 px-3 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-[10px] tracking-wider uppercase rounded-none shadow-sm flex items-center justify-center gap-1.5 cursor-pointer whitespace-normal text-center leading-normal"
                   >
-                    <span>ACTIVATE MY MEMBERSHIP + $75 SHIPPING CREDIT</span>
+                    <span>Activate My Membership + $75 Shipping Credit</span>
                     <ChevronRight className="w-3.5 h-3.5 shrink-0" />
                   </Button>
                   <p className="text-[8px] text-[#A4B3A7] text-center italic">
