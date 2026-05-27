@@ -3,13 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, ChevronRight, Lock, ArrowRight, Shield, Check, Trophy } from "lucide-react";
+import { CheckCircle2, ChevronRight, Lock, ArrowRight, Shield, Check } from "lucide-react";
 import { toast } from "sonner";
 
 type DemoStep = "OPT_IN" | "QUIZ_INTRO" | "QUIZ" | "OFFER" | "STRIPE_CHECKOUT" | "SUCCESS";
 
 interface QuizAnswer {
-  questionId: number;
+  questionId: string;
   answer: string;
 }
 
@@ -34,24 +34,24 @@ export default function Home() {
 
   const quizQuestions = [
     {
-      id: 1,
-      question: "How many times do you travel for golf annually?",
-      options: ["1-2 times", "3-5 times", "6+ times", "Rarely"]
+      id: "travel_freq",
+      question: "How often do you travel with your golf clubs?",
+      options: ["3+ times a year", "Once or twice a year", "Rarely", "Planning my first golf trip"]
     },
     {
-      id: 2,
-      question: "Do you currently own a high-end, custom set of golf clubs?",
-      options: ["Yes, custom fitted ($2,000+ value)", "Yes, standard set", "No, I rent at courses"]
+      id: "worry_factor",
+      question: "What concerns you most when shipping or traveling with your clubs?",
+      options: ["Damage to expensive clubs", "Delays/lost luggage", "Excessive shipping fees", "Logistical hassle"]
     },
     {
-      id: 3,
-      question: "In the event of an unforeseen medical emergency while traveling, do you have a plan to safely transport yourself and your equipment back home?",
-      options: ["Yes, I have dedicated medical transport coverage", "No, I assume my standard health insurance covers it", "I don't have a plan in place"]
+      id: "planner_mindset",
+      question: "When you travel, do you usually plan emergency logistics in advance?",
+      options: ["Always (I have written checklists)", "Usually", "Sometimes", "I prefer to wing it"]
     },
     {
-      id: 4,
-      question: "What is your primary concern when traveling with your clubs?",
-      options: ["Clubs getting lost or damaged by airlines", "High airline baggage fees and hassle", "Unforeseen travel or health disruptions"]
+      id: "first_call_gap",
+      question: "If an unexpected medical crisis happened away from home, would your family know exactly who to call first?",
+      options: ["Yes, we have a clear emergency contact", "Not entirely sure", "Probably not", "We have never thought about it"]
     }
   ];
 
