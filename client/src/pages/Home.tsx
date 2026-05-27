@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, ChevronRight, Lock, ArrowRight, Shield, Check, Share2 } from "lucide-react";
+import { CheckCircle2, ChevronRight, Lock, ArrowRight, Shield, Check, Share2, HelpCircle, FileText, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 
 type DemoStep = "OPT_IN" | "QUIZ" | "OFFER" | "STRIPE_CHECKOUT" | "SUCCESS";
@@ -31,6 +31,10 @@ export default function Home() {
     expiry: "",
     cvc: ""
   });
+  
+  // FAQs and Terms toggle states for final page
+  const [faqOpen, setFaqOpen] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
 
   const quizQuestions = [
     {
@@ -421,7 +425,7 @@ export default function Home() {
                   </p>
                   <Button 
                     onClick={() => setDemoStep("STRIPE_CHECKOUT")}
-                    className="w-full min-h-12 py-3 px-4 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md flex items-center justify-center gap-2 cursor-pointer whitespace-normal text-center leading-normal"
+                    className="w-full min-h-12 py-3 px-4 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md flex items-center justify-center gap-2 mt-2 cursor-pointer whitespace-normal text-center leading-normal"
                   >
                     <span>ACCEPT OFFER & PROCEED TO CHECKOUT</span>
                     <ChevronRight className="w-4 h-4 shrink-0" />
@@ -556,55 +560,169 @@ export default function Home() {
         )}
 
         {step === "SUCCESS" && (
-          <div className="w-full space-y-4 animate-fade-in">
-            <Card className="border border-[#107C41] shadow-[0_12px_40px_rgba(28,43,33,0.04)] bg-white rounded-none overflow-hidden">
-              <div className="bg-[#107C41] text-white p-5 text-center space-y-1.5">
-                <CheckCircle2 className="w-12 h-10 mx-auto text-[#E5C158] animate-bounce" />
-                <h2 className="text-lg font-serif font-bold">Welcome to the Club!</h2>
-                <p className="text-xs text-[#EAF7EE] max-w-xs mx-auto">
-                  Your TPC membership is active and your Ship Sticks voucher has been issued.
-                </p>
-              </div>
+          <div className="w-full space-y-4 animate-fade-in pb-6">
+            {/* Pure, borderless, warm-sand success card */}
+            <Card className="border-0 shadow-none bg-transparent rounded-none">
+              <CardContent className="p-0 space-y-5">
+                <div className="text-center space-y-2">
+                  <div className="p-2 bg-[#EAF7EE] text-[#107C41] inline-flex rounded-full mb-1">
+                    <CheckCircle2 className="w-10 h-10" />
+                  </div>
+                  <h1 className="text-2xl font-sans font-black tracking-tight text-black leading-tight">
+                    You're Officially Protected!
+                  </h1>
+                  <div className="h-[2px] w-16 bg-[#E5C158] mx-auto mt-2" />
+                </div>
 
-              <CardContent className="p-5 space-y-4">
-                {/* Active Voucher Code Box */}
-                <div className="bg-[#FAF8F5] border-2 border-dashed border-[#107C41] rounded-none p-4 text-center space-y-1.5">
-                  <span className="text-[9px] font-bold text-[#107C41] tracking-widest uppercase">
+                {/* EMOTIONALLY REASSURING AND ACTIONABLE MESSAGE */}
+                <div className="bg-[#FAF8F5] border border-[#E8E4DC] p-4 text-center space-y-3 rounded-none">
+                  <p className="text-xs md:text-sm text-[#1C2B21] font-semibold leading-relaxed">
+                    We have emailed your $75 Ship Sticks rebate code directly to <span className="text-[#107C41] font-bold">{formData.email || "your inbox"}</span>.
+                  </p>
+                  
+                  <div className="h-[1px] bg-[#E8E4DC] w-full" />
+                  
+                  <p className="text-[11px] text-[#5C6B5E] leading-relaxed">
+                    An email containing your permanent **Travel Protection Club** membership credentials and first-call guidelines has also been dispatched.
+                  </p>
+                </div>
+
+                {/* ACTIVE VOUCHER CODE BOX - RE-STYLED WITHOUT ROUNDED CORNERS */}
+                <div className="bg-white border border-[#107C41] p-4 text-center space-y-2 rounded-none shadow-sm">
+                  <span className="text-[9px] font-bold text-[#107C41] tracking-widest uppercase block">
                     Your Active Ship Sticks Voucher Code
                   </span>
                   <div className="text-2xl font-mono font-extrabold text-[#1C2B21] tracking-wider select-all">
                     TPC-75-GOLF
                   </div>
-                  <p className="text-xs text-[#5C6B5E]">
+                  <p className="text-[10px] text-[#5C6B5E] leading-relaxed">
                     Apply this code at checkout on **ShipSticks.com** to receive your $75 discount instantly.
                   </p>
                 </div>
 
-                <div className="flex gap-3">
-                  <Button 
-                    onClick={handleShare}
-                    variant="outline"
-                    className="flex-1 h-11 border-[#E8E4DC] text-xs font-bold text-[#1C2B21] hover:bg-[#FAF8F5] active:scale-[0.98] rounded-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                {/* COMPLETE-THE-LOOP GLOBAL 360 PORTAL CARD */}
+                <div className="bg-[#FAF8F5] border border-[#E5C158] p-4 rounded-none space-y-3 shadow-sm">
+                  <div className="flex gap-2.5 items-start">
+                    <Shield className="w-5 h-5 text-[#107C41] shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-xs font-bold text-black uppercase tracking-wider">Global 360 Assurance Portal</h4>
+                      <p className="text-[11px] text-[#5C6B5E] leading-relaxed mt-1">
+                        Access complete program details, view emergency contacts, and download family guidelines. If that unfortunate day happens, your family can log in here to activate instant repatriation support.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <a 
+                    href="https://global360assurance.com/tpc-member" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-full h-11 border border-[#107C41] hover:bg-[#EAF7EE]/20 active:scale-[0.98] transition-all text-[#107C41] font-bold text-xs tracking-wider uppercase rounded-none flex items-center justify-center gap-1.5 cursor-pointer mt-1"
                   >
-                    <Share2 className="w-4 h-4" />
-                    Share This Offer
-                  </Button>
-
-                  <Button 
-                    onClick={() => {
-                      setDemoStep("OPT_IN");
-                      setFormData({ name: "", email: "", phone: "" });
-                      setQuizAnswers([]);
-                      setCurrentQuestionIndex(0);
-                      setStripeData({ cardNumber: "", expiry: "", cvc: "" });
-                    }}
-                    className="flex-1 h-11 bg-[#1C2B21] hover:bg-black text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md transition-all cursor-pointer"
-                  >
-                    Restart Demo Flow
-                  </Button>
+                    <span>Visit Global 360 Assurance Website</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </a>
                 </div>
+
+                {/* FAQ AND TERMS SECTION - PURE CLASSIC ACCORDIONS */}
+                <div className="space-y-2 pt-2">
+                  {/* FAQ Accordion */}
+                  <div className="border-b border-[#E8E4DC] pb-2">
+                    <button 
+                      onClick={() => setFaqOpen(!faqOpen)}
+                      className="w-full flex justify-between items-center py-2 text-left text-xs font-bold text-[#5C6B5E] uppercase tracking-wider cursor-pointer"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <HelpCircle className="w-3.5 h-3.5 text-[#107C41]" />
+                        Frequently Asked Questions
+                      </span>
+                      <ChevronDown className={`w-4 h-4 text-[#5C6B5E] transition-transform ${faqOpen ? "rotate-180" : ""}`} />
+                    </button>
+                    {faqOpen && (
+                      <div className="pt-2 pb-1 text-[11px] text-[#5C6B5E] space-y-3 leading-relaxed animate-fade-in">
+                        <div>
+                          <p className="font-bold text-black">Q: How do I activate my emergency protection?</p>
+                          <p className="mt-0.5">A: In an emergency, simply call the dedicated First-Call number found in your welcome email. Our response center is staffed 24/7/365.</p>
+                        </div>
+                        <div>
+                          <p className="font-bold text-black">Q: Is my family covered under my plan?</p>
+                          <p className="mt-0.5">A: This individual membership covers the primary account holder. Family add-on options can be configured directly inside your Global 360 Assurance portal.</p>
+                        </div>
+                        <div>
+                          <p className="font-bold text-black">Q: When does my Ship Sticks rebate expire?</p>
+                          <p className="mt-0.5">A: Your $75 rebate code is valid for 12 months from the date of issuance and can be used on any domestic or international shipment.</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Terms Accordion */}
+                  <div className="border-b border-[#E8E4DC] pb-2">
+                    <button 
+                      onClick={() => setTermsOpen(!termsOpen)}
+                      className="w-full flex justify-between items-center py-2 text-left text-xs font-bold text-[#5C6B5E] uppercase tracking-wider cursor-pointer"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-[#107C41]" />
+                        Membership Terms & Disclosures
+                      </span>
+                      <ChevronDown className={`w-4 h-4 text-[#5C6B5E] transition-transform ${termsOpen ? "rotate-180" : ""}`} />
+                    </button>
+                    {termsOpen && (
+                      <div className="pt-2 pb-1 text-[10px] text-[#5C6B5E] leading-relaxed space-y-2 animate-fade-in">
+                        <p>
+                          By enrolling in the Travel Protection Club, you agree to the annual membership fee of $150.00, which will automatically renew unless canceled at least 30 days prior to the renewal date.
+                        </p>
+                        <p>
+                          Repatriation services are subject to geographic limitations and must be coordinated solely through our designated medical logistics partners. Self-coordinated transport is not eligible for reimbursement.
+                        </p>
+                        <p>
+                          The $75 Ship Sticks rebate is provided in partnership with Ship Sticks and is subject to their standard shipping terms and conditions.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Viral Share Button */}
+                <Button 
+                  onClick={handleShare}
+                  className="w-full h-11 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md flex items-center justify-center gap-2 cursor-pointer mt-1"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Share This Offer with Partners
+                </Button>
               </CardContent>
             </Card>
+
+            {/* Bottom co-branded logos on final screen */}
+            <div className="space-y-4 pt-4">
+              <div className="flex items-center justify-center gap-2 md:gap-4 px-2">
+                <img 
+                  src="/manus-storage/57885_120b932a.png" 
+                  alt="Travel Protection Club" 
+                  className="h-16 md:h-20 object-contain shrink-0"
+                />
+                <img 
+                  src="/manus-storage/cropped_shipsticks_dark_9caa446b.png" 
+                  alt="Ship Sticks" 
+                  className="h-11 md:h-13 object-contain shrink-0"
+                />
+                <div className="h-13 w-16 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-transparent">
+                  <img 
+                    src="/manus-storage/cropped_asb_dark_f202b5ec.png" 
+                    alt="ASB Logo" 
+                    className="h-[105%] w-[105%] object-cover scale-[0.95]"
+                  />
+                </div>
+              </div>
+              <div className="text-center px-4">
+                <span className="text-[9px] text-[#5C6B5E] font-bold tracking-wider uppercase block leading-relaxed">
+                  COMPLEMENT of <br />
+                  THE TRAVEL PROTECTION CLUB & ASB ATHLETICS <br />
+                  <span className="text-[#A4B3A7] font-medium text-[8px]">in conjunction with SHIP STICKS</span>
+                </span>
+              </div>
+            </div>
           </div>
         )}
       </main>
