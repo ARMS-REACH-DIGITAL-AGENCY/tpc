@@ -189,18 +189,22 @@ export default function Home() {
       {/* Main Content Area - Centered, Tightened Spacing, Warm Sand Aesthetics */}
       <main className="flex-1 max-w-md mx-auto w-full flex flex-col justify-center my-auto space-y-2">
         {step === "OPT_IN" && (
-          <div className="space-y-2 w-full animate-fade-in">
-            {/* Pure, Frictionless Opt-In Form Card - Sharp Corners, Rich Cream Background */}
-            <Card className="border border-[#E8E4DC] shadow-[0_8px_30px_rgba(28,43,33,0.02)] bg-white rounded-none">
-              <CardContent className="p-4 md:p-5 space-y-3">
-                <div className="text-center space-y-1.5">
-                  <h1 className="text-base md:text-lg font-serif font-bold tracking-tight text-[#1C2B21] leading-snug">
-                    The next time your precious clubs need to get home safely... please think of us!
+          <div className="space-y-3 w-full animate-fade-in">
+            {/* Pure, Frictionless Opt-In Form Card - Sharp Corners, Rich Cream Background, NO BORDERS */}
+            <Card className="border-0 shadow-none bg-transparent rounded-none">
+              <CardContent className="p-2 md:p-3 space-y-4">
+                <div className="text-center space-y-2">
+                  {/* BOLD SANS-SERIF HEADLINE - EXACTLY AS SHOWN IN USER MOCKUP */}
+                  <h1 className="text-2xl md:text-3xl font-sans font-black tracking-tight text-black leading-tight">
+                    The next time <br />
+                    your precious clubs <br />
+                    need to get home safely... <br />
+                    please think of us!
                   </h1>
-                  <div className="h-[1px] w-12 bg-[#E5C158] mx-auto" />
+                  <div className="h-[2px] w-16 bg-[#E5C158] mx-auto mt-2" />
                 </div>
 
-                <form onSubmit={handleOptInSubmit} className="space-y-3">
+                <form onSubmit={handleOptInSubmit} className="space-y-4 pt-2">
                   <div className="space-y-1">
                     <Label htmlFor="name" className="text-[10px] font-bold text-[#5C6B5E] tracking-wider uppercase">
                       Full Name
@@ -212,7 +216,7 @@ export default function Home() {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
-                      className="h-10 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] focus:ring-0 rounded-none font-medium placeholder:text-[#C1C9C3]"
+                      className="h-11 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] focus:ring-0 rounded-none font-medium placeholder:text-[#C1C9C3]"
                     />
                   </div>
 
@@ -227,7 +231,7 @@ export default function Home() {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       required
-                      className="h-10 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] focus:ring-0 rounded-none font-medium placeholder:text-[#C1C9C3]"
+                      className="h-11 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] focus:ring-0 rounded-none font-medium placeholder:text-[#C1C9C3]"
                     />
                   </div>
 
@@ -241,14 +245,14 @@ export default function Home() {
                       placeholder="(555) 123-4567"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="h-10 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] focus:ring-0 rounded-none font-medium placeholder:text-[#C1C9C3]"
+                      className="h-11 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] focus:ring-0 rounded-none font-medium placeholder:text-[#C1C9C3]"
                     />
                   </div>
 
                   <Button 
                     type="submit" 
                     disabled={isSubmitting}
-                    className="w-full min-h-11 py-2 px-4 bg-[#107C41] hover:bg-[#0C6233] active:scale-[0.98] transition-all text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md flex items-center justify-center gap-2 mt-1 cursor-pointer whitespace-normal text-center leading-normal"
+                    className="w-full min-h-12 py-3 px-4 bg-[#107C41] hover:bg-[#0C6233] active:scale-[0.98] transition-all text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md flex items-center justify-center gap-2 mt-2 cursor-pointer whitespace-normal text-center leading-normal"
                   >
                     <span>{isSubmitting ? "Securing..." : "ACTIVATE YOUR $75 SHIP STICKS REBATE NOW!"}</span>
                     <ArrowRight className="w-3.5 h-3.5 shrink-0" />
@@ -258,28 +262,28 @@ export default function Home() {
             </Card>
 
             {/* Bottom Section: Grouped Co-branded Logos & Elegant Footnote */}
-            <div className="space-y-2 pt-1">
-              {/* Row of Logos - EXACTLY MATCHING USER MOCKUP SIZES */}
-              <div className="flex items-center justify-center gap-4 md:gap-6 opacity-100">
-                {/* Logo 1: High-Res TPC Shield */}
+            <div className="space-y-3 pt-2">
+              {/* Row of Logos - EXACTLY MATCHING USER MOCKUP SIZES (HUGE AND NO CONTAINERS) */}
+              <div className="flex items-center justify-center gap-2 md:gap-4 px-2">
+                {/* Logo 1: High-Res TPC Shield (Larger) */}
                 <img 
                   src="/manus-storage/57885_120b932a.png" 
                   alt="Travel Protection Club" 
-                  className="h-14 md:h-16 object-contain"
+                  className="h-20 md:h-24 object-contain shrink-0"
                 />
 
-                {/* Logo 2: Dark Ship Sticks Banner */}
+                {/* Logo 2: Dark Ship Sticks Banner (Larger) */}
                 <img 
                   src="/manus-storage/cropped_shipsticks_dark_9caa446b.png" 
                   alt="Ship Sticks" 
-                  className="h-12 md:h-14 object-contain"
+                  className="h-14 md:h-16 object-contain shrink-0"
                 />
 
-                {/* Logo 3: Circular ASB Logo */}
+                {/* Logo 3: Circular ASB Logo (Larger) */}
                 <img 
                   src="/manus-storage/cropped_asb_dark_f202b5ec.png" 
                   alt="ASB Logo" 
-                  className="h-12 w-12 md:h-14 md:w-14 object-contain rounded-full"
+                  className="h-16 w-16 md:h-20 md:w-24 object-contain shrink-0 rounded-full"
                 />
               </div>
 
@@ -287,7 +291,7 @@ export default function Home() {
               <div className="text-center px-4">
                 <span className="text-[9px] md:text-[10px] text-[#5C6B5E] font-bold tracking-wider uppercase block leading-relaxed">
                   COMPLEMENT of <br />
-                  The TRAVEL PROTECTION CLUB & ASB ATHLETICS <br />
+                  THE TRAVEL PROTECTION CLUB & ASB ATHLETICS <br />
                   <span className="text-[#A4B3A7] font-medium text-[8px] md:text-[9px]">in conjunction with SHIP STICKS</span>
                 </span>
               </div>
