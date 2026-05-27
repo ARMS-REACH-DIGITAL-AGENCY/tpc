@@ -1,657 +1,650 @@
-import React, { useState } from "react";
-import { 
-  ShieldCheck, 
-  CheckCircle2, 
-  Sparkles, 
-  ChevronRight, 
-  ChevronLeft, 
-  Mail, 
-  User, 
-  CreditCard, 
-  Lock, 
-  RefreshCw, 
-  Award, 
-  Compass, 
-  HeartHandshake,
-  Users,
-  Clock,
-  PhoneCall,
-  Plane,
-  AlertTriangle
-} from "lucide-react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { 
+  Loader2, 
+  ShieldCheck, 
+  Plane, 
+  Gift, 
+  ArrowRight, 
+  CheckCircle, 
+  Lock, 
+  CreditCard,
+  PhoneCall,
+  User,
+  HeartHandshake
+} from "lucide-react";
 
-// Steps in the pure consumer-facing funnel
-type FunnelStep = "LANDING_PAGE" | "OPT_IN" | "QUIZ" | "OFFER" | "STRIPE_CHECKOUT" | "OUTCOME" | "FOLLOW_UP";
+// Funnel Steps
+type FunnelStep = 
+  | "LANDING"          // Pure $75 Voucher claim, no Global 360 branding
+  | "QUIZ_1"           // Travel frequency
+  | "QUIZ_2"           // Equipment value
+  | "QUIZ_3"           // Crisis awareness
+  | "QUIZ_4"           // Family emergency contact preference
+  | "OFFER"            // The reveal: Join the Travel Protection Club to unlock voucher
+  | "STRIPE_CHECKOUT"  // Secure Stripe checkout
+  | "SUCCESS";         // Active voucher code & welcome info
 
 export default function Home() {
-  const [currentStep, setCurrentStep] = useState<FunnelStep>("LANDING_PAGE");
-  const [leadName, setLeadName] = useState("");
-  const [leadEmail, setLeadEmail] = useState("");
-  const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
-  const [quizIndex, setQuizIndex] = useState(0);
+  const [step, setStep] = useState<FunnelStep>("LANDING");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Stripe Card Form State
+  // Quiz Answers
+  const [travelFreq, setTravelFreq] = useState("");
+  const [equipmentValue, setEquipmentValue] = useState("");
+  const [crisisAwareness, setCrisisAwareness] = useState("");
+  const [emergencyContact, setEmergencyContact] = useState("");
+
+  // Stripe Card Simulation
   const [cardNumber, setCardNumber] = useState("");
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCvc, setCardCvc] = useState("");
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+  const [isPaying, setIsPaying] = useState(false);
 
-  // Custom Form Submission with Background API Bridge to YAT?STATS
-  const handleCustomFormSubmit = async (e: React.FormEvent) => {
+  // Auto-scroll to top on step change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step]);
+
+  // Handle Landing Opt-In Submission (Natively posts to YAT?STATS)
+  const handleLandingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!leadName || !leadEmail) {
-      toast.error("Please enter both your name and email.");
+    if (!name || !email) {
+      toast.error("Please fill in both Name and Email to reserve your voucher.");
       return;
     }
 
-    setIsSubmittingForm(true);
+    setIsSubmitting(true);
 
     try {
-      // Create a hidden form submission payload to post directly to HighLevel's native form endpoint
+      // Background submission to YAT?STATS native form to ensure lead is captured
       const formData = new FormData();
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("phone", phone || "");
       formData.append("formId", "H634urGOeGS6U0BpCfBS");
-      formData.append("full_name", leadName);
-      formData.append("email", leadEmail);
-      formData.append("location_id", "8eYj1Uj7Ugt0PDUGHblx"); // YAT?STATS Location ID
 
-      // Send the background POST request to the native HighLevel form endpoint
+      // Post in background natively
       await fetch("https://api.armsreachdigital.com/widget/form/H634urGOeGS6U0BpCfBS", {
         method: "POST",
-        mode: "no-cors",
-        body: formData
+        body: formData,
+        mode: "no-cors" // Prevent CORS preflight blocks while ensuring submission dispatches
       });
 
-      setIsSubmittingForm(false);
-      setCurrentStep("QUIZ");
-      toast.success("Voucher reserved! Let's complete your travel planner.");
-
-    } catch (error) {
-      console.error("Form submission error:", error);
-      setIsSubmittingForm(false);
-      setCurrentStep("QUIZ");
+      toast.success("Voucher Reserved! Let's complete your profile.");
+      setStep("QUIZ_1");
+    } catch (err) {
+      console.error("Submission error:", err);
+      // Fail-safe: always advance the demo even if network fails
+      setStep("QUIZ_1");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // Quiz Questions definition
-  const quizQuestions = [
-    {
-      id: "travel_freq",
-      question: "How often do you travel with your golf clubs?",
-      options: ["3+ times a year", "Once or twice a year", "Rarely", "Planning my first golf trip"]
-    },
-    {
-      id: "worry_factor",
-      question: "What concerns you most when shipping or traveling with your clubs?",
-      options: ["Damage to expensive clubs", "Delays/lost luggage", "Excessive shipping fees", "Logistical hassle"]
-    },
-    {
-      id: "planner_mindset",
-      question: "When you travel, do you usually plan emergency logistics in advance?",
-      options: ["Always (I have written checklists)", "Usually", "Sometimes", "I prefer to wing it"]
-    },
-    {
-      id: "first_call_gap",
-      question: "If an unexpected medical crisis happened away from home, would your family know exactly who to call first?",
-      options: ["Yes, we have a clear emergency contact", "Not entirely sure", "Probably not", "We have never thought about it"]
-    }
-  ];
-
-  // Handle quiz answers
-  const handleQuizAnswer = (option: string) => {
-    const currentQ = quizQuestions[quizIndex];
-    setQuizAnswers(prev => ({ ...prev, [currentQ.id]: option }));
-
-    if (quizIndex < quizQuestions.length - 1) {
-      setQuizIndex(prev => prev + 1);
-    } else {
-      setCurrentStep("OFFER");
-    }
-  };
-
-  // Pre-fill card for quick presentation
-  const prefillDemoCard = () => {
+  const handlePreFillCard = () => {
     setCardNumber("4242 •••• •••• 4242");
-    setCardExpiry("12/28");
-    setCardCvc("424");
-    toast.info("Demo card pre-filled.");
+    setCardExpiry("12 / 29");
+    setCardCvc("123");
+    toast.success("Demo credit card pre-filled.");
   };
 
-  // Process Simulated Payment
   const handlePaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!cardNumber || !cardExpiry || !cardCvc) {
-      toast.error("Please enter your card details.");
+      toast.error("Please fill in all card details.");
       return;
     }
 
-    setIsProcessingPayment(true);
-    
+    setIsPaying(true);
     setTimeout(() => {
-      setIsProcessingPayment(false);
-      setCurrentStep("OUTCOME");
-      toast.success("Payment Captured! Membership Activated.");
+      setIsPaying(false);
+      setStep("SUCCESS");
+      toast.success("Membership Activated! Your $75 Voucher is unlocked.");
     }, 2000);
   };
 
-  // Reset the funnel
-  const resetDemo = () => {
-    setCurrentStep("LANDING_PAGE");
-    setLeadName("");
-    setLeadEmail("");
-    setQuizAnswers({});
-    setQuizIndex(0);
-    setCardNumber("");
-    setCardExpiry("");
-    setCardCvc("");
-  };
-
   return (
-    <div className="min-h-screen flex flex-col bg-[#FDFCF7] text-[#1E2B22] font-sans-ui selection:bg-[#C2B280] selection:text-[#1A331E]">
-      
-      {/* Premium Country Club Style Header */}
-      <header className="border-b border-[#E6E2D3] bg-[#F9F8F0] py-5 px-6 sticky top-0 z-50 shadow-xs">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 bg-[#1A331E] rounded-xs flex items-center justify-center border border-[#C2B280]">
-              <span className="font-serif-display text-lg font-bold text-[#E6E2D3]">G</span>
-            </div>
-            <div>
-              <h1 className="font-serif-display text-lg font-bold tracking-wider text-[#1A331E]">GLOBAL 360</h1>
-              <p className="text-[10px] uppercase tracking-widest text-[#C2B280] font-bold">Travel Protection Club</p>
-            </div>
+    <div className="min-h-screen bg-neutral-50 text-stone-900 font-serif selection:bg-emerald-800 selection:text-white flex flex-col justify-between">
+      {/* 1. Header: Completely clean, NO Global 360 or Repatriation branding to avoid friction */}
+      <header className="border-b border-stone-200 bg-white/80 backdrop-blur-md sticky top-0 z-50 py-4 px-6">
+        <div className="max-w-4xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <Gift className="h-5 w-5 text-emerald-800" />
+            <span className="font-sans text-xs uppercase tracking-widest font-bold text-stone-500">
+              GOLF TRAVEL REWARDS
+            </span>
           </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-1.5 text-xs text-[#4A5D4E] font-medium">
-              <ShieldCheck className="h-4 w-4 text-[#C2B280]" />
-              <span>Elite Global Medical Repatriation</span>
-            </div>
+          <div className="flex items-center gap-2 text-stone-500 text-xs font-sans">
+            <ShieldCheck className="h-4 w-4 text-emerald-700" />
+            <span>Secure Voucher Activation Portal</span>
           </div>
         </div>
       </header>
 
-      {/* Main Content Area - Full Screen Consumer Experience */}
-      <main className="flex-1 flex items-center justify-center py-12 px-6">
-        <div className="w-full max-w-2xl bg-white rounded-lg border border-[#E6E2D3] shadow-xl overflow-hidden relative">
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-[#1A331E]"></div>
-
-          {/* STEP 1: CONSUMER LANDING PAGE */}
-          {currentStep === "LANDING_PAGE" && (
-            <div className="flex flex-col">
-              {/* Premium Hero Section */}
-              <div className="relative h-64 w-full overflow-hidden">
-                <div className="absolute inset-0 bg-black/50 z-10"></div>
+      {/* 2. Main Content Area */}
+      <main className="flex-grow flex items-center justify-center py-12 px-4">
+        <div className="w-full max-w-lg">
+          {/* STEP 1: LANDING - Pure Voucher Claim Hook */}
+          {step === "LANDING" && (
+            <Card className="border-stone-200 shadow-xl overflow-hidden bg-white">
+              {/* Luxury Golf Banner */}
+              <div className="relative h-48 bg-stone-900 flex items-end">
                 <img 
-                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663368558979/TncsUA3wJWw3btME2gSgvv/luxury_golf_bg-eU6pGTC8LSgMWDHb2SD2Nq.webp" 
-                  alt="Luxury Golf" 
-                  className="h-full w-full object-cover"
+                  src="https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?auto=format&fit=crop&q=80&w=1200" 
+                  alt="Luxury Golf Course" 
+                  className="absolute inset-0 w-full h-full object-cover opacity-60"
                 />
-                <div className="absolute inset-0 z-20 flex flex-col justify-end p-8">
-                  <span className="text-xs uppercase tracking-widest text-[#C2B280] font-bold mb-1.5">Exclusive Golf Invitation</span>
-                  <h2 className="font-serif-display text-3xl font-bold text-white leading-tight max-w-lg">
-                    Your Clubs Are Protected. But What About You?
-                  </h2>
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-950 to-transparent" />
+                <div className="relative p-6 text-white">
+                  <span className="text-xs font-sans uppercase tracking-widest bg-emerald-800/80 text-emerald-50 px-2 py-1 rounded">
+                    Exclusive Invitation Only
+                  </span>
+                  <h1 className="text-2xl md:text-3xl font-bold mt-2 leading-tight">
+                    Your $75 Golf Travel Shipping Voucher Is Reserved
+                  </h1>
                 </div>
               </div>
 
-              {/* Body & Benefits */}
-              <div className="p-8 space-y-6">
-                <div className="inline-flex items-center gap-1.5 bg-[#1A331E]/5 border border-[#1A331E]/10 px-3 py-1 rounded-xs">
-                  <Sparkles className="h-4 w-4 text-[#C2B280]" />
-                  <span className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E]">Exclusive Member Benefit</span>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="font-serif-display text-xl font-bold text-[#1A331E] leading-snug">
-                    Activate Your $75 Golf Travel Shipping Voucher
-                  </h3>
-                  <p className="text-sm text-[#4A5D4E] leading-relaxed">
-                    Congratulations! Your invitation scan qualifies you for a <strong>$75 credit</strong> toward premium golf club shipping (ShipSticks-style). Ensure your clubs travel safely and stress-free on your next excursion.
-                  </p>
-                  <p className="text-sm text-[#4A5D4E] leading-relaxed">
-                    But before you ship, ask yourself: if you plan ahead to protect your equipment, do you have a plan to protect yourself in an unforeseen medical crisis?
-                  </p>
-                </div>
-
-                {/* Info Card */}
-                <div className="bg-[#F9F8F0] border border-[#E6E2D3] p-5 rounded-xs space-y-3">
-                  <div className="flex items-center gap-2 text-sm text-[#1A331E] font-bold">
-                    <CheckCircle2 className="h-5 w-5 text-[#1A331E]" />
-                    <span>Instant Voucher Reservation</span>
-                  </div>
-                  <p className="text-xs text-[#4A5D4E] pl-7 leading-relaxed">
-                    Secure your credit first. You can apply it to your next golf shipment immediately once your membership is confirmed.
-                  </p>
-                </div>
-
-                {/* CTA */}
-                <Button 
-                  onClick={() => setCurrentStep("OPT_IN")}
-                  className="w-full bg-[#1A331E] hover:bg-[#2D4A32] text-white border border-[#C2B280] py-6 rounded-sm font-sans-ui text-xs uppercase tracking-wider font-bold transition-all shadow-md active:scale-[0.99]"
-                >
-                  Secure Your Voucher <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 2: OPT-IN FORM */}
-          {currentStep === "OPT_IN" && (
-            <div className="p-8 space-y-6">
-              <div className="w-full bg-[#E6E2D3] h-1 rounded-full overflow-hidden">
-                <div className="bg-[#1A331E] h-full w-1/4"></div>
-              </div>
-              
-              <div className="text-center space-y-1.5">
-                <span className="text-xs uppercase tracking-widest text-[#C2B280] font-bold">Voucher Registration</span>
-                <h3 className="font-serif-display text-2xl font-bold text-[#1A331E] leading-tight">Secure Your $75 Credit</h3>
-                <p className="text-xs text-[#4A5D4E] max-w-md mx-auto leading-relaxed">
-                  Enter your details to reserve your ShipSticks-style rebate voucher and begin your personalized travel safety planner.
+              <CardContent className="p-6 md:p-8 space-y-6">
+                <p className="text-stone-600 font-sans text-sm md:text-base leading-relaxed">
+                  Congratulations! Your invitation qualifies you for a **$75 credit** toward premium golf club shipping. Ensure your cherished clubs travel safely, stress-free, and arrive directly at your next course destination.
                 </p>
-              </div>
 
-              {/* Custom Premium React Form */}
-              <form onSubmit={handleCustomFormSubmit} className="space-y-4 max-w-md mx-auto pt-2">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E]">Full Name</label>
-                  <div className="relative">
-                    <input 
-                      type="text" 
-                      required
-                      value={leadName}
-                      onChange={(e) => setLeadName(e.target.value)}
-                      placeholder="Peter DeLuca" 
-                      className="w-full bg-white border border-[#E6E2D3] focus:border-[#1A331E] pl-10 pr-3 py-3 rounded-xs text-xs focus:outline-hidden transition-all text-[#1A331E]"
-                    />
-                    <User className="absolute left-3.5 top-3.5 h-4 w-4 text-[#C2B280]" />
-                  </div>
+                <div className="bg-emerald-50/50 border border-emerald-100 rounded-lg p-4 space-y-2">
+                  <h3 className="font-sans text-xs uppercase tracking-wider font-bold text-emerald-900 flex items-center gap-1.5">
+                    <CheckCircle className="h-4 w-4 text-emerald-800" />
+                    Instant Voucher Reservation
+                  </h3>
+                  <p className="text-xs text-stone-500 font-sans leading-relaxed">
+                    Secure your credit code first. Once registered, you can apply this $75 credit directly to your next golf club shipment.
+                  </p>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E]">Email Address</label>
-                  <div className="relative">
-                    <input 
-                      type="email" 
-                      required
-                      value={leadEmail}
-                      onChange={(e) => setLeadEmail(e.target.value)}
-                      placeholder="peter.deluca@gmail.com" 
-                      className="w-full bg-white border border-[#E6E2D3] focus:border-[#1A331E] pl-10 pr-3 py-3 rounded-xs text-xs focus:outline-hidden transition-all text-[#1A331E]"
-                    />
-                    <Mail className="absolute left-3.5 top-3.5 h-4 w-4 text-[#C2B280]" />
+                <form onSubmit={handleLandingSubmit} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="name" className="font-sans text-xs uppercase tracking-wider text-stone-600 font-semibold">
+                      Full Name
+                    </Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-stone-400" />
+                      <Input 
+                        id="name"
+                        placeholder="e.g., Andrew Miller"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        className="pl-9 font-sans border-stone-300 focus:border-emerald-800 focus:ring-emerald-800/20"
+                      />
+                    </div>
                   </div>
-                </div>
-              </form>
 
-              <div className="space-y-3 pt-4 max-w-md mx-auto">
-                <Button 
-                  onClick={handleCustomFormSubmit}
-                  disabled={isSubmittingForm}
-                  className="w-full bg-[#1A331E] hover:bg-[#2D4A32] text-white border border-[#C2B280] py-6 rounded-sm font-sans-ui text-xs uppercase tracking-wider font-bold flex items-center justify-center gap-1.5"
-                >
-                  {isSubmittingForm ? (
-                    <>
-                      <RefreshCw className="h-4 w-4 animate-spin" />
-                      Reserving Voucher...
-                    </>
-                  ) : (
-                    <>
-                      Reserve & Continue <ChevronRight className="h-4 w-4" />
-                    </>
-                  )}
-                </Button>
-                <span className="text-[10px] text-[#4A5D4E] text-center block leading-relaxed">
-                  🔒 Your information is secure and protected. No spam, ever.
-                </span>
-              </div>
-            </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="email" className="font-sans text-xs uppercase tracking-wider text-stone-600 font-semibold">
+                      Email Address
+                    </Label>
+                    <div className="relative">
+                      <Plane className="absolute left-3 top-3 h-4 w-4 text-stone-400" />
+                      <Input 
+                        id="email"
+                        type="email"
+                        placeholder="e.g., andrew@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="pl-9 font-sans border-stone-300 focus:border-emerald-800 focus:ring-emerald-800/20"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="phone" className="font-sans text-xs uppercase tracking-wider text-stone-600 font-semibold">
+                      Mobile Number <span className="text-stone-400 font-normal">(Optional)</span>
+                    </Label>
+                    <div className="relative">
+                      <PhoneCall className="absolute left-3 top-3 h-4 w-4 text-stone-400" />
+                      <Input 
+                        id="phone"
+                        type="tel"
+                        placeholder="e.g., (555) 123-4567"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="pl-9 font-sans border-stone-300 focus:border-emerald-800 focus:ring-emerald-800/20"
+                      />
+                    </div>
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="w-full bg-emerald-800 hover:bg-emerald-900 text-white font-sans uppercase tracking-widest text-xs py-6 mt-2 transition-all duration-300 shadow-md active:scale-[0.98]"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Securing Voucher...
+                      </>
+                    ) : (
+                      <>
+                        Secure Your $75 Voucher
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
           )}
 
-          {/* STEP 3: TRAVEL QUIZ */}
-          {currentStep === "QUIZ" && (
-            <div className="p-8 space-y-6">
-              <div className="w-full bg-[#E6E2D3] h-1.5 rounded-full overflow-hidden">
-                <div 
-                  className="bg-[#1A331E] h-full transition-all duration-300"
-                  style={{ width: `${((quizIndex + 1) / quizQuestions.length) * 100}%` }}
-                ></div>
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-xs uppercase tracking-widest text-[#C2B280] font-bold">
-                  Question {quizIndex + 1} of {quizQuestions.length}
+          {/* STEP 2: QUIZ 1 - Travel Frequency */}
+          {step === "QUIZ_1" && (
+            <Card className="border-stone-200 shadow-xl bg-white p-6 md:p-8 space-y-6">
+              <div className="space-y-2 text-center">
+                <span className="font-sans text-xs uppercase tracking-widest font-bold text-emerald-800">
+                  Step 1 of 4: Travel Profile
                 </span>
-                <h3 className="font-serif-display text-xl font-bold text-[#1A331E] leading-snug">
-                  {quizQuestions[quizIndex].question}
-                </h3>
+                <h2 className="text-xl md:text-2xl font-bold text-stone-900">
+                  How often do you travel with your golf clubs annually?
+                </h2>
               </div>
 
-              <div className="space-y-3 max-w-md mx-auto pt-2">
-                {quizQuestions[quizIndex].options.map((option, idx) => (
+              <div className="grid grid-cols-1 gap-3 font-sans">
+                {[
+                  { label: "Occasionally (1-2 trips per year)", val: "occasionally" },
+                  { label: "Regularly (3-5 trips per year)", val: "regularly" },
+                  { label: "Frequently (6+ trips per year)", val: "frequently" }
+                ].map((opt) => (
                   <button
-                    key={idx}
-                    onClick={() => handleQuizAnswer(option)}
-                    className="w-full text-left bg-white hover:bg-[#F1EFE6] border border-[#E6E2D3] hover:border-[#1A331E] p-4 rounded-xs text-xs text-[#1A331E] font-medium transition-all active:scale-[0.99]"
+                    key={opt.val}
+                    onClick={() => {
+                      setTravelFreq(opt.val);
+                      setStep("QUIZ_2");
+                    }}
+                    className="w-full text-left p-4 rounded-lg border border-stone-200 hover:border-emerald-800 hover:bg-emerald-50/30 transition-all text-sm font-medium focus:outline-none"
                   >
-                    {option}
+                    {opt.label}
                   </button>
                 ))}
               </div>
-
-              <div className="flex justify-between items-center text-xs text-[#4A5D4E] pt-4 border-t border-[#E6E2D3]/40">
-                <span>🔒 Secure Travel Profile</span>
-                {quizIndex > 0 && (
-                  <button 
-                    onClick={() => setQuizIndex(prev => prev - 1)}
-                    className="flex items-center gap-1 font-bold text-[#1A331E]"
-                  >
-                    <ChevronLeft className="h-3.5 w-3.5" /> Back
-                  </button>
-                )}
-              </div>
-            </div>
+            </Card>
           )}
 
-          {/* STEP 4: THE OFFER PIVOT */}
-          {currentStep === "OFFER" && (
-            <div className="flex flex-col">
-              {/* Header */}
-              <div className="bg-[#1A331E] text-white p-6 text-center border-b border-[#C2B280]">
-                <span className="text-[10px] uppercase tracking-widest text-[#C2B280] font-bold block mb-1">Voucher Reserved & Held</span>
-                <h3 className="font-serif-display text-lg font-bold text-white tracking-wide">
-                  Your $75 Shipping Credit is Ready to Activate
-                </h3>
+          {/* STEP 3: QUIZ 2 - Equipment Value */}
+          {step === "QUIZ_2" && (
+            <Card className="border-stone-200 shadow-xl bg-white p-6 md:p-8 space-y-6">
+              <div className="space-y-2 text-center">
+                <span className="font-sans text-xs uppercase tracking-widest font-bold text-emerald-800">
+                  Step 2 of 4: Equipment Value
+                </span>
+                <h2 className="text-xl md:text-2xl font-bold text-stone-900">
+                  What is the estimated replacement value of your golf equipment?
+                </h2>
               </div>
 
-              <div className="p-8 space-y-6">
-                <div className="text-center space-y-1.5">
-                  <span className="text-xs uppercase tracking-widest text-[#C2B280] font-bold">The Planner's Choice</span>
-                  <h3 className="font-serif-display text-2xl font-bold text-[#1A331E] leading-tight">
-                    Your clubs have a plan to get home. Do you?
+              <div className="grid grid-cols-1 gap-3 font-sans">
+                {[
+                  { label: "Under $2,500", val: "under_2500" },
+                  { label: "$2,500 - $5,000", val: "2500_5000" },
+                  { label: "Over $5,000 (Custom fitted/Premium)", val: "over_5000" }
+                ].map((opt) => (
+                  <button
+                    key={opt.val}
+                    onClick={() => {
+                      setEquipmentValue(opt.val);
+                      setStep("QUIZ_3");
+                    }}
+                    className="w-full text-left p-4 rounded-lg border border-stone-200 hover:border-emerald-800 hover:bg-emerald-50/30 transition-all text-sm font-medium focus:outline-none"
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* STEP 4: QUIZ 3 - Crisis Awareness */}
+          {step === "QUIZ_3" && (
+            <Card className="border-stone-200 shadow-xl bg-white p-6 md:p-8 space-y-6">
+              <div className="space-y-2 text-center">
+                <span className="font-sans text-xs uppercase tracking-widest font-bold text-emerald-800">
+                  Step 3 of 4: Crisis Coordination
+                </span>
+                <h2 className="text-xl md:text-2xl font-bold text-stone-900">
+                  Do you currently have a plan to coordinate and pay for emergency medical transportation back to your local hospital in a travel crisis?
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 font-sans">
+                {[
+                  { label: "Yes, I assume my health insurance covers it", val: "assume_covered" },
+                  { label: "No, I do not have a dedicated plan", val: "no_plan" },
+                  { label: "Unsure of how repatriation works", val: "unsure" }
+                ].map((opt) => (
+                  <button
+                    key={opt.val}
+                    onClick={() => {
+                      setCrisisAwareness(opt.val);
+                      setStep("QUIZ_4");
+                    }}
+                    className="w-full text-left p-4 rounded-lg border border-stone-200 hover:border-emerald-800 hover:bg-emerald-50/30 transition-all text-sm font-medium focus:outline-none"
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* STEP 5: QUIZ 4 - Emergency Contact Preference */}
+          {step === "QUIZ_4" && (
+            <Card className="border-stone-200 shadow-xl bg-white p-6 md:p-8 space-y-6">
+              <div className="space-y-2 text-center">
+                <span className="font-sans text-xs uppercase tracking-widest font-bold text-emerald-800">
+                  Step 4 of 4: Family Preparedness
+                </span>
+                <h2 className="text-xl md:text-2xl font-bold text-stone-900">
+                  If an unforeseen emergency occurs, would you prefer your loved ones to coordinate medical logistics, or have a professional single-point-of-contact handle everything?
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 font-sans">
+                {[
+                  { label: "I want a professional team to handle everything", val: "professional" },
+                  { label: "My family can coordinate with hospitals/airlines", val: "family" }
+                ].map((opt) => (
+                  <button
+                    key={opt.val}
+                    onClick={() => {
+                      setEmergencyContact(opt.val);
+                      setStep("OFFER");
+                    }}
+                    className="w-full text-left p-4 rounded-lg border border-stone-200 hover:border-emerald-800 hover:bg-emerald-50/30 transition-all text-sm font-medium focus:outline-none"
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* STEP 6: THE OFFER REVEAL */}
+          {step === "OFFER" && (
+            <Card className="border-stone-200 shadow-2xl overflow-hidden bg-white">
+              {/* Premium Branding Header */}
+              <div className="bg-emerald-950 text-white p-6 text-center space-y-1">
+                <span className="text-xs uppercase tracking-widest text-emerald-400 font-sans font-bold">
+                  Exclusive Invitation Benefit
+                </span>
+                <h2 className="text-2xl font-bold">GLOBAL 360</h2>
+                <p className="text-xs text-stone-300 font-sans italic">Travel Protection Club</p>
+              </div>
+
+              <CardContent className="p-6 md:p-8 space-y-6">
+                <div className="space-y-3">
+                  <h3 className="text-lg font-bold text-stone-900 text-center">
+                    Activate Your $75 Shipping Voucher by Securing Your Peace of Mind
                   </h3>
-                  <p className="text-xs text-[#4A5D4E] max-w-lg mx-auto leading-relaxed">
-                    You plan ahead to protect your golf equipment. But what about your own peace of mind? If an unforeseen medical emergency occurs away from home, the logistical and financial burden of returning home can be astronomical.
+                  <p className="text-stone-600 font-sans text-xs md:text-sm leading-relaxed">
+                    Andrew, as a responsible golfer, you plan ahead to protect your expensive clubs. But what about protecting **yourself**? 
+                  </p>
+                  <p className="text-stone-600 font-sans text-xs md:text-sm leading-relaxed">
+                    Standard health insurance does **not** pay to fly you or your remains back home in a medical crisis. The cost of medical repatriation can exceed **$50,000**.
+                  </p>
+                  <p className="text-stone-600 font-sans text-xs md:text-sm leading-relaxed">
+                    To activate your **$75 ShipSticks-style voucher**, we invite you to join the **Global 360 Travel Protection Club**. Your annual membership is normally $150—but once you apply your $75 rebate credit, you are securing a full year of elite protection for **half price**.
                   </p>
                 </div>
 
-                {/* Value Stack Table */}
-                <div className="bg-[#F9F8F0] border border-[#E6E2D3] p-6 rounded-xs space-y-4 max-w-lg mx-auto">
-                  <div className="border-b border-[#E6E2D3] pb-2 text-center">
-                    <span className="text-xs uppercase tracking-widest text-[#1A331E] font-bold">The Activation Offer</span>
-                  </div>
-                  
-                  <div className="flex justify-between text-xs border-b border-[#E6E2D3]/60 pb-2">
-                    <span className="text-[#4A5D4E]">Travel Protection Club Membership (1 Yr)</span>
-                    <span className="font-bold text-[#1A331E]">$150.00</span>
-                  </div>
-                  
-                  <div className="flex justify-between text-xs text-[#2D6A4F] border-b border-[#E6E2D3]/60 pb-2">
-                    <span>ShipSticks-Style Golf Shipping Credit</span>
-                    <span className="font-bold">-$75.00</span>
-                  </div>
+                {/* Core Benefits List */}
+                <div className="bg-stone-50 border border-stone-200 rounded-lg p-4 space-y-3 font-sans">
+                  <h4 className="text-xs uppercase tracking-wider font-bold text-stone-700">
+                    What is Included in Your Membership:
+                  </h4>
+                  <ul className="space-y-2 text-xs text-stone-600">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-emerald-800 shrink-0 mt-0.5" />
+                      <span><strong>Elite Global Medical Repatriation:</strong> Complete air ambulance coordination to bring you and your remains back to your local home hospital.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-emerald-800 shrink-0 mt-0.5" />
+                      <span><strong>First-Call Emergency Assistance:</strong> A single, dedicated professional emergency coordinator available 24/7 to manage hospital logistics.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-emerald-800 shrink-0 mt-0.5" />
+                      <span><strong>$75 Shipping Voucher:</strong> Unlocked instantly upon activation to use on your next premium golf club shipment.</span>
+                    </li>
+                  </ul>
+                </div>
 
-                  <div className="flex justify-between items-center pt-1">
-                    <div>
-                      <span className="text-xs font-bold text-[#1A331E] block">Effective First-Year Cost</span>
-                      <span className="text-[10px] text-[#4A5D4E]">After voucher redemption</span>
+                {/* Pricing Comparison */}
+                <div className="border border-emerald-100 rounded-lg bg-emerald-50/40 p-4 flex justify-between items-center font-sans">
+                  <div>
+                    <span className="text-xs text-stone-500 line-through">Standard Price: $150/yr</span>
+                    <div className="text-lg font-bold text-emerald-950">
+                      Your Price: $150 <span className="text-xs font-normal text-stone-500">(Includes $75 Voucher Rebate)</span>
                     </div>
-                    <span className="font-serif-display text-2xl font-bold text-[#1A331E]">$75.00</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs font-bold text-emerald-800 bg-emerald-100/80 px-2 py-1 rounded">
+                      Net Cost: $75
+                    </span>
                   </div>
                 </div>
 
-                {/* Pillars of Protection */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                  <div className="border border-[#E6E2D3] p-4 rounded-xs bg-white space-y-1.5">
-                    <ShieldCheck className="h-5 w-5 text-[#C2B280]" />
-                    <h4 className="font-serif-display text-xs font-bold text-[#1A331E]">Elite Repatriation</h4>
-                    <p className="text-[10px] text-[#4A5D4E] leading-relaxed">Complete medical transportation back to your local hospital in a crisis.</p>
-                  </div>
-                  <div className="border border-[#E6E2D3] p-4 rounded-xs bg-white space-y-1.5">
-                    <PhoneCall className="h-5 w-5 text-[#C2B280]" />
-                    <h4 className="font-serif-display text-xs font-bold text-[#1A331E]">First-Call Support</h4>
-                    <p className="text-[10px] text-[#4A5D4E] leading-relaxed">One dedicated emergency number that coordinates everything for your family.</p>
-                  </div>
-                  <div className="border border-[#E6E2D3] p-4 rounded-xs bg-white space-y-1.5">
-                    <Award className="h-5 w-5 text-[#C2B280]" />
-                    <h4 className="font-serif-display text-xs font-bold text-[#1A331E]">Plan-Ahead Tools</h4>
-                    <p className="text-[10px] text-[#4A5D4E] leading-relaxed">Includes physical membership cards, luggage tags, and emergency guides.</p>
-                  </div>
-                </div>
-
-                {/* CTA Buttons */}
-                <div className="space-y-3 pt-4 max-w-md mx-auto">
+                <div className="flex flex-col gap-2.5">
                   <Button 
-                    onClick={() => setCurrentStep("STRIPE_CHECKOUT")}
-                    className="w-full bg-[#1A331E] hover:bg-[#2D4A32] text-white border border-[#C2B280] py-6 rounded-sm font-sans-ui text-xs uppercase tracking-wider font-bold shadow-md"
+                    onClick={() => setStep("STRIPE_CHECKOUT")}
+                    className="w-full bg-emerald-800 hover:bg-emerald-900 text-white font-sans uppercase tracking-widest text-xs py-6 shadow-md active:scale-[0.98]"
                   >
-                    Activate Membership & Get Voucher
+                    Accept Offer & Activate Voucher
                   </Button>
                   <button 
-                    onClick={() => setCurrentStep("FOLLOW_UP")}
-                    className="w-full text-center text-xs text-[#4A5D4E] hover:text-[#1A331E] font-semibold py-2"
+                    onClick={() => {
+                      toast.info("Thank you. We have saved your voucher reservation. Check your inbox for your Plan B follow-up!");
+                      setStep("LANDING");
+                    }}
+                    className="text-stone-400 hover:text-stone-600 text-xs font-sans underline transition-colors py-1"
                   >
-                    No thanks, I will forfeit my $75 voucher credit
+                    No thanks, I will forfeit my $75 shipping voucher
                   </button>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           )}
 
-          {/* STEP 5: SECURE STRIPE CHECKOUT */}
-          {currentStep === "STRIPE_CHECKOUT" && (
-            <div className="p-8 space-y-6">
+          {/* STEP 7: SECURE STRIPE CHECKOUT */}
+          {step === "STRIPE_CHECKOUT" && (
+            <Card className="border-stone-200 shadow-2xl overflow-hidden bg-white">
               {/* Stripe Header */}
-              <div className="flex items-center justify-between border-b border-[#E6E2D3] pb-4">
-                <div className="flex items-center gap-1.5">
-                  <div className="bg-[#635BFF] text-white p-1 rounded-xs">
-                    <CreditCard className="h-4 w-4" />
-                  </div>
-                  <span className="text-xs font-bold text-[#1E2022] font-sans-ui tracking-wide">Secure Checkout</span>
-                </div>
-                <div className="flex items-center gap-1 text-xs text-[#2D6A4F] font-semibold">
-                  <Lock className="h-3.5 w-3.5" />
-                  <span>Stripe SSL Encryption</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                {/* Order Summary (5 Cols) */}
-                <div className="md:col-span-5 space-y-4 bg-[#F9F8F0] p-5 rounded-xs border border-[#E6E2D3]">
-                  <span className="text-[10px] uppercase tracking-widest text-[#4A5D4E] font-bold block">Order Summary</span>
-                  
-                  <div className="space-y-2.5 text-xs text-[#4A5D4E]">
-                    <div className="flex justify-between">
-                      <span>Annual Membership</span>
-                      <span className="font-semibold text-[#1A331E]">$150.00</span>
-                    </div>
-                    <div className="flex justify-between text-[#2D6A4F] font-semibold">
-                      <span>$75 Rebate Voucher</span>
-                      <span>Included</span>
-                    </div>
-                  </div>
-
-                  <div className="border-t border-[#E6E2D3] pt-3 flex justify-between items-baseline">
-                    <span className="text-xs font-bold text-[#1A331E]">Total Due Now</span>
-                    <span className="font-serif-display text-xl font-bold text-[#1A331E]">$150.00</span>
-                  </div>
-                  
-                  <span className="text-[9px] text-[#4A5D4E] block leading-relaxed">
-                    ✓ Your $75 ShipSticks-style voucher will be delivered instantly upon payment authorization.
+              <div className="bg-stone-900 text-white p-5 flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-emerald-400" />
+                  <span className="font-sans text-xs uppercase tracking-widest font-bold">
+                    Secure Stripe Checkout
                   </span>
                 </div>
+                <div className="flex items-center gap-1 text-[10px] text-stone-400 font-sans">
+                  <ShieldCheck className="h-3 w-3 text-emerald-400" />
+                  <span>SSL Encrypted</span>
+                </div>
+              </div>
 
-                {/* Card Fields (7 Cols) */}
-                <form onSubmit={handlePaymentSubmit} className="md:col-span-7 space-y-4">
+              <CardContent className="p-6 md:p-8 space-y-6">
+                {/* Order Summary */}
+                <div className="border-b border-stone-100 pb-4 space-y-2 font-sans">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-stone-600">Travel Protection Club (Annual Membership)</span>
+                    <span className="font-semibold">$150.00</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-emerald-800 font-semibold bg-emerald-50 p-2 rounded">
+                    <span>Golf Travel Voucher Rebate Included</span>
+                    <span>-$75.00 Value</span>
+                  </div>
+                  <div className="flex justify-between text-base font-bold text-stone-900 pt-2 border-t border-stone-100">
+                    <span>Amount Due Today</span>
+                    <span>$150.00</span>
+                  </div>
+                </div>
+
+                {/* Simulated Payment Form */}
+                <form onSubmit={handlePaymentSubmit} className="space-y-4">
                   <div className="space-y-1.5">
-                    <div className="flex justify-between items-center">
-                      <label className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E]">Card Number</label>
-                      <button 
-                        type="button" 
-                        onClick={prefillDemoCard}
-                        className="text-[10px] text-[#635BFF] hover:underline font-bold"
-                      >
-                        Pre-fill Demo Card
-                      </button>
-                    </div>
+                    <Label htmlFor="card-number" className="font-sans text-xs uppercase tracking-wider text-stone-600 font-semibold">
+                      Card Number
+                    </Label>
                     <div className="relative">
-                      <input 
-                        type="text" 
-                        required
+                      <CreditCard className="absolute left-3 top-3 h-4 w-4 text-stone-400" />
+                      <Input 
+                        id="card-number"
+                        placeholder="4242 4242 4242 4242"
                         value={cardNumber}
                         onChange={(e) => setCardNumber(e.target.value)}
-                        placeholder="4242 4242 4242 4242" 
-                        className="w-full bg-white border border-[#E6E2D3] pl-10 pr-3 py-3 rounded-xs text-xs focus:outline-hidden focus:ring-1 focus:ring-[#635BFF]"
+                        required
+                        className="pl-9 font-sans border-stone-300 focus:border-emerald-800 focus:ring-emerald-800/20"
                       />
-                      <CreditCard className="absolute left-3 top-3.5 h-4 w-4 text-[#A3ACB9]" />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E]">Expiry Date</label>
-                      <input 
-                        type="text" 
-                        required
+                      <Label htmlFor="card-expiry" className="font-sans text-xs uppercase tracking-wider text-stone-600 font-semibold">
+                        Expiration
+                      </Label>
+                      <Input 
+                        id="card-expiry"
+                        placeholder="MM / YY"
                         value={cardExpiry}
                         onChange={(e) => setCardExpiry(e.target.value)}
-                        placeholder="MM/YY" 
-                        className="w-full bg-white border border-[#E6E2D3] px-3 py-3 rounded-xs text-xs focus:outline-hidden focus:ring-1 focus:ring-[#635BFF] text-center"
+                        required
+                        className="font-sans border-stone-300 focus:border-emerald-800 focus:ring-emerald-800/20"
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] uppercase tracking-wider font-bold text-[#1A331E]">CVC / CVV</label>
-                      <input 
-                        type="text" 
-                        required
+                      <Label htmlFor="card-cvc" className="font-sans text-xs uppercase tracking-wider text-stone-600 font-semibold">
+                        CVC
+                      </Label>
+                      <Input 
+                        id="card-cvc"
+                        placeholder="123"
                         value={cardCvc}
                         onChange={(e) => setCardCvc(e.target.value)}
-                        placeholder="123" 
-                        className="w-full bg-white border border-[#E6E2D3] px-3 py-3 rounded-xs text-xs focus:outline-hidden focus:ring-1 focus:ring-[#635BFF] text-center"
+                        required
+                        className="font-sans border-stone-300 focus:border-emerald-800 focus:ring-emerald-800/20"
                       />
                     </div>
                   </div>
+
+                  <div className="flex gap-2">
+                    <Button 
+                      type="button"
+                      variant="outline"
+                      onClick={handlePreFillCard}
+                      className="flex-1 font-sans text-xs uppercase tracking-wider py-5 border-stone-300 hover:bg-stone-50"
+                    >
+                      Pre-fill Demo Card
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      disabled={isPaying}
+                      className="flex-[2] bg-emerald-800 hover:bg-emerald-900 text-white font-sans uppercase tracking-widest text-xs py-5 shadow-md active:scale-[0.98]"
+                    >
+                      {isPaying ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Authorizing...
+                        </>
+                      ) : (
+                        "Pay $150.00 Securely"
+                      )}
+                    </Button>
+                  </div>
                 </form>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* STEP 8: SUCCESS / VOUCHER REVEAL */}
+          {step === "SUCCESS" && (
+            <Card className="border-stone-200 shadow-2xl overflow-hidden bg-white">
+              <div className="bg-emerald-900 text-white p-8 text-center space-y-3">
+                <CheckCircle className="h-12 w-12 text-emerald-400 mx-auto" />
+                <h2 className="text-2xl font-bold">MEMBERSHIP ACTIVATED!</h2>
+                <p className="text-xs text-stone-300 font-sans max-w-xs mx-auto leading-relaxed">
+                  Thank you, **{name || "Peter DeLuca"}**. Your first-year Travel Protection Club membership is active. Your family is now fully protected.
+                </p>
               </div>
 
-              <div className="space-y-3 pt-4 max-w-md mx-auto">
+              <CardContent className="p-6 md:p-8 space-y-6">
+                {/* Active Voucher Code Box */}
+                <div className="border-2 border-dashed border-emerald-800 rounded-xl p-6 text-center space-y-3 bg-emerald-50/30">
+                  <span className="font-sans text-xs uppercase tracking-widest font-bold text-emerald-800">
+                    Your $75 Shipping Voucher
+                  </span>
+                  <div className="text-2xl md:text-3xl font-mono font-bold tracking-wider text-stone-900">
+                    SS-GOLF-75-ACTIVE
+                  </div>
+                  <p className="text-xs text-stone-500 font-sans leading-relaxed">
+                    Copy this code to use on your next golf travel shipment. An activation link has also been sent to **{email || "your email"}**.
+                  </p>
+                </div>
+
+                {/* What Happens Next */}
+                <div className="space-y-3 font-sans">
+                  <h4 className="text-xs uppercase tracking-wider font-bold text-stone-700">
+                    What Happens Next:
+                  </h4>
+                  <ul className="space-y-2 text-xs text-stone-600">
+                    <li className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-emerald-800 shrink-0" />
+                      <span>Check your inbox for the digital welcome packet.</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-emerald-800 shrink-0" />
+                      <span>Download and share the 1-Page Family Instruction sheet.</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-emerald-800 shrink-0" />
+                      <span>Your physical membership card will arrive in 5-7 business days.</span>
+                    </li>
+                  </ul>
+                </div>
+
                 <Button 
-                  onClick={handlePaymentSubmit}
-                  disabled={isProcessingPayment}
-                  className="w-full bg-[#635BFF] hover:bg-[#5249E0] text-white py-4 rounded-sm font-sans-ui text-xs uppercase tracking-wider font-bold shadow-md flex items-center justify-center gap-2"
+                  onClick={() => {
+                    setName("");
+                    setEmail("");
+                    setPhone("");
+                    setCardNumber("");
+                    setCardExpiry("");
+                    setCardCvc("");
+                    setStep("LANDING");
+                  }}
+                  className="w-full bg-stone-900 hover:bg-stone-800 text-white font-sans uppercase tracking-widest text-xs py-5 mt-2 transition-all"
                 >
-                  {isProcessingPayment ? (
-                    <>
-                      <RefreshCw className="h-4 w-4 animate-spin" />
-                      Authorizing Securely...
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="h-3.5 w-3.5" />
-                      Authorize $150.00 Payment
-                    </>
-                  )}
+                  Simulate Next Scan
                 </Button>
-                <button 
-                  onClick={() => setCurrentStep("OFFER")}
-                  className="w-full text-center text-xs text-[#4A5D4E] hover:text-[#1A331E] font-semibold py-1"
-                >
-                  ← Return to Offer Details
-                </button>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           )}
-
-          {/* STEP 6: SUCCESS OUTCOME */}
-          {currentStep === "OUTCOME" && (
-            <div className="p-8 text-center space-y-6">
-              <div className="h-16 w-16 bg-[#1A331E] rounded-full flex items-center justify-center border-2 border-[#C2B280] mx-auto">
-                <Award className="h-8 w-8 text-[#C2B280]" />
-              </div>
-
-              <div className="space-y-2">
-                <span className="text-xs uppercase tracking-widest text-[#C2B280] font-bold">Welcome to the Club</span>
-                <h3 className="font-serif-display text-2xl font-bold text-[#1A331E]">Membership Activated!</h3>
-                <p className="text-sm text-[#4A5D4E] max-w-md mx-auto leading-relaxed">
-                  Thank you, {leadName}. Your first-year Travel Protection Club membership is active. Your family is now fully protected.
-                </p>
-              </div>
-
-              {/* Voucher Box */}
-              <div className="bg-[#F9F8F0] border-2 border-dashed border-[#C2B280] p-6 rounded-xs max-w-md mx-auto space-y-3">
-                <span className="text-xs uppercase tracking-widest text-[#4A5D4E] font-bold block">Your $75 Shipping Voucher</span>
-                <span className="font-mono text-lg font-bold text-[#1A331E] tracking-wider bg-white px-4 py-2 border border-[#E6E2D3] rounded-xs block">
-                  SS-GOLF-75-ACTIVE
-                </span>
-                <p className="text-[11px] text-[#4A5D4E] leading-relaxed">
-                  Copy this code to use on your next golf travel shipment. An activation link has been sent to <strong>{leadEmail}</strong>.
-                </p>
-              </div>
-
-              <div className="bg-[#1A331E]/5 border border-[#1A331E]/10 p-4 rounded-xs text-left max-w-md mx-auto space-y-2">
-                <span className="text-xs font-bold text-[#1A331E] block">What happens next:</span>
-                <ul className="text-xs text-[#4A5D4E] space-y-1.5 pl-5 list-disc">
-                  <li>Check your inbox for the digital welcome packet.</li>
-                  <li>Download and share the 1-Page Family Instruction sheet.</li>
-                  <li>Your physical member card will arrive in 5-7 business days.</li>
-                </ul>
-              </div>
-
-              <Button 
-                onClick={resetDemo}
-                className="bg-[#1A331E] hover:bg-[#2D4A32] text-white border border-[#C2B280] px-6 py-4 rounded-sm font-sans-ui text-xs uppercase tracking-wider font-bold"
-              >
-                Simulate Next Scan
-              </Button>
-            </div>
-          )}
-
-          {/* STEP 7: PLAN B FOLLOW-UP */}
-          {currentStep === "FOLLOW_UP" && (
-            <div className="p-8 text-center space-y-6">
-              <div className="h-16 w-16 bg-[#F1EFE6] rounded-full flex items-center justify-center border border-[#E6E2D3] mx-auto">
-                <Mail className="h-8 w-8 text-[#1A331E]" />
-              </div>
-
-              <div className="space-y-2">
-                <span className="text-xs uppercase tracking-widest text-[#C2B280] font-bold">Voucher Reserved</span>
-                <h3 className="font-serif-display text-2xl font-bold text-[#1A331E]">Voucher Reservation Confirmed</h3>
-                <p className="text-sm text-[#4A5D4E] max-w-md mx-auto leading-relaxed">
-                  The voucher reservation remains active. A temporary confirmation has been sent to <strong>{leadEmail}</strong>.
-                </p>
-              </div>
-
-              <div className="bg-[#F9F8F0] border border-[#E6E2D3] p-5 rounded-xs text-left max-w-md mx-auto space-y-3">
-                <span className="text-xs font-bold text-[#1A331E] block">What to expect next:</span>
-                <p className="text-xs text-[#4A5D4E] leading-relaxed">
-                  Your $75 credit is held securely. Over the next few days, we will send you helpful, non-intrusive traveler safety guides and planner tools to assist your travel decisions.
-                </p>
-              </div>
-
-              <Button 
-                onClick={resetDemo}
-                className="bg-[#1A331E] hover:bg-[#2D4A32] text-white border border-[#C2B280] px-6 py-4 rounded-sm font-sans-ui text-xs uppercase tracking-wider font-bold"
-              >
-                Simulate Next Scan
-              </Button>
-            </div>
-          )}
-
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-[#E6E2D3] bg-[#F9F8F0] py-8 px-6 text-center text-xs text-[#4A5D4E]">
-        <div className="max-w-6xl mx-auto space-y-2">
-          <p className="font-sans-ui">
-            &copy; 2026 Global 360 Travel Protection Club. All rights reserved.
-          </p>
-          <p className="text-[10px] text-[#C2B280] font-bold uppercase tracking-wider">
-            Elite Repatriation & Crisis Coordination
-          </p>
+      {/* 3. Footer */}
+      <footer className="border-t border-stone-200 bg-white py-6 px-6">
+        <div className="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-sans text-stone-400">
+          <p>© 2026 Golf Travel Rewards. All rights reserved.</p>
+          <div className="flex gap-4">
+            <a href="#" className="hover:text-stone-600 transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-stone-600 transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-stone-600 transition-colors">Voucher Terms</a>
+          </div>
         </div>
       </footer>
     </div>
