@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { CheckCircle2, ChevronRight, Lock, ArrowRight, Shield, Check } from "lucide-react";
 import { toast } from "sonner";
 
-type DemoStep = "OPT_IN" | "QUIZ_INTRO" | "QUIZ" | "OFFER" | "STRIPE_CHECKOUT" | "SUCCESS";
+type DemoStep = "OPT_IN" | "QUIZ" | "OFFER" | "STRIPE_CHECKOUT" | "SUCCESS";
 
 interface QuizAnswer {
   questionId: string;
@@ -78,16 +78,17 @@ export default function Home() {
             tag: "Golf_Wedge_Launch"
           })
         });
-        toast.success("Voucher registered successfully!");
+        toast.success("Contact info saved!");
       } catch (err) {
         console.error("Webhook submit failed:", err);
       }
     } else {
-      toast.success("Voucher registered successfully!");
+      toast.success("Contact info saved!");
     }
 
     setIsSubmitting(false);
-    setDemoStep("QUIZ_INTRO");
+    // Go directly to the quiz questions!
+    setDemoStep("QUIZ");
   };
 
   const handleQuizAnswer = (answer: string) => {
@@ -243,39 +244,6 @@ export default function Home() {
           </div>
         )}
 
-        {step === "QUIZ_INTRO" && (
-          <div className="w-full space-y-4 animate-fade-in">
-            <Card className="border border-[#E8E4DC] shadow-[0_12px_40px_rgba(28,43,33,0.03)] bg-white rounded-none overflow-hidden">
-              <div className="bg-[#107C41] text-white p-5 text-center">
-                <CheckCircle2 className="w-10 h-10 mx-auto text-[#E5C158] mb-1.5" />
-                <h2 className="text-lg font-serif font-bold">Voucher Reserved!</h2>
-                <p className="text-xs text-[#EAF7EE] mt-0.5">Your $75 credit is held under: <span className="font-bold text-white">{formData.email}</span></p>
-              </div>
-              <CardContent className="p-5 space-y-4 text-center">
-                <p className="text-xs text-[#5C6B5E] leading-relaxed">
-                  To complete your voucher activation and claim your official code, please complete our brief 4-question Golf Travel Planner. 
-                </p>
-                <div className="bg-[#FAF8F5] border border-[#E8E4DC] rounded-none p-3 text-left space-y-1.5">
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#1C2B21]">
-                    <Shield className="w-3.5 h-3.5 text-[#107C41]" />
-                    EXCLUSIVE MEMBER BENEFIT
-                  </div>
-                  <p className="text-[11px] text-[#5C6B5E] leading-relaxed">
-                    By completing this planner, you will also be evaluated for complimentary trial enrollment in the **Travel Protection Club (TPC)**.
-                  </p>
-                </div>
-                <Button 
-                  onClick={() => setDemoStep("QUIZ")}
-                  className="w-full h-11 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  Start Travel Planner
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
         {step === "QUIZ" && (
           <div className="w-full space-y-3 animate-fade-in">
             <div className="flex justify-between items-center text-[10px] font-bold text-[#5C6B5E] uppercase tracking-wider px-1">
@@ -320,7 +288,7 @@ export default function Home() {
               </div>
 
               <div className="bg-[#1C2B21] text-white p-5 text-center">
-                <span className="text-[10px] font-bold text-[#E5C158] tracking-widest uppercase">
+                <span className="text-xs font-bold text-[#E5C158] tracking-widest uppercase">
                   Travel Protection Club
                 </span>
                 <h2 className="text-base font-serif font-bold tracking-tight mt-0.5">
