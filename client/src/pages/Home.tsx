@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, ChevronRight, Lock, ArrowRight, Shield, Check } from "lucide-react";
+import { CheckCircle2, ChevronRight, Lock, ArrowRight, Shield, Check, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
 type DemoStep = "OPT_IN" | "QUIZ" | "OFFER" | "STRIPE_CHECKOUT" | "SUCCESS";
@@ -119,6 +119,30 @@ export default function Home() {
       cvc: "123"
     });
     toast.info("Demo card details pre-filled.");
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: "Exclusive $75 Ship Sticks Rebate",
+      text: "Check out this co-branded gift from The Travel Protection Club & ASB Athletics in conjunction with Ship Sticks!",
+      url: window.location.origin
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        toast.success("Shared successfully!");
+      } catch (err) {
+        console.log("Error sharing:", err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(window.location.origin);
+        toast.success("Offer link copied to clipboard!");
+      } catch (err) {
+        toast.error("Failed to copy link.");
+      }
+    }
   };
 
   return (
@@ -493,18 +517,29 @@ export default function Home() {
                   </p>
                 </div>
 
-                <Button 
-                  onClick={() => {
-                    setDemoStep("OPT_IN");
-                    setFormData({ name: "", email: "", phone: "" });
-                    setQuizAnswers([]);
-                    setCurrentQuestionIndex(0);
-                    setStripeData({ cardNumber: "", expiry: "", cvc: "" });
-                  }}
-                  className="w-full h-11 bg-[#1C2B21] hover:bg-black text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md transition-all cursor-pointer"
-                >
-                  Restart Demo Flow
-                </Button>
+                <div className="flex gap-3">
+                  <Button 
+                    onClick={handleShare}
+                    variant="outline"
+                    className="flex-1 h-11 border-[#E8E4DC] text-xs font-bold text-[#1C2B21] hover:bg-[#FAF8F5] active:scale-[0.98] rounded-none transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    Share This Offer
+                  </Button>
+
+                  <Button 
+                    onClick={() => {
+                      setDemoStep("OPT_IN");
+                      setFormData({ name: "", email: "", phone: "" });
+                      setQuizAnswers([]);
+                      setCurrentQuestionIndex(0);
+                      setStripeData({ cardNumber: "", expiry: "", cvc: "" });
+                    }}
+                    className="flex-1 h-11 bg-[#1C2B21] hover:bg-black text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md transition-all cursor-pointer"
+                  >
+                    Restart Demo Flow
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
