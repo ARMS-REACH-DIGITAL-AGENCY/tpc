@@ -163,13 +163,10 @@ export default function Home() {
             {/* Pure, Frictionless Opt-In Form Card */}
             <Card className="border border-[#E8E8ED] shadow-[0_12px_40px_rgba(0,0,0,0.04)] bg-white overflow-hidden rounded-2xl">
               <CardContent className="p-6 md:p-8 space-y-6">
-                <div className="text-center space-y-2">
-                  <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#1D1D1F]">
-                    Instant Voucher Reservation
+                <div className="text-center space-y-3">
+                  <h1 className="text-xl md:text-2xl font-bold tracking-tight text-[#1D1D1F] leading-snug">
+                    The next time your precious clubs need to get home safely... think of us!
                   </h1>
-                  <p className="text-sm text-[#86868B] max-w-xs mx-auto leading-relaxed">
-                    Secure your $75 credit code first. Apply this credit directly to your next golf club shipment.
-                  </p>
                 </div>
 
                 <form onSubmit={handleOptInSubmit} className="space-y-5">
@@ -220,19 +217,21 @@ export default function Home() {
                   <Button 
                     type="submit" 
                     disabled={isSubmitting}
-                    className="w-full h-12 bg-[#107C41] hover:bg-[#0C6233] active:scale-[0.98] transition-all text-white font-bold text-sm tracking-wider uppercase rounded-xl shadow-md flex items-center justify-center gap-2 mt-4 cursor-pointer"
+                    className="w-full h-12 bg-[#107C41] hover:bg-[#0C6233] active:scale-[0.98] transition-all text-white font-bold text-xs md:text-sm tracking-wider uppercase rounded-xl shadow-md flex items-center justify-center gap-2 mt-4 cursor-pointer"
                   >
-                    {isSubmitting ? "Securing..." : "Secure Your $75 Voucher"}
-                    <ArrowRight className="w-4 h-4" />
+                    {isSubmitting ? "Securing..." : "ACTIVATE YOUR $75 SHIP STICKS REBATE NOW!"}
+                    <ArrowRight className="w-4 h-4 shrink-0" />
                   </Button>
                 </form>
               </CardContent>
             </Card>
 
-            {/* Clean, Modern TPC Footnote */}
-            <div className="text-center">
-              <span className="text-[11px] text-[#86868B] font-semibold tracking-wider uppercase">
-                An exclusive offer from the Travel Protection Club
+            {/* Clean, Modern TPC & ASB Footnote */}
+            <div className="text-center px-2">
+              <span className="text-[10px] md:text-xs text-[#86868B] font-bold tracking-wider uppercase block leading-relaxed">
+                COMPLEMENT of <br />
+                The TRAVEL PROTECTION CLUB & ASB ATHLETICS <br />
+                <span className="text-[#A1A1A6] font-medium text-[9px] md:text-[10px]">in conjunction with SHIP STICKS</span>
               </span>
             </div>
           </div>
