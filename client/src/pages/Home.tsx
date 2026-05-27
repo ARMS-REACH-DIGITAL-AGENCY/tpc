@@ -1,548 +1,624 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Check, Shield, Plane, HelpCircle, PhoneCall, Award, CreditCard, Lock } from "lucide-react";
+import { CheckCircle2, ChevronRight, Lock, ArrowRight, Shield, PhoneCall, FileText, Check, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
-type FunnelStep = "OPT_IN" | "QUIZ_1" | "QUIZ_2" | "QUIZ_3" | "QUIZ_4" | "OFFER" | "STRIPE_CHECKOUT" | "SUCCESS";
+type DemoStep = "OPT_IN" | "QUIZ_INTRO" | "QUIZ" | "OFFER" | "STRIPE_CHECKOUT" | "SUCCESS";
+
+interface QuizAnswer {
+  questionId: number;
+  answer: string;
+}
 
 export default function Home() {
-  const [step, setStep] = useState<FunnelStep>("OPT_IN");
+  const [step, setDemoStep] = useState<DemoStep>("OPT_IN");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: ""
   });
-
-  // Quiz answers
-  const [travelFreq, setQuizTravelFreq] = useState("3-5");
-  const [gearValue, setQuizGearValue] = useState("$2,000-$5,000");
-  const [hasPlan, setQuizHasPlan] = useState("no");
-  const [plannerMindset, setQuizPlannerHasMindset] = useState("yes");
-
-  // Webhook trigger URL (saved locally)
+  const [quizAnswers, setQuizAnswers] = useState<QuizAnswer[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState(() => {
-    return localStorage.getItem("yatstats_webhook_url") || "";
+    return localStorage.getItem("arms_webhook_url") || "";
+  });
+  const [stripeData, setStripeData] = useState({
+    cardNumber: "",
+    expiry: "",
+    cvc: ""
   });
 
-  useEffect(() => {
-    localStorage.setItem("yatstats_webhook_url", webhookUrl);
-  }, [webhookUrl]);
+  const quizQuestions = [
+    {
+      id: 1,
+      question: "How many times do you travel for golf annually?",
+      options: ["1-2 times", "3-5 times", "6+ times", "Rarely"]
+    },
+    {
+      id: 2,
+      question: "Do you currently own a high-end, custom set of golf clubs?",
+      options: ["Yes, custom fitted ($2,000+ value)", "Yes, standard set", "No, I rent at courses"]
+    },
+    {
+      id: 3,
+      question: "In the event of an unforeseen medical emergency while traveling, do you have a plan to safely transport yourself and your equipment back home?",
+      options: ["Yes, I have dedicated medical transport coverage", "No, I assume my standard health insurance covers it", "I don't have a plan in place"]
+    },
+    {
+      id: 4,
+      question: "What is your primary concern when traveling with your clubs?",
+      options: ["Clubs getting lost or damaged by airlines", "High airline baggage fees and hassle", "Unforeseen travel or health disruptions"]
+    }
+  ];
 
-  // Submit contact to YAT?STATS HighLevel Form in the background
   const handleOptInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email) {
-      toast.error("Please fill in your name and email address.");
+      toast.error("Please fill in your name and email.");
       return;
     }
 
-    toast.info("Verifying invitation and reserving voucher...");
+    setIsSubmitting(true);
 
-    // Send background webhook payload if configured
+    // Send payload to YAT?STATS/HighLevel Webhook if configured
     if (webhookUrl) {
       try {
         await fetch(webhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          mode: "no-cors",
           body: JSON.stringify({
             name: formData.name,
             email: formData.email,
             phone: formData.phone,
-            source: "Ship Sticks Voucher Funnel",
-            tag: "Golf_Wedge_Launch",
-            timestamp: new Date().toISOString()
+            source: "ShipSticks_TPC_Launch",
+            tag: "Golf_Wedge_Launch"
           })
         });
         toast.success("Live contact pushed to YAT?STATS!");
       } catch (err) {
-        console.error("Webhook submission failed:", err);
+        console.error("Webhook submit failed:", err);
       }
     } else {
-      // Free form submission fallback (Post directly to the YAT?STATS form endpoint in the background)
-      try {
-        const bodyData = new URLSearchParams();
-        bodyData.append("formId", "H634urGOeGS6U0BpCfBS");
-        bodyData.append("full_name", formData.name);
-        bodyData.append("email", formData.email);
-        if (formData.phone) bodyData.append("phone", formData.phone);
-
-        // Standard HighLevel Form Post
-        fetch("https://api.armsreachdigital.com/widget/form/H634urGOeGS6U0BpCfBS", {
-          method: "POST",
-          mode: "no-cors", // Prevents CORS blocks for standard post
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: bodyData.toString()
-        });
-        
-        toast.success("Voucher Reserved! Contact logged in YAT?STATS.");
-      } catch (err) {
-        console.error("Form background post failed:", err);
-      }
+      toast.success("Contact captured in demo engine!");
     }
 
-    // Instantly advance to the quiz with zero extra clicks
-    setStep("QUIZ_1");
+    setIsSubmitting(false);
+    setDemoStep("QUIZ_INTRO");
+  };
+
+  const handleQuizAnswer = (answer: string) => {
+    const updatedAnswers = [...quizAnswers, { questionId: quizQuestions[currentQuestionIndex].id, answer }];
+    setQuizAnswers(updatedAnswers);
+
+    if (currentQuestionIndex < quizQuestions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else {
+      setDemoStep("OFFER");
+    }
+  };
+
+  const handleStripeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripeData.cardNumber || !stripeData.expiry || !stripeData.cvc) {
+      toast.error("Please enter your card details.");
+      return;
+    }
+    toast.success("Payment Authorized Successfully!");
+    setDemoStep("SUCCESS");
+  };
+
+  const prefillStripeDemo = () => {
+    setStripeData({
+      cardNumber: "4242 •••• •••• 4242",
+      expiry: "12/28",
+      cvc: "123"
+    });
+    toast.info("Demo card details pre-filled.");
+  };
+
+  const saveWebhook = (url: string) => {
+    setWebhookUrl(url);
+    localStorage.setItem("arms_webhook_url", url);
+    toast.success("YAT?STATS Webhook URL updated!");
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#1C2D1F] font-serif flex flex-col selection:bg-[#E6DFD3] selection:text-[#1C2D1F]">
-      {/* Premium Minimal Header */}
-      <header className="border-b border-[#EAE4D8] py-4 px-6 bg-white flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <img 
-            src="/manus-storage/shipsticks_logo_ffe81851.png" 
-            alt="Ship Sticks" 
-            className="h-10 object-contain"
-          />
-          <div className="h-6 w-px bg-[#EAE4D8]" />
-          <span className="text-xs tracking-[0.2em] uppercase text-[#6B7F6D] font-sans font-semibold">
-            Fulfillment Partner
-          </span>
-        </div>
-        <div className="flex items-center gap-2 text-xs tracking-wider uppercase text-[#6B7F6D] font-sans font-medium">
-          <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          Secure Verification Portal
+    <div className="min-h-screen bg-[#FDFBF7] text-[#1C2B21] font-sans antialiased flex flex-col justify-between">
+      {/* 1. Header with Official Ship Sticks Logo */}
+      <header className="border-b border-[#E8E4DC] bg-white py-4 px-6 sticky top-0 z-50 shadow-xs">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img 
+              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663368558979/TncsUA3wJWw3btME2gSgvv/shipsticks_logo-EsmX8YxH468XGfG9G4e7Y7.png" 
+              alt="Ship Sticks Logo" 
+              className="h-10 object-contain"
+            />
+          </div>
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#107C41] bg-[#EAF7EE] px-3 py-1.5 rounded-full">
+            <Shield className="w-3.5 h-3.5" />
+            Official Invitation Benefit
+          </div>
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col justify-center items-center py-12 px-4 max-w-4xl mx-auto w-full">
+      {/* 2. Main Content Area */}
+      <main className="flex-1 py-8 px-4 max-w-4xl mx-auto w-full flex flex-col justify-center">
         {step === "OPT_IN" && (
-          <div className="w-full max-w-2xl bg-white rounded-2xl border border-[#EAE4D8] shadow-[0_8px_30px_rgb(0,0,0,0.02)] overflow-hidden transition-all duration-300">
-            {/* Elegant Hero Wedge Banner */}
-            <div className="bg-[#1C2D1F] text-white p-8 text-center relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#FFF_1px,transparent_1px)] [background-size:16px_16px]" />
-              <div className="relative z-10">
-                <span className="inline-block px-3 py-1 bg-[#E6DFD3]/10 border border-[#E6DFD3]/20 rounded-full text-[10px] tracking-[0.2em] uppercase text-[#E6DFD3] font-sans font-semibold mb-4">
-                  Exclusive Invitation Only
-                </span>
-                <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2 font-serif">
-                  YOUR $75 SHIP STICKS VOUCHER IS RESERVED
-                </h1>
+          <div className="space-y-6 max-w-xl mx-auto w-full animate-fade-in">
+            {/* Elegant Golf Course Hero Banner Image */}
+            <div className="rounded-xl overflow-hidden shadow-md border border-[#E8E4DC] relative h-48 md:h-56">
+              <img 
+                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663368558979/TncsUA3wJWw3btME2gSgvv/luxury_golf_bg-A89ErcbS3N7Dbe9S79e8E8.png" 
+                alt="Luxury Golf Course" 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+                <div>
+                  <span className="text-xs font-bold text-[#E5C158] uppercase tracking-widest bg-black/40 px-2.5 py-1 rounded-sm">
+                    Exclusive Golf Invitation
+                  </span>
+                  <h1 className="text-xl md:text-2xl font-serif font-bold text-white mt-2">
+                    Activate Your $75 Golf Travel Voucher
+                  </h1>
+                </div>
               </div>
             </div>
 
-            <div className="p-8 space-y-6">
-              <p className="text-[#4A5D4E] font-sans text-base leading-relaxed text-center">
-                Congratulations! Your invitation scan qualifies you for a **$75 credit** toward premium golf club shipping with **Ship Sticks**. Ensure your cherished clubs travel safely, stress-free, and arrive directly at your next course destination.
-              </p>
-
-              <div className="bg-[#F9F7F2] border border-[#EAE4D8] rounded-xl p-5 flex gap-4 items-start">
-                <div className="p-2 bg-emerald-50 text-emerald-700 rounded-lg">
-                  <Check className="w-5 h-5" />
+            {/* Clean, Frictionless Opt-In Form Card */}
+            <Card className="border border-[#E8E4DC] shadow-lg bg-white overflow-hidden rounded-xl">
+              <CardContent className="p-6 md:p-8 space-y-6">
+                <div className="bg-[#FAF8F5] border border-[#E8E4DC] rounded-lg p-4 flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-[#107C41] shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="text-sm font-bold text-[#1C2B21] uppercase tracking-wider">
+                      Instant Voucher Reservation
+                    </h3>
+                    <p className="text-xs text-[#5C6B5E] mt-1 leading-relaxed">
+                      Secure your credit code first. Once registered, you can apply this $75 credit directly to your next golf club shipment.
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-sans font-bold text-sm text-[#1C2D1F] uppercase tracking-wider mb-1">
-                    Instant Voucher Reservation
-                  </h3>
-                  <p className="text-xs text-[#6B7F6D] font-sans leading-relaxed">
-                    Secure your credit first. Once registered, you can apply this $75 credit directly to your next golf club shipment.
+
+                <form onSubmit={handleOptInSubmit} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-xs font-bold text-[#5C6B5E] tracking-wider uppercase">
+                      Full Name
+                    </Label>
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="e.g., Andrew Miller"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      required
+                      className="h-12 border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] focus:ring-1 focus:ring-[#107C41] rounded-md"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-xs font-bold text-[#5C6B5E] tracking-wider uppercase">
+                      Email Address
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="e.g., andrew@example.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      required
+                      className="h-12 border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] focus:ring-1 focus:ring-[#107C41] rounded-md"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-xs font-bold text-[#5C6B5E] tracking-wider uppercase">
+                      Mobile Number <span className="text-[#A4B3A7] font-normal">(Optional)</span>
+                    </Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="e.g., (555) 123-4567"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="h-12 border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] focus:ring-1 focus:ring-[#107C41] rounded-md"
+                    />
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="w-full h-12 bg-[#107C41] hover:bg-[#0C6233] active:scale-[0.98] transition-all text-white font-bold text-sm tracking-wider uppercase rounded-md shadow-md flex items-center justify-center gap-2"
+                  >
+                    {isSubmitting ? "Securing..." : "Secure Your $75 Voucher"}
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {step === "QUIZ_INTRO" && (
+          <div className="max-w-xl mx-auto w-full space-y-6 animate-fade-in">
+            <Card className="border border-[#E8E4DC] shadow-lg bg-white rounded-xl overflow-hidden">
+              <div className="bg-[#107C41] text-white p-6 text-center">
+                <CheckCircle2 className="w-12 h-12 mx-auto text-[#E5C158]" />
+                <h2 className="text-xl font-serif font-bold mt-3">Voucher Reserved Successfully!</h2>
+                <p className="text-xs text-[#EAF7EE] mt-1">Your $75 credit is held under: <span className="font-bold text-white">{formData.email}</span></p>
+              </div>
+              <CardContent className="p-6 md:p-8 space-y-6 text-center">
+                <p className="text-sm text-[#5C6B5E] leading-relaxed">
+                  To complete your voucher activation and claim your official code, please complete our brief 4-question Golf Travel Planner. 
+                </p>
+                <div className="bg-[#FAF8F5] border border-[#E8E4DC] rounded-lg p-4 text-left space-y-3">
+                  <div className="flex items-center gap-2.5 text-xs font-bold text-[#1C2B21]">
+                    <Shield className="w-4 h-4 text-[#107C41]" />
+                    EXCLUSIVE MEMBER BENEFIT
+                  </div>
+                  <p className="text-xs text-[#5C6B5E] leading-relaxed">
+                    By completing this planner, you will also be evaluated for complimentary trial enrollment in the **Travel Protection Club (TPC)**.
                   </p>
                 </div>
-              </div>
-
-              {/* Custom Seamless React Form */}
-              <form onSubmit={handleOptInSubmit} className="space-y-4 pt-2">
-                <div className="space-y-1">
-                  <Label htmlFor="name" className="text-xs tracking-wider uppercase text-[#6B7F6D] font-sans font-semibold">
-                    Full Name
-                  </Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    required
-                    placeholder="e.g., Andrew Miller"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="border-[#EAE4D8] focus:border-[#1C2D1F] focus:ring-0 rounded-lg bg-white font-sans text-sm py-5"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <Label htmlFor="email" className="text-xs tracking-wider uppercase text-[#6B7F6D] font-sans font-semibold">
-                    Email Address
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    required
-                    placeholder="e.g., andrew@example.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="border-[#EAE4D8] focus:border-[#1C2D1F] focus:ring-0 rounded-lg bg-white font-sans text-sm py-5"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <div className="flex justify-between items-center">
-                    <Label htmlFor="phone" className="text-xs tracking-wider uppercase text-[#6B7F6D] font-sans font-semibold">
-                      Mobile Number <span className="text-gray-400 font-normal">(Optional)</span>
-                    </Label>
-                  </div>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="e.g., (555) 123-4567"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="border-[#EAE4D8] focus:border-[#1C2D1F] focus:ring-0 rounded-lg bg-white font-sans text-sm py-5"
-                  />
-                </div>
-
                 <Button 
-                  type="submit" 
-                  className="w-full bg-[#1C2D1F] hover:bg-[#2C3F30] text-white py-6 rounded-lg font-sans font-bold tracking-wider uppercase text-xs transition-all duration-200 mt-4 active:scale-[0.98]"
+                  onClick={() => setDemoStep("QUIZ")}
+                  className="w-full h-12 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-sm tracking-wider uppercase rounded-md shadow-md flex items-center justify-center gap-2"
                 >
-                  Secure Your $75 Voucher →
+                  Start Travel Planner
+                  <ChevronRight className="w-4 h-4" />
                 </Button>
-              </form>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         )}
 
-        {/* Quiz Steps */}
-        {step === "QUIZ_1" && (
-          <div className="w-full max-w-xl bg-white rounded-2xl border border-[#EAE4D8] p-8 space-y-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] transition-all duration-300">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-sans tracking-widest text-[#6B7F6D] uppercase font-bold">Step 1 of 4</span>
-              <span className="text-xs font-sans tracking-widest text-emerald-600 uppercase font-bold">Verification In Progress</span>
+        {step === "QUIZ" && (
+          <div className="max-w-xl mx-auto w-full space-y-6 animate-fade-in">
+            {/* Progress Indicator */}
+            <div className="flex justify-between items-center text-xs font-bold text-[#5C6B5E] uppercase tracking-wider px-1">
+              <span>Golf Travel Planner</span>
+              <span>Question {currentQuestionIndex + 1} of {quizQuestions.length}</span>
             </div>
-            <h2 className="text-2xl font-bold font-serif tracking-tight">How often do you travel for golf excursions each year?</h2>
-            <RadioGroup value={travelFreq} onValueChange={setQuizTravelFreq} className="space-y-3 pt-2">
-              {[
-                { value: "1-2", label: "1 to 2 times a year" },
-                { value: "3-5", label: "3 to 5 times a year" },
-                { value: "6+", label: "6 or more times a year" }
-              ].map((opt) => (
-                <Label key={opt.value} className="flex items-center justify-between p-4 border border-[#EAE4D8] rounded-xl cursor-pointer hover:bg-[#F9F7F2] transition-colors font-sans text-sm">
-                  <span>{opt.label}</span>
-                  <RadioGroupItem value={opt.value} />
-                </Label>
-              ))}
-            </RadioGroup>
-            <Button onClick={() => setStep("QUIZ_2")} className="w-full bg-[#1C2D1F] hover:bg-[#2C3F30] text-white py-5 rounded-lg font-sans font-bold tracking-wider uppercase text-xs">
-              Continue
-            </Button>
+            <div className="h-1.5 w-full bg-[#E8E4DC] rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-[#107C41] transition-all duration-300"
+                style={{ width: `${((currentQuestionIndex + 1) / quizQuestions.length) * 100}%` }}
+              />
+            </div>
+
+            <Card className="border border-[#E8E4DC] shadow-lg bg-white rounded-xl overflow-hidden">
+              <CardContent className="p-6 md:p-8 space-y-6">
+                <h2 className="text-lg md:text-xl font-serif font-bold text-[#1C2B21] leading-snug">
+                  {quizQuestions[currentQuestionIndex].question}
+                </h2>
+
+                <div className="space-y-3">
+                  {quizQuestions[currentQuestionIndex].options.map((option, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleQuizAnswer(option)}
+                      className="w-full p-4 text-left border border-[#E8E4DC] hover:border-[#107C41] hover:bg-[#EAF7EE]/30 active:scale-[0.99] transition-all rounded-lg text-sm font-medium text-[#1C2B21] flex items-center justify-between group"
+                    >
+                      <span>{option}</span>
+                      <ChevronRight className="w-4 h-4 text-[#A4B3A7] group-hover:text-[#107C41] transition-colors" />
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
 
-        {step === "QUIZ_2" && (
-          <div className="w-full max-w-xl bg-white rounded-2xl border border-[#EAE4D8] p-8 space-y-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] transition-all duration-300">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-sans tracking-widest text-[#6B7F6D] uppercase font-bold">Step 2 of 4</span>
-              <span className="text-xs font-sans tracking-widest text-emerald-600 uppercase font-bold">Verification In Progress</span>
-            </div>
-            <h2 className="text-2xl font-bold font-serif tracking-tight">What is the estimated replacement value of your golf clubs & travel gear?</h2>
-            <RadioGroup value={gearValue} onValueChange={setQuizGearValue} className="space-y-3 pt-2">
-              {[
-                { value: "under-2k", label: "Under $2,000" },
-                { value: "$2,000-$5,000", label: "$2,000 to $5,000" },
-                { value: "over-5k", label: "Over $5,000" }
-              ].map((opt) => (
-                <Label key={opt.value} className="flex items-center justify-between p-4 border border-[#EAE4D8] rounded-xl cursor-pointer hover:bg-[#F9F7F2] transition-colors font-sans text-sm">
-                  <span>{opt.label}</span>
-                  <RadioGroupItem value={opt.value} />
-                </Label>
-              ))}
-            </RadioGroup>
-            <Button onClick={() => setStep("QUIZ_3")} className="w-full bg-[#1C2D1F] hover:bg-[#2C3F30] text-white py-5 rounded-lg font-sans font-bold tracking-wider uppercase text-xs">
-              Continue
-            </Button>
-          </div>
-        )}
-
-        {step === "QUIZ_3" && (
-          <div className="w-full max-w-xl bg-white rounded-2xl border border-[#EAE4D8] p-8 space-y-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] transition-all duration-300">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-sans tracking-widest text-[#6B7F6D] uppercase font-bold">Step 3 of 4</span>
-              <span className="text-xs font-sans tracking-widest text-emerald-600 uppercase font-bold">Verification In Progress</span>
-            </div>
-            <h2 className="text-2xl font-bold font-serif tracking-tight">Do you currently have a guaranteed medical repatriation plan in place for travel emergencies?</h2>
-            <RadioGroup value={hasPlan} onValueChange={setQuizHasPlan} className="space-y-3 pt-2">
-              {[
-                { value: "yes", label: "Yes, I am fully covered" },
-                { value: "no", label: "No, or I am unsure if my insurance covers it" }
-              ].map((opt) => (
-                <Label key={opt.value} className="flex items-center justify-between p-4 border border-[#EAE4D8] rounded-xl cursor-pointer hover:bg-[#F9F7F2] transition-colors font-sans text-sm">
-                  <span>{opt.label}</span>
-                  <RadioGroupItem value={opt.value} />
-                </Label>
-              ))}
-            </RadioGroup>
-            <Button onClick={() => setStep("QUIZ_4")} className="w-full bg-[#1C2D1F] hover:bg-[#2C3F30] text-white py-5 rounded-lg font-sans font-bold tracking-wider uppercase text-xs">
-              Continue
-            </Button>
-          </div>
-        )}
-
-        {step === "QUIZ_4" && (
-          <div className="w-full max-w-xl bg-white rounded-2xl border border-[#EAE4D8] p-8 space-y-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] transition-all duration-300">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-sans tracking-widest text-[#6B7F6D] uppercase font-bold">Step 4 of 4</span>
-              <span className="text-xs font-sans tracking-widest text-emerald-600 uppercase font-bold">Verification In Progress</span>
-            </div>
-            <h2 className="text-2xl font-bold font-serif tracking-tight">Would you value complete peace of mind knowing you and your remains would be returned home to your family in an unforeseen medical crisis?</h2>
-            <RadioGroup value={plannerMindset} onValueChange={setQuizPlannerHasMindset} className="space-y-3 pt-2">
-              {[
-                { value: "yes", label: "Yes, protecting my family from logistical/financial crisis is essential" },
-                { value: "maybe", label: "I would like to learn more about how it works" }
-              ].map((opt) => (
-                <Label key={opt.value} className="flex items-center justify-between p-4 border border-[#EAE4D8] rounded-xl cursor-pointer hover:bg-[#F9F7F2] transition-colors font-sans text-sm">
-                  <span>{opt.label}</span>
-                  <RadioGroupItem value={opt.value} />
-                </Label>
-              ))}
-            </RadioGroup>
-            <Button onClick={() => setStep("OFFER")} className="w-full bg-[#1C2D1F] hover:bg-[#2C3F30] text-white py-5 rounded-lg font-sans font-bold tracking-wider uppercase text-xs">
-              Complete Verification
-            </Button>
-          </div>
-        )}
-
-        {/* Value-Stacked Offer Page */}
         {step === "OFFER" && (
-          <div className="w-full max-w-2xl bg-white rounded-2xl border border-[#EAE4D8] shadow-[0_8px_30px_rgb(0,0,0,0.02)] overflow-hidden transition-all duration-300">
-            <div className="bg-[#1C2D1F] text-white p-8 text-center">
-              <span className="text-[10px] tracking-[0.2em] uppercase text-[#E6DFD3] font-sans font-semibold mb-2 block">Verification Successful</span>
-              <h2 className="text-3xl font-bold font-serif tracking-tight">YOUR $75 SHIP STICKS VOUCHER IS UNLOCKED</h2>
-              <p className="text-[#A3B899] font-sans text-sm mt-2">Exclusive Member Benefit: Save 50% on Your First Year</p>
-            </div>
+          <div className="max-w-2xl mx-auto w-full space-y-6 animate-fade-in">
+            {/* Exclusive Offer Card */}
+            <Card className="border border-[#E5C158] shadow-xl bg-white rounded-xl overflow-hidden relative">
+              <div className="absolute top-0 right-0 bg-[#E5C158] text-[#1C2B21] font-bold text-[10px] tracking-widest uppercase px-4 py-1.5 rounded-bl-lg">
+                Exclusive Package
+              </div>
 
-            <div className="p-8 space-y-6">
-              {/* The Hook, Story, Offer */}
-              <div className="space-y-4">
-                <p className="text-sm font-sans text-[#4A5D4E] leading-relaxed">
-                  As a golfer, you understand the importance of preparation. You protect your cherished golf clubs with premium shipping. But what about protecting **yourself** and your loved ones during your travels?
-                </p>
-                <p className="text-sm font-sans text-[#4A5D4E] leading-relaxed">
-                  Standard health insurance and travel credit cards **do not cover** medical repatriation. If an unforeseen medical crisis occurs away from home, getting you or your remains back to your local hospital can cost your family upwards of **$50,000** in cash, plus immense logistical stress.
-                </p>
-                <p className="text-sm font-sans text-[#4A5D4E] leading-relaxed font-semibold text-[#1C2D1F]">
-                  The **Travel Protection Club** is your ultimate safety plan. For a standard annual membership of $150, you gain guaranteed, zero-cost medical repatriation and 24/7 emergency coordination. 
+              <div className="bg-[#1C2B21] text-white p-6 md:p-8 text-center">
+                <span className="text-xs font-bold text-[#E5C158] tracking-widest uppercase">
+                  Travel Protection Club
+                </span>
+                <h2 className="text-2xl md:text-3xl font-serif font-bold mt-2">
+                  Activate Your Travel Protection Club Membership
+                </h2>
+                <p className="text-xs text-[#A4B3A7] mt-2 max-w-md mx-auto leading-relaxed">
+                  Your travel profile qualifies you for our exclusive member bundle. Spend less time worrying about your health, and more time enjoying the game.
                 </p>
               </div>
 
-              {/* The Value Stack Box */}
-              <div className="bg-[#F9F7F2] border border-[#EAE4D8] rounded-xl p-6 space-y-4">
-                <h3 className="font-serif font-bold text-lg text-[#1C2D1F] border-b border-[#EAE4D8] pb-2">Your Value-Stacked Offer</h3>
-                <div className="space-y-2 font-sans text-sm">
-                  <div className="flex justify-between text-[#4A5D4E]">
-                    <span>1-Year Travel Protection Club Membership</span>
-                    <span className="font-semibold">$150.00</span>
+              <CardContent className="p-6 md:p-8 space-y-6">
+                {/* Value Comparison Table */}
+                <div className="border border-[#E8E4DC] rounded-lg overflow-hidden">
+                  <div className="grid grid-cols-3 bg-[#FAF8F5] border-b border-[#E8E4DC] p-3 text-xs font-bold text-[#5C6B5E] tracking-wider uppercase">
+                    <span>Benefit Item</span>
+                    <span className="text-center">Standard Value</span>
+                    <span className="text-right text-[#107C41]">Your Bundle</span>
                   </div>
-                  <div className="flex justify-between text-emerald-700 font-semibold">
-                    <span>Your Unlocked Ship Sticks Rebate Credit</span>
-                    <span>-$75.00</span>
-                  </div>
-                  <div className="border-t border-[#EAE4D8] pt-3 flex justify-between text-[#1C2D1F] font-bold text-base">
-                    <span>Net Investment After Rebate</span>
-                    <span className="text-emerald-800">$75.00</span>
+                  <div className="divide-y divide-[#E8E4DC] text-xs">
+                    <div className="grid grid-cols-3 p-3 text-[#1C2B21]">
+                      <span className="font-semibold">1-Yr TPC Travel Membership</span>
+                      <span className="text-center text-[#5C6B5E] line-through">$150.00</span>
+                      <span className="text-right font-bold text-[#107C41]">$150.00</span>
+                    </div>
+                    <div className="grid grid-cols-3 p-3 text-[#1C2B21] bg-[#EAF7EE]/20">
+                      <span className="font-semibold text-[#107C41]">Ship Sticks Voucher Credit</span>
+                      <span className="text-center text-[#5C6B5E]">-</span>
+                      <span className="text-right font-bold text-[#107C41]">-$75.00 Rebate</span>
+                    </div>
+                    <div className="grid grid-cols-3 p-3 bg-[#FAF8F5] font-bold text-sm text-[#1C2B21]">
+                      <span>Net Effective Cost</span>
+                      <span className="text-center text-[#5C6B5E]">$150.00</span>
+                      <span className="text-right text-[#107C41]">$75.00</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Trust Pillars */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                {[
-                  { icon: Shield, title: "Elite Repatriation", desc: "Guaranteed air transport home" },
-                  { icon: Plane, title: "Worldwide Coverage", desc: "Protected anywhere on earth" },
-                  { icon: HelpCircle, title: "Family Peace of Mind", desc: "Zero financial burden left behind" }
-                ].map((p, idx) => (
-                  <div key={idx} className="text-center p-3 border border-[#EAE4D8] rounded-xl bg-white">
-                    <p.icon className="w-5 h-5 mx-auto text-[#6B7F6D] mb-1" />
-                    <h4 className="text-xs font-bold font-sans uppercase tracking-wider text-[#1C2D1F]">{p.title}</h4>
-                    <p className="text-[10px] text-[#6B7F6D] font-sans mt-0.5">{p.desc}</p>
+                {/* Core Pillars List */}
+                <div className="space-y-4">
+                  <h3 className="text-xs font-bold text-[#5C6B5E] uppercase tracking-widest">
+                    What is Included in Your Membership:
+                  </h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="flex gap-3 items-start">
+                      <div className="p-1 bg-[#EAF7EE] rounded-full text-[#107C41] shrink-0">
+                        <Check className="w-3.5 h-3.5" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-[#1C2B21]">Elite Medical Repatriation</h4>
+                        <p className="text-[11px] text-[#5C6B5E] mt-0.5 leading-relaxed">
+                          In a crisis, we coordinate and pay to fly you and your equipment back to your home hospital.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3 items-start">
+                      <div className="p-1 bg-[#EAF7EE] rounded-full text-[#107C41] shrink-0">
+                        <Check className="w-3.5 h-3.5" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-[#1C2B21]">First-Call Emergency Response</h4>
+                        <p className="text-[11px] text-[#5C6B5E] mt-0.5 leading-relaxed">
+                          One dedicated phone number connects you instantly to global crisis coordination experts.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3 items-start">
+                      <div className="p-1 bg-[#EAF7EE] rounded-full text-[#107C41] shrink-0">
+                        <Check className="w-3.5 h-3.5" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-[#1C2B21]">Physical Membership Pack</h4>
+                        <p className="text-[11px] text-[#5C6B5E] mt-0.5 leading-relaxed">
+                          Receive heavy-duty engraved metal luggage tags and emergency wallet cards.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3 items-start">
+                      <div className="p-1 bg-[#EAF7EE] rounded-full text-[#107C41] shrink-0">
+                        <Check className="w-3.5 h-3.5" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-[#1C2B21]">Verified Ship Sticks Voucher</h4>
+                        <p className="text-[11px] text-[#5C6B5E] mt-0.5 leading-relaxed">
+                          Get an active $75 voucher code immediately to use on your very next club shipment.
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                ))}
-              </div>
+                </div>
 
-              <div className="space-y-3 pt-2">
-                <Button onClick={() => setStep("STRIPE_CHECKOUT")} className="w-full bg-[#1C2D1F] hover:bg-[#2C3F30] text-white py-6 rounded-lg font-sans font-bold tracking-wider uppercase text-xs transition-all active:scale-[0.98]">
-                  Activate Membership & Claim Voucher →
-                </Button>
-                <p className="text-center text-[10px] text-[#6B7F6D] font-sans">
-                  By clicking, you agree to join the Travel Protection Club. Cancel anytime.
-                </p>
-              </div>
-            </div>
+                {/* Terms Acceptance & CTA */}
+                <div className="space-y-4 pt-2">
+                  <p className="text-[10px] text-[#849387] text-center leading-relaxed">
+                    By clicking below, you agree to join the Travel Protection Club and pay the $150 first-year membership fee. Once confirmed, your $75 Ship Sticks voucher will be instantly issued.
+                  </p>
+                  <Button 
+                    onClick={() => setDemoStep("STRIPE_CHECKOUT")}
+                    className="w-full h-12 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-sm tracking-wider uppercase rounded-md shadow-md flex items-center justify-center gap-2"
+                  >
+                    Accept Offer & Proceed to Checkout
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
 
-        {/* Simulated Stripe Checkout Screen */}
         {step === "STRIPE_CHECKOUT" && (
-          <div className="w-full max-w-md bg-white rounded-2xl border border-[#EAE4D8] shadow-[0_8px_30px_rgb(0,0,0,0.02)] overflow-hidden transition-all duration-300">
-            {/* Stripe Header */}
-            <div className="bg-[#F8F9FC] border-b border-[#EAE4D8] p-6 flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <CreditCard className="w-5 h-5 text-indigo-600" />
-                <span className="font-sans font-bold text-sm text-[#1C2D1F] tracking-tight">Secure Checkout</span>
+          <div className="max-w-md mx-auto w-full space-y-6 animate-fade-in">
+            <Card className="border border-[#E8E4DC] shadow-lg bg-white rounded-xl overflow-hidden">
+              <div className="bg-[#FAF8F5] border-b border-[#E8E4DC] p-5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-[#107C41]" />
+                  <span className="text-xs font-bold text-[#1C2B21] tracking-wider uppercase">Secure Stripe Checkout</span>
+                </div>
+                <div className="text-xs font-bold text-[#107C41] bg-[#EAF7EE] px-2.5 py-1 rounded-sm">
+                  SSL Encrypted
+                </div>
               </div>
-              <div className="flex items-center gap-1 text-[10px] text-gray-400 font-sans uppercase tracking-wider font-semibold">
-                <Lock className="w-3 h-3 text-emerald-500" />
-                SSL Encrypted
-              </div>
-            </div>
 
-            <div className="p-6 space-y-6">
-              {/* Price Summary */}
-              <div className="space-y-3 font-sans">
-                <div className="flex justify-between text-xs text-gray-400 uppercase tracking-wider font-semibold">
-                  <span>Product</span>
-                  <span>Price</span>
+              <CardContent className="p-6 space-y-6">
+                {/* Order Summary */}
+                <div className="bg-[#FAF8F5] border border-[#E8E4DC] rounded-lg p-4 space-y-2">
+                  <div className="flex justify-between text-xs text-[#5C6B5E]">
+                    <span>1-Year TPC Membership</span>
+                    <span>$150.00</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-[#107C41] font-bold">
+                    <span>Ship Sticks Voucher</span>
+                    <span>-$75.00 Rebate Held</span>
+                  </div>
+                  <div className="border-t border-[#E8E4DC] pt-2 flex justify-between text-sm font-bold text-[#1C2B21]">
+                    <span>Total Due Today</span>
+                    <span>$150.00</span>
+                  </div>
+                  <p className="text-[10px] text-[#849387] leading-relaxed pt-1">
+                    *Your $75 Ship Sticks voucher will be delivered instantly upon payment confirmation.
+                  </p>
                 </div>
-                <div className="flex justify-between text-sm text-[#1C2D1F] font-semibold">
-                  <span>Travel Protection Club (Annual)</span>
-                  <span>$150.00</span>
-                </div>
-                <div className="flex justify-between text-sm text-emerald-700 font-semibold">
-                  <span>Ship Sticks Rebate Applied</span>
-                  <span>-$75.00</span>
-                </div>
-                <div className="border-t border-dashed border-[#EAE4D8] pt-3 flex justify-between text-[#1C2D1F] font-bold text-lg">
-                  <span>Total Due Today</span>
-                  <span>$150.00</span>
-                </div>
-                <p className="text-[10px] text-[#6B7F6D] leading-relaxed">
-                  *Your card will be charged $150.00 today. Your physical welcome packet will arrive in 5-7 days, containing your official membership cards and your **guaranteed $75 Ship Sticks rebate code** to apply directly to your next shipment.
+
+                <form onSubmit={handleStripeSubmit} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="cardNumber" className="text-[10px] font-bold text-[#5C6B5E] uppercase tracking-wider">Card Number</Label>
+                    <Input
+                      id="cardNumber"
+                      type="text"
+                      placeholder="4242 4242 4242 4242"
+                      value={stripeData.cardNumber}
+                      onChange={(e) => setStripeData({ ...stripeData, cardNumber: e.target.value })}
+                      required
+                      className="h-11 border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] rounded-md"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="expiry" className="text-[10px] font-bold text-[#5C6B5E] uppercase tracking-wider">Expiration Date</Label>
+                      <Input
+                        id="expiry"
+                        type="text"
+                        placeholder="MM/YY"
+                        value={stripeData.expiry}
+                        onChange={(e) => setStripeData({ ...stripeData, expiry: e.target.value })}
+                        required
+                        className="h-11 border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] rounded-md"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="cvc" className="text-[10px] font-bold text-[#5C6B5E] uppercase tracking-wider">Security Code (CVC)</Label>
+                      <Input
+                        id="cvc"
+                        type="text"
+                        placeholder="123"
+                        value={stripeData.cvc}
+                        onChange={(e) => setStripeData({ ...stripeData, cvc: e.target.value })}
+                        required
+                        className="h-11 border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] rounded-md"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={prefillStripeDemo}
+                      className="flex-1 h-11 border-[#E8E4DC] text-xs font-bold text-[#5C6B5E] hover:bg-[#FAF8F5] active:scale-[0.98]"
+                    >
+                      Pre-fill Demo Card
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="flex-1 h-11 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-xs tracking-wider uppercase rounded-md shadow-md active:scale-[0.98]"
+                    >
+                      Authorize Payment
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {step === "SUCCESS" && (
+          <div className="max-w-xl mx-auto w-full space-y-6 animate-fade-in">
+            <Card className="border border-[#107C41] shadow-xl bg-white rounded-xl overflow-hidden">
+              <div className="bg-[#107C41] text-white p-8 text-center space-y-3">
+                <CheckCircle2 className="w-16 h-16 mx-auto text-[#E5C158] animate-bounce" />
+                <h2 className="text-2xl font-serif font-bold">Welcome to the Club!</h2>
+                <p className="text-xs text-[#EAF7EE] max-w-xs mx-auto">
+                  Your TPC Travel Protection membership is active and your Ship Sticks voucher has been issued.
                 </p>
               </div>
 
-              {/* Payment Form */}
-              <div className="space-y-4 pt-2">
-                <div className="space-y-1">
-                  <Label className="text-xs font-sans font-semibold text-gray-500">Cardholder Name</Label>
-                  <Input 
-                    type="text" 
-                    defaultValue={formData.name || "Andrew Miller"} 
-                    className="border-[#EAE4D8] rounded-lg font-sans text-sm bg-white"
-                  />
+              <CardContent className="p-6 md:p-8 space-y-6">
+                {/* Active Voucher Code Box */}
+                <div className="bg-[#FAF8F5] border-2 border-dashed border-[#107C41] rounded-lg p-6 text-center space-y-3">
+                  <span className="text-[10px] font-bold text-[#107C41] tracking-widest uppercase">
+                    Your Active Ship Sticks Voucher Code
+                  </span>
+                  <div className="text-3xl font-mono font-extrabold text-[#1C2B21] tracking-wider select-all">
+                    TPC-75-GOLF
+                  </div>
+                  <p className="text-xs text-[#5C6B5E]">
+                    Apply this code at checkout on **ShipSticks.com** to receive your $75 discount instantly.
+                  </p>
                 </div>
 
-                <div className="space-y-1">
-                  <Label className="text-xs font-sans font-semibold text-gray-500">Card Information</Label>
-                  <div className="relative">
-                    <Input 
-                      type="text" 
-                      placeholder="4242  4242  4242  4242" 
-                      className="border-[#EAE4D8] rounded-lg font-sans text-sm bg-white pr-10"
-                    />
-                    <CreditCard className="w-5 h-5 text-gray-300 absolute right-3 top-2.5" />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <Label className="text-xs font-sans font-semibold text-gray-500">Expiration</Label>
-                    <Input 
-                      type="text" 
-                      placeholder="MM / YY" 
-                      className="border-[#EAE4D8] rounded-lg font-sans text-sm bg-white text-center"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs font-sans font-semibold text-gray-500">CVC</Label>
-                    <Input 
-                      type="text" 
-                      placeholder="123" 
-                      className="border-[#EAE4D8] rounded-lg font-sans text-sm bg-white text-center"
-                    />
+                {/* Membership Details */}
+                <div className="space-y-4">
+                  <h3 className="text-xs font-bold text-[#5C6B5E] uppercase tracking-widest">
+                    Next Steps & Fulfillment:
+                  </h3>
+                  <div className="space-y-3 text-xs">
+                    <div className="flex gap-3">
+                      <div className="w-5 h-5 bg-[#EAF7EE] text-[#107C41] font-bold rounded-full flex items-center justify-center shrink-0">1</div>
+                      <p className="text-[#5C6B5E] leading-relaxed">
+                        An official welcome email with your digital TPC membership card has been dispatched to **{formData.email}**.
+                      </p>
+                    </div>
+                    <div className="flex gap-3">
+                      <div className="w-5 h-5 bg-[#EAF7EE] text-[#107C41] font-bold rounded-full flex items-center justify-center shrink-0">2</div>
+                      <p className="text-[#5C6B5E] leading-relaxed">
+                        Your physical member pack (engraved metal luggage tags and emergency wallet cards) will ship via premium ground in 3-5 business days.
+                      </p>
+                    </div>
+                    <div className="flex gap-3">
+                      <div className="w-5 h-5 bg-[#EAF7EE] text-[#107C41] font-bold rounded-full flex items-center justify-center shrink-0">3</div>
+                      <p className="text-[#5C6B5E] leading-relaxed">
+                        Save our 24/7 First-Call emergency coordinator hotline: **1-800-555-GOLF** directly to your phone.
+                      </p>
+                    </div>
                   </div>
                 </div>
 
                 <Button 
-                  onClick={() => setStep("SUCCESS")} 
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-6 rounded-lg font-sans font-bold tracking-wider uppercase text-xs mt-2"
+                  onClick={() => {
+                    setDemoStep("OPT_IN");
+                    setFormData({ name: "", email: "", phone: "" });
+                    setQuizAnswers([]);
+                    setCurrentQuestionIndex(0);
+                    setStripeData({ cardNumber: "", expiry: "", cvc: "" });
+                  }}
+                  className="w-full h-12 bg-[#1C2B21] hover:bg-black text-white font-bold text-sm tracking-wider uppercase rounded-md shadow-md"
                 >
-                  Pay $150.00 & Claim Rebate
+                  Restart Demo Flow
                 </Button>
-
-                <div className="flex justify-center items-center gap-2 pt-2 text-[10px] text-gray-400 font-sans">
-                  <span>Powered by</span>
-                  <span className="font-bold text-gray-500 tracking-tight text-xs">stripe</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Success / Voucher Page */}
-        {step === "SUCCESS" && (
-          <div className="w-full max-w-md bg-white rounded-2xl border border-[#EAE4D8] p-8 space-y-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] text-center transition-all duration-300">
-            <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto border border-emerald-100">
-              <Check className="w-8 h-8 text-emerald-600" />
-            </div>
-            <div className="space-y-2">
-              <span className="text-[10px] tracking-[0.2em] uppercase text-emerald-600 font-sans font-bold">Membership Activated</span>
-              <h2 className="text-3xl font-bold font-serif tracking-tight">WELCOME TO THE CLUB</h2>
-              <p className="text-sm font-sans text-[#4A5D4E] leading-relaxed">
-                Thank you, **{formData.name || "Peter DeLuca"}**. Your first-year Travel Protection Club membership is active. Your family is now fully protected.
-              </p>
-            </div>
-
-            {/* Voucher Code Box */}
-            <div className="bg-[#F9F7F2] border-2 border-dashed border-[#EAE4D8] rounded-xl p-6 space-y-3 relative overflow-hidden">
-              <span className="text-[9px] tracking-[0.15em] uppercase text-[#6B7F6D] font-sans font-bold block">Your $75 Shipping Voucher</span>
-              <div className="bg-white border border-[#EAE4D8] py-3 px-4 rounded-lg font-mono text-lg font-bold tracking-widest text-[#1C2D1F] select-all">
-                SS-GOLF-75-ACTIVE
-              </div>
-              <p className="text-[10px] text-[#6B7F6D] font-sans leading-relaxed">
-                Copy this code to use on your next golf travel shipment. An activation link has been sent to **{formData.email || "pdeluca@gmail.com"}**.
-              </p>
-            </div>
-
-            <div className="text-left bg-[#F9F7F2]/50 border border-[#EAE4D8] rounded-xl p-4 space-y-3 font-sans text-xs">
-              <h4 className="font-bold text-[#1C2D1F] uppercase tracking-wider">What Happens Next:</h4>
-              <ul className="space-y-2 text-[#4A5D4E] list-disc list-inside">
-                <li>Check your inbox for the digital welcome packet.</li>
-                <li>Download and share the 1-Page Family Instruction sheet.</li>
-                <li>Your physical member card will arrive in 5-7 business days.</li>
-              </ul>
-            </div>
-
-            <Button onClick={() => {
-              setStep("OPT_IN");
-              setFormData({ name: "", email: "", phone: "" });
-            }} className="w-full bg-[#1C2D1F] hover:bg-[#2C3F30] text-white py-5 rounded-lg font-sans font-bold tracking-wider uppercase text-xs">
-              Simulate Next Scan ↻
-            </Button>
+              </CardContent>
+            </Card>
           </div>
         )}
       </main>
 
-      {/* Embedded Webhook configuration helper (hidden elegant tray in bottom left) */}
-      <div className="fixed bottom-4 left-4 z-50">
-        <details className="bg-white border border-[#EAE4D8] rounded-xl shadow-lg font-sans text-xs max-w-sm overflow-hidden group">
-          <summary className="p-3 font-bold cursor-pointer select-none bg-[#F9F7F2] hover:bg-[#E6DFD3]/30 transition-colors flex items-center gap-2">
-            <PhoneCall className="w-4 h-4 text-emerald-700" />
-            <span>&lt;&gt; YAT?STATS WEBHOOK INTEGRATION</span>
-          </summary>
-          <div className="p-4 space-y-3 border-t border-[#EAE4D8] bg-white">
-            <p className="text-[11px] text-[#6B7F6D] leading-relaxed">
-              Paste your YAT?STATS Inbound Webhook URL here to send live contact data directly to your CRM when submitting the form!
-            </p>
-            <Input
-              type="text"
-              placeholder="https://services.leadconnectorhq.com/hooks/..."
-              value={webhookUrl}
-              onChange={(e) => setWebhookUrl(e.target.value)}
-              className="border-[#EAE4D8] focus:border-[#1C2D1F] rounded-lg text-xs"
-            />
-            {webhookUrl && (
-              <p className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
-                <Check className="w-3 h-3" /> Live webhook active!
-              </p>
-            )}
+      {/* 3. Collapsible YAT?STATS Integration Drawer */}
+      <footer className="bg-white border-t border-[#E8E4DC] p-4">
+        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5 text-xs text-[#5C6B5E]">
+            <span className="font-bold text-[#1C2B21]">Demo Controls:</span>
+            <span>Current Step: <strong className="text-[#107C41]">{step}</strong></span>
           </div>
-        </details>
-      </div>
 
-      {/* Premium Minimal Footer */}
-      <footer className="border-t border-[#EAE4D8] py-6 px-6 text-center text-[10px] text-[#6B7F6D] font-sans tracking-wider uppercase bg-white">
-        © 2026 Travel Protection Club. All rights reserved. Fulfillment powered by Ship Sticks®.
+          <div className="w-full md:w-auto flex items-center gap-2">
+            <Label htmlFor="webhook-url" className="text-[10px] font-bold text-[#5C6B5E] uppercase tracking-wider shrink-0">
+              YAT?STATS Webhook URL:
+            </Label>
+            <Input
+              id="webhook-url"
+              type="text"
+              placeholder="Paste Inbound Webhook URL here..."
+              value={webhookUrl}
+              onChange={(e) => saveWebhook(e.target.value)}
+              className="h-8 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] w-full md:w-64 rounded-sm"
+            />
+          </div>
+        </div>
       </footer>
     </div>
   );
