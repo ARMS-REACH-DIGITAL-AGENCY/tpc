@@ -24,6 +24,14 @@ export default function Home() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [webhookUrl] = useState(() => {
+    // 1. Check URL query parameters first (e.g. ?webhook=https://...)
+    const params = new URLSearchParams(window.location.search);
+    const urlParam = params.get("webhook");
+    if (urlParam) {
+      localStorage.setItem("arms_webhook_url", urlParam);
+      return urlParam;
+    }
+    // 2. Fallback to localStorage
     return localStorage.getItem("arms_webhook_url") || "";
   });
   const [stripeData, setStripeData] = useState({
