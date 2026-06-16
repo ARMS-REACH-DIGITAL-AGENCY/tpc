@@ -212,7 +212,7 @@ export default function Home() {
   const BrandFooter = () => (
     <div className="space-y-2 mt-1">
       <div className="flex items-center justify-center gap-5 md:gap-8 px-2">
-        <img src={LOGOS.benefitBuddies} alt="Benefit Buddies" className="h-30 w-30 md:h-36 md:w-36 object-contain shrink-0" />
+        <img src={LOGOS.benefitBuddies} alt="Benefit Buddies" className="h-36 w-36 md:h-40 md:w-40 object-contain shrink-0" />
         <img src={LOGOS.tpc} alt="Travel Protection Club" className="h-16 md:h-20 object-contain shrink-0" />
         <img src={LOGOS.shipSticks} alt="ShipSticks" className="h-12 md:h-16 object-contain shrink-0" />
       </div>
