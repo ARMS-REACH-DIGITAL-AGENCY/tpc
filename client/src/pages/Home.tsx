@@ -245,7 +245,7 @@ export default function Home() {
           <div className="space-y-0 w-full animate-fade-in">
             <Card className="border-0 shadow-none bg-transparent rounded-none">
               <CardContent className="p-0 space-y-2">
-                <div className="text-center space-y-2 -translate-y-10 mb-10">
+                <div className="text-center space-y-2 -translate-y-6 mb-6">
                   <h1 className="text-2xl md:text-3xl font-sans font-black tracking-tight text-black leading-tight">
                     The next time <br />
                     your precious clubs <br />
