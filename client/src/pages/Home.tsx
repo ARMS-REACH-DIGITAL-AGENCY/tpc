@@ -213,12 +213,12 @@ export default function Home() {
     <div className="space-y-0 mt-0">
       <div className="flex items-center justify-center gap-5 md:gap-8 px-20">
         <img src={LOGOS.tpc} alt="Travel Protection Club" className="h-20 md:h-24 object-contain shrink-0" />
-        <img src={LOGOS.benefitBuddies} alt="Benefit Buddies" className="h-24 w-24 md:h-30 d:w-30 object-contain shrink-0" />
+        <img src={LOGOS.benefitBuddies} alt="Benefit Buddies" className="h-20 w-20 md:h-24 d:w-24 object-contain shrink-0" />
         <img src={LOGOS.shipSticks} alt="ShipSticks" className="h-12 md:h-16 object-contain shrink-0" />
       </div>
       <div className="text-center px-4">
         <span className="text-[9px] md:text-[10px] text-[#5C6B5E] font-bold tracking-wider block leading-relaxed">
-          Compliments of The TRAVEL PROTECTION CLUB by BENEFIT BUDDIES <br />
+          Compliments of </br> The TRAVEL PROTECTION CLUB by BENEFIT BUDDIES <br/>
           <span className="text-[#A4B3A7] font-medium text-[8px] md:text-[9px]">in conjunction with ShipSticks</span>
         </span>
       </div>
@@ -231,7 +231,7 @@ export default function Home() {
         {step === "OPT_IN" && (
           <div className="space-y-0 w-full animate-fade-in">
             <Card className="border-0 shadow-none bg-transparent rounded-none">
-              <CardContent className="p-0 space-y-4">
+              <CardContent className="p-0 space-y-2">
                 <div className="text-center space-y-2">
                   <h1 className="text-2xl md:text-3xl font-sans font-black tracking-tight text-black leading-tight">
                     The next time <br />
