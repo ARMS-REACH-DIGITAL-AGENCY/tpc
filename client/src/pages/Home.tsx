@@ -245,7 +245,7 @@ export default function Home() {
           <div className="space-y-0 w-full animate-fade-in">
             <Card className="border-0 shadow-none bg-transparent rounded-none">
               <CardContent className="p-0 space-y-2">
-                <div className="text-center space-y-2 -translate-y-6 mb-4">
+                <div className="text-center space-y-2 -translate-y-6 mb-2">
                   <h1 className="text-2xl md:text-3xl font-sans font-black tracking-tight text-black leading-tight">
                     The next time <br />
                     your precious clubs <br />
@@ -269,7 +269,7 @@ export default function Home() {
                     <Input id="phone" type="tel" placeholder="(555) 123-4567" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="h-11 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] focus:ring-0 rounded-none font-medium placeholder:text-[#C1C9C3]" />
                   </div>
                   <Button type="submit" disabled={isSubmitting} className="w-full min-h-12 py-3 px-4 bg-[#107C41] hover:bg-[#0C6233] active:scale-[0.98] transition-all text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md flex items-center justify-center gap-2 mt-2 cursor-pointer whitespace-normal text-center leading-normal">
-                    <span>{isSubmitting ? "Securing..." : "I WANT TO ACTIVATE MY <br>$75 SHIPSTICKS REBATE!"}</span>
+                    <span>{isSubmitting ? "Securing..." : "ACTIVATE MY $75 SHIPSTICKS REBATE!"}</span>
                     <ChevronRight className="w-3.5 h-3.5 shrink-0" />
                   </Button>
                 </form>
