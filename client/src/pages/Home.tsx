@@ -224,7 +224,7 @@ export default function Home() {
         <img
           src={LOGOS.benefitBuddies}
           alt="Benefit Buddies"
-          className="w-[170px] md:w-[260px] h-auto max-h-[72px] object-contain shrink-0"
+          className="w-[102px] md:w-[156px] h-auto max-h-[43px] object-contain shrink-0"
         />
         <img src={LOGOS.shipSticks} alt="ShipSticks" className="h-12 md:h-16 object-contain shrink-0" />
       </div>
@@ -245,7 +245,7 @@ export default function Home() {
           <div className="space-y-0 w-full animate-fade-in">
             <Card className="border-0 shadow-none bg-transparent rounded-none">
               <CardContent className="p-0 space-y-2">
-                <div className="text-center space-y-2">
+                <div className="text-center space-y-2 -translate-y-10 mb-10">
                   <h1 className="text-2xl md:text-3xl font-sans font-black tracking-tight text-black leading-tight">
                     The next time <br />
                     your precious clubs <br />
