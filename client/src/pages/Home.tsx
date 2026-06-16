@@ -92,7 +92,12 @@ export default function Home() {
     return acc;
   }, {} as Record<string, string>);
 
-  const sendLeadToLiveWebhook = async (funnelStep: string, status: string, answers: Record<string, string> = {}, extra: Record<string, unknown> = {}) => {
+  const sendLeadToLiveWebhook = async (
+    funnelStep: string,
+    status: string,
+    answers: Record<string, string> = {},
+    extra: Record<string, unknown> = {}
+  ) => {
     const payload = {
       name: formData.name,
       email: formData.email,
@@ -180,7 +185,10 @@ export default function Home() {
       return;
     }
     setIsSubmitting(true);
-    await sendLeadToLiveWebhook("Payment Completed", "Active Golf Travel Benefits Member", formattedAnswers, { lead_type: "conversion", transaction_amount: SALE_PRICE });
+    await sendLeadToLiveWebhook("Payment Completed", "Active Golf Travel Benefits Member", formattedAnswers, {
+      lead_type: "conversion",
+      transaction_amount: SALE_PRICE
+    });
     setIsSubmitting(false);
     toast.success("Payment Authorized Successfully!");
     setDemoStep("SUCCESS");
@@ -194,7 +202,7 @@ export default function Home() {
   const handleShare = async () => {
     const shareData = {
       title: "Exclusive $75 Ship Sticks Rebate",
-      text: "Check out this co-branded golf travel benefit from The Travel Protection Club by Benefit Buddies in conjunction with Ship Sticks by Ship&Play!",
+      text: "Check out this co-branded golf travel benefit from The Travel Protection Club by Benefit Buddies in conjunction with ShipSticks by Ship&Play!",
       url: window.location.origin
     };
     try {
@@ -211,17 +219,21 @@ export default function Home() {
 
   const BrandFooter = () => (
     <div className="space-y-0 mt-0">
-      <div className="flex items-center justify-center gap-5 md:gap-8 px-20">
+      <div className="flex items-center justify-center gap-5 md:gap-8 px-4 md:px-20">
         <img src={LOGOS.tpc} alt="Travel Protection Club" className="h-20 md:h-24 object-contain shrink-0" />
-        <img src={LOGOS.benefitBuddies} alt="Benefit Buddies" className="h-20 w-20 md:h-24 d:w-24 object-contain shrink-0" />
+        <img
+          src={LOGOS.benefitBuddies}
+          alt="Benefit Buddies"
+          className="w-[170px] md:w-[260px] h-auto max-h-[72px] object-contain shrink-0"
+        />
         <img src={LOGOS.shipSticks} alt="ShipSticks" className="h-12 md:h-16 object-contain shrink-0" />
       </div>
-      <div className="text-center px-4">
-        <span className="text-[9px] md:text-[10px] text-[#5C6B5E] font-bold tracking-wider block leading-relaxed">
-          Compliments of </br> The TRAVEL PROTECTION CLUB by BENEFIT BUDDIES 
-           <br/>
-          <span className="text-[#A4B3A7] font-medium text-[8px] md:text-[9px]">in conjunction with ShipSticks by Ship&Play</span>
-        </span>
+      <div className="text-center px-4 mt-1">
+        <div className="text-[9px] md:text-[10px] text-[#5C6B5E] font-bold tracking-wider block leading-relaxed">
+          <div>Compliments of</div>
+          <div>THE TRAVEL PROTECTION CLUB by BENEFIT BUDDIES</div>
+          <div className="text-[#A4B3A7] font-medium text-[8px] md:text-[9px]">in conjunction with ShipSticks by Ship&amp;Play</div>
+        </div>
       </div>
     </div>
   );
@@ -298,8 +310,7 @@ export default function Home() {
               <CardContent className="p-0 space-y-3">
                 <div className="text-center space-y-1.5">
                   <h1 className="text-3xl md:text-5xl font-sans font-black tracking-tight text-black leading-tight max-w-4xl mx-auto">
-                    Good Job! <br> You now have a plan to get your clubs home safely...
-                    </br>
+                    Good job — you now have a plan to get your clubs home safely.
                   </h1>
                   <div className="h-[3px] w-24 bg-[#E5C158] mx-auto my-3" />
                   <p className="text-base md:text-2xl text-[#3A4A3D] font-serif font-bold max-w-3xl mx-auto leading-snug px-1">
@@ -331,7 +342,7 @@ export default function Home() {
                       <span className="text-2xl md:text-4xl font-black text-[#107C41] -rotate-2 leading-tight" style={pencilScoreStyle}>Member<br />Year 1</span>
                     </div>
                     <div className="p-2 border-r-[3px] border-[#13263A] flex items-center justify-center text-center text-3xl md:text-5xl font-black text-[#107C41]" style={pencilScoreStyle}>${SALE_PRICE}</div>
-                    <div className="p-2 border-r-[3px] border-[#13263A] flex items-center justify-center text-center text-3xl md:text-5xl font-black text-red-600" style={pencilScoreStyle}>$-{GOLF_SHIPPING_CREDIT}</div>
+                    <div className="p-2 border-r-[3px] border-[#13263A] flex items-center justify-center text-center text-3xl md:text-5xl font-black text-red-600" style={pencilScoreStyle}>-${GOLF_SHIPPING_CREDIT}</div>
                     <div className="p-1 flex items-center justify-center text-center relative overflow-visible">
                       <span className="relative inline-flex items-center justify-center text-3xl md:text-5xl font-black text-[#107C41] px-2 py-2" style={pencilScoreStyle}>
                         ${EFFECTIVE_FIRST_YEAR_COST}
