@@ -297,7 +297,8 @@ export default function Home() {
               <CardContent className="p-0 space-y-3">
                 <div className="text-center space-y-1.5">
                   <h1 className="text-3xl md:text-5xl font-sans font-black tracking-tight text-black leading-tight max-w-4xl mx-auto">
-                    Good Job! <br> You now have a plan to get your clubs home safely...</br>br>
+                    Good Job! <br> You now have a plan to get your clubs home safely...
+                    </br>
                   </h1>
                   <div className="h-[3px] w-24 bg-[#E5C158] mx-auto my-3" />
                   <p className="text-base md:text-2xl text-[#3A4A3D] font-serif font-bold max-w-3xl mx-auto leading-snug px-1">
