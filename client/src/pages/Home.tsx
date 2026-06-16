@@ -194,7 +194,7 @@ export default function Home() {
   const handleShare = async () => {
     const shareData = {
       title: "Exclusive $75 Ship Sticks Rebate",
-      text: "Check out this co-branded golf travel benefit from The Travel Protection Club & Benefit Buddies in conjunction with Ship Sticks!",
+      text: "Check out this co-branded golf travel benefit from The Travel Protection Club by Benefit Buddies in conjunction with Ship Sticks by Ship&Play!",
       url: window.location.origin
     };
     try {
@@ -218,8 +218,9 @@ export default function Home() {
       </div>
       <div className="text-center px-4">
         <span className="text-[9px] md:text-[10px] text-[#5C6B5E] font-bold tracking-wider block leading-relaxed">
-          Compliments of </br> The TRAVEL PROTECTION CLUB by BENEFIT BUDDIES <br/>
-          <span className="text-[#A4B3A7] font-medium text-[8px] md:text-[9px]">in conjunction with ShipSticks</span>
+          Compliments of </br> The TRAVEL PROTECTION CLUB by BENEFIT BUDDIES 
+           <br/>
+          <span className="text-[#A4B3A7] font-medium text-[8px] md:text-[9px]">in conjunction with ShipSticks by Ship&Play</span>
         </span>
       </div>
     </div>
