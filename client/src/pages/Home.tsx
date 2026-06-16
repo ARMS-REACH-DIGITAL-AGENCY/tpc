@@ -19,8 +19,8 @@ const EFFECTIVE_FIRST_YEAR_COST = SALE_PRICE - GOLF_SHIPPING_CREDIT;
 const NON_MEMBER_SCORE = 445;
 
 const LOGOS = {
-  benefitBuddies: "/assets/logos/benefit-buddies-logo.png",
   tpc: "/assets/logos/tpc-shield-logo.png",
+  benefitBuddies: "/assets/logos/benefit-buddies-logo.png",
   shipSticks: "/assets/logos/shipsticks-logo.png"
 };
 
@@ -210,10 +210,10 @@ export default function Home() {
   };
 
   const BrandFooter = () => (
-    <div className="space-y-2 mt-1">
+    <div className="space-y-0 mt-0">
       <div className="flex items-center justify-center gap-5 md:gap-8 px-2">
-        <img src={LOGOS.benefitBuddies} alt="Benefit Buddies" className="h-36 w-36 md:h-40 md:w-40 object-contain shrink-0" />
         <img src={LOGOS.tpc} alt="Travel Protection Club" className="h-16 md:h-20 object-contain shrink-0" />
+        <img src={LOGOS.benefitBuddies} alt="Benefit Buddies" className="h-36 w-36 md:h-40 md:w-40 object-contain shrink-0" />
         <img src={LOGOS.shipSticks} alt="ShipSticks" className="h-12 md:h-16 object-contain shrink-0" />
       </div>
       <div className="text-center px-4">
@@ -230,7 +230,7 @@ export default function Home() {
     <div className="min-h-screen bg-[#FDFBF7] text-[#1C2B21] font-sans antialiased flex flex-col justify-between overflow-x-hidden pt-1 pb-4 px-4">
       <main className="flex-1 max-w-md mx-auto w-full flex flex-col justify-center my-auto space-y-2">
         {step === "OPT_IN" && (
-          <div className="space-y-4 w-full animate-fade-in">
+          <div className="space-y-2 w-full animate-fade-in">
             <Card className="border-0 shadow-none bg-transparent rounded-none">
               <CardContent className="p-0 space-y-4">
                 <div className="text-center space-y-2">
