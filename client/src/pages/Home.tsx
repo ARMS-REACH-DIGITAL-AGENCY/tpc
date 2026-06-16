@@ -212,11 +212,11 @@ export default function Home() {
   const BrandFooter = () => (
     <div className="space-y-0 mt-0">
       <div className="flex items-center justify-center gap-5 md:gap-8 px-20">
-        <img src={LOGOS.tpc} alt="Travel Protection Club" className="h-16 md:h-20 object-contain shrink-0" />
-        <img src={LOGOS.benefitBuddies} alt="Benefit Buddies" className="h-36 w-36 md:h-40 md:w-40 object-contain shrink-0" />
+        <img src={LOGOS.tpc} alt="Travel Protection Club" className="h-20 md:h-24 object-contain shrink-0" />
+        <img src={LOGOS.benefitBuddies} alt="Benefit Buddies" className="h-30 w-30 md:h-36 md:w-36 object-contain shrink-0" />
         <img src={LOGOS.shipSticks} alt="ShipSticks" className="h-12 md:h-16 object-contain shrink-0" />
       </div>
-      <div className="text-center px-4 -mt-10">
+      <div className="text-center px-4">
         <span className="text-[9px] md:text-[10px] text-[#5C6B5E] font-bold tracking-wider uppercase block leading-relaxed">
           Compliments of The TRAVEL PROTECTION CLUB by BENEFIT BUDDIES <br />
           <span className="text-[#A4B3A7] font-medium text-[8px] md:text-[9px]">in conjunction with ShipSticks</span>
