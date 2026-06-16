@@ -151,11 +151,4 @@
     pointer-events: none;
     opacity: 0.5;
   }
-
-  img[src$="benefit-buddies-logo.png"] {
-    width: clamp(170px, 24vw, 260px) !important;
-    height: auto !important;
-    max-height: 72px !important;
-    object-fit: contain !important;
-  }
 }
