@@ -140,8 +140,8 @@ export default function Home() {
 
   const handleShare = async () => {
     const shareData = {
-      title: "Golf Travel Benefit Package",
-      text: "A smarter travel benefit package for golf trips, road trips, tournaments, and families who want a better first-call plan.",
+      title: "Exclusive $75 Ship Sticks Rebate",
+      text: "Check out this co-branded gift from The Travel Protection Club & ASB Athletics in conjunction with Ship Sticks!",
       url: window.location.origin
     };
     if (navigator.share) {
@@ -172,9 +172,9 @@ export default function Home() {
       </div>
       <div className="text-center px-4">
         <span className="text-[9px] md:text-[10px] text-[#5C6B5E] font-bold tracking-wider uppercase block leading-relaxed">
-          Presented by <br />
+          Compliments of <br />
           THE TRAVEL PROTECTION CLUB & ASB ATHLETICS <br />
-          <span className="text-[#A4B3A7] font-medium text-[8px] md:text-[9px]">with golf travel and member benefit partners</span>
+          <span className="text-[#A4B3A7] font-medium text-[8px] md:text-[9px]">in conjunction with SHIP STICKS</span>
         </span>
       </div>
     </div>
@@ -188,16 +188,13 @@ export default function Home() {
             <Card className="border-0 shadow-none bg-transparent rounded-none">
               <CardContent className="p-0 space-y-4">
                 <div className="text-center space-y-2">
-                  <p className="text-[10px] font-bold text-[#107C41] uppercase tracking-[0.25em]">Golf Travel Benefit Package</p>
                   <h1 className="text-2xl md:text-3xl font-sans font-black tracking-tight text-black leading-tight">
-                    Your clubs deserve <br />
-                    a way home. <br />
-                    So do you.
+                    The next time <br />
+                    your precious clubs <br />
+                    need to get home safely... <br />
+                    please think of us!
                   </h1>
                   <div className="h-[2px] w-16 bg-[#E5C158] mx-auto mt-2" />
-                  <p className="text-xs text-[#5C6B5E] font-semibold leading-relaxed max-w-sm mx-auto px-2">
-                    Activate a golf travel benefits package built for road trips, tournaments, snowbird travel, family vacations, and the problems nobody wants to handle alone.
-                  </p>
                 </div>
 
                 <form onSubmit={handleOptInSubmit} className="space-y-4 pt-1">
@@ -214,7 +211,7 @@ export default function Home() {
                     <Input id="phone" type="tel" placeholder="(555) 123-4567" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="h-11 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] focus:ring-0 rounded-none font-medium placeholder:text-[#C1C9C3]" />
                   </div>
                   <Button type="submit" disabled={isSubmitting} className="w-full min-h-12 py-3 px-4 bg-[#107C41] hover:bg-[#0C6233] active:scale-[0.98] transition-all text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md flex items-center justify-center gap-2 mt-2 cursor-pointer whitespace-normal text-center leading-normal">
-                    <span>{isSubmitting ? "Securing..." : "BUILD MY GOLF TRAVEL PLAN"}</span>
+                    <span>{isSubmitting ? "Securing..." : "ACTIVATE YOUR $75 SHIP STICKS REBATE NOW!"}</span>
                     <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                   </Button>
                 </form>
