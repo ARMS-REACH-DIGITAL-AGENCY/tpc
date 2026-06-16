@@ -41,6 +41,12 @@ const includedBenefits = [
   }
 ];
 
+const pencilScoreStyle = {
+  fontFamily: "'Comic Sans MS', 'Bradley Hand', 'Segoe Print', cursive",
+  textShadow: "1px 2px 2px rgba(0,0,0,0.25)",
+  letterSpacing: "0.02em"
+};
+
 export default function Home() {
   const [step, setDemoStep] = useState<DemoStep>("OPT_IN");
   const [formData, setFormData] = useState({ name: "", email: "", phone: "" });
@@ -298,30 +304,30 @@ export default function Home() {
                   <div className="bg-[#13263A] text-white text-center py-2 text-[10px] font-black uppercase tracking-[0.18em]">
                     Your First Year TPC Member Scorecard
                   </div>
-                  <div className="grid grid-cols-[1.35fr_0.85fr_0.9fr_0.8fr] bg-[#FDFBF7] border-b-2 border-[#13263A] text-[8px] font-black uppercase tracking-wider text-[#13263A]">
-                    <div className="p-2 border-r border-[#13263A]">Annual Score</div>
-                    <div className="p-2 text-right border-r border-[#13263A]">Gross</div>
-                    <div className="p-2 text-right border-r border-[#13263A]">Handicap</div>
-                    <div className="p-2 text-right">Net</div>
+                  <div className="grid grid-cols-[1.35fr_0.85fr_0.9fr_0.8fr] bg-[#FDFBF7] border-b-2 border-[#13263A] text-[#13263A]">
+                    <div className="p-2 border-r border-[#13263A]" />
+                    <div className="p-2 border-r border-[#13263A] flex items-center justify-center text-center font-serif text-[15px] font-black uppercase tracking-wide">Gross</div>
+                    <div className="p-2 border-r border-[#13263A] flex items-center justify-center text-center font-serif text-[15px] font-black uppercase tracking-wide">HCP</div>
+                    <div className="p-2 flex items-center justify-center text-center font-serif text-[15px] font-black uppercase tracking-wide">Net</div>
                   </div>
-                  <div className="grid grid-cols-[1.35fr_0.85fr_0.9fr_0.8fr] text-[10px] border-b border-[#13263A] text-[#1C2B21]">
-                    <div className="p-2 font-bold border-r border-[#13263A]">Annual Score for Non-Member</div>
-                    <div className="p-2 text-right border-r border-[#13263A]">${TYPICAL_GOLFER_COST}</div>
-                    <div className="p-2 text-right border-r border-[#13263A]">0</div>
-                    <div className="p-2 text-right font-bold">${TYPICAL_GOLFER_COST}</div>
+                  <div className="grid grid-cols-[1.35fr_0.85fr_0.9fr_0.8fr] min-h-[70px] text-[#1C2B21] border-b border-[#13263A]">
+                    <div className="p-2 border-r border-[#13263A] flex items-center justify-center text-center font-serif text-[12px] font-black leading-tight">Annual Score for Non-Member</div>
+                    <div className="p-2 border-r border-[#13263A] flex items-center justify-center text-center text-[24px] font-black text-black" style={pencilScoreStyle}>${TYPICAL_GOLFER_COST}</div>
+                    <div className="p-2 border-r border-[#13263A] flex items-center justify-center text-center text-[24px] font-black text-black" style={pencilScoreStyle}>0</div>
+                    <div className="p-2 flex items-center justify-center text-center text-[24px] font-black text-black" style={pencilScoreStyle}>${TYPICAL_GOLFER_COST}</div>
                   </div>
-                  <div className="grid grid-cols-[1.35fr_0.85fr_0.9fr_0.8fr] text-[10px] bg-[#EAF7EE] text-[#107C41]">
-                    <div className="p-2 font-black border-r border-[#13263A]">Year 1 Score for TPC Member</div>
-                    <div className="p-2 text-right border-r border-[#13263A] font-bold flex items-center justify-end gap-1">
-                      <img src="/manus-storage/57885_120b932a.png" alt="TPC" className="h-5 w-5 object-contain shrink-0" />
-                      <span>${SALE_PRICE}</span>
+                  <div className="grid grid-cols-[1.35fr_0.85fr_0.9fr_0.8fr] min-h-[78px] bg-[#EAF7EE] text-[#107C41]">
+                    <div className="p-2 border-r border-[#13263A] flex items-center justify-center text-center font-serif text-[12px] font-black leading-tight">Year 1 Score for TPC Member</div>
+                    <div className="p-1 border-r border-[#13263A] flex items-center justify-center text-center gap-1">
+                      <img src="/manus-storage/57885_120b932a.png" alt="TPC" className="h-7 w-7 object-contain shrink-0" />
+                      <span className="text-[25px] font-black text-[#107C41]" style={pencilScoreStyle}>${SALE_PRICE}</span>
                     </div>
-                    <div className="p-2 text-right border-r border-[#13263A] font-bold flex items-center justify-end gap-1">
-                      <img src="/manus-storage/shipsticks_logo_perfect_2_768183cb.png" alt="Ship Sticks" className="h-4 w-5 object-contain shrink-0" />
-                      <span>-${GOLF_SHIPPING_CREDIT}</span>
+                    <div className="p-1 border-r border-[#13263A] flex items-center justify-center text-center gap-1">
+                      <img src="/manus-storage/shipsticks_logo_perfect_2_768183cb.png" alt="Ship Sticks" className="h-5 w-6 object-contain shrink-0" />
+                      <span className="text-[25px] font-black text-red-600" style={pencilScoreStyle}>-${GOLF_SHIPPING_CREDIT}</span>
                     </div>
-                    <div className="p-2 text-right font-black flex items-center justify-end">
-                      <span className="inline-flex items-center justify-center border-2 border-red-600 text-red-700 rounded-full px-2 py-1 -rotate-6 bg-white/70 leading-none">
+                    <div className="p-1 flex items-center justify-center text-center">
+                      <span className="inline-flex items-center justify-center border-[3px] border-red-600 text-[#107C41] rounded-full px-2.5 py-1 -rotate-6 bg-white/70 text-[23px] font-black leading-none" style={pencilScoreStyle}>
                         ${EFFECTIVE_FIRST_YEAR_COST}/yr
                       </span>
                     </div>
@@ -329,9 +335,12 @@ export default function Home() {
                 </div>
 
                 <div className="space-y-1.5 pt-0.5 max-w-sm mx-auto">
-                  <Button onClick={handleCheckoutStart} className="w-full min-h-10 py-2 px-3 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-[10px] tracking-wider uppercase rounded-none shadow-sm flex items-center justify-center gap-1.5 cursor-pointer whitespace-normal text-center leading-normal active:scale-[0.97] transition-all">
-                    <span>ACTIVATE MY TPC MEMBERSHIP + $75 SHIPSTICKS REBATE</span>
-                    <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+                  <Button onClick={handleCheckoutStart} className="w-full min-h-10 p-0 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-[10px] tracking-wider uppercase rounded-none shadow-sm flex items-stretch justify-center gap-0 cursor-pointer whitespace-normal text-center leading-normal active:scale-[0.97] transition-all overflow-hidden">
+                    <span className="bg-[#13263A] px-3 py-2 flex items-center justify-center shrink-0">
+                      <img src="/manus-storage/shipsticks_logo_perfect_2_768183cb.png" alt="Ship Sticks" className="h-8 w-20 object-contain" />
+                    </span>
+                    <span className="flex-1 px-3 py-2 flex items-center justify-center">ACTIVATE MY TPC MEMBERSHIP + $75 SHIPSTICKS REBATE</span>
+                    <ChevronRight className="w-3.5 h-3.5 shrink-0 self-center mr-3" />
                   </Button>
                 </div>
 
