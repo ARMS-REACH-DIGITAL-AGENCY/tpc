@@ -72,8 +72,8 @@ const quizQuestions = [
 
 const pencilScoreStyle: React.CSSProperties = {
   fontFamily: "'Comic Sans MS', 'Bradley Hand', 'Segoe Print', cursive",
-  textShadow: "1px 2px 2px rgba(0,0,0,0.32)",
-  letterSpacing: "0.02em"
+  textShadow: "0.5px 1px 1px rgba(0,0,0,0.22)",
+  letterSpacing: "0.01em"
 };
 
 export default function Home() {
@@ -219,14 +219,14 @@ export default function Home() {
 
   const BrandFooter = () => (
     <div className="space-y-0 mt-0">
-      <div className="flex items-center justify-center gap-5 md:gap-8 px-4 md:px-20">
-        <img src={LOGOS.tpc} alt="Travel Protection Club" className="h-20 md:h-24 object-contain shrink-0" />
+      <div className="flex items-center justify-center gap-4 md:gap-7 px-4 md:px-12">
+        <img src={LOGOS.tpc} alt="Travel Protection Club" className="h-16 md:h-20 object-contain shrink-0" />
         <img
           src={LOGOS.benefitBuddies}
           alt="Benefit Buddies"
           className="w-[102px] md:w-[156px] h-auto max-h-[43px] object-contain shrink-0"
         />
-        <img src={LOGOS.shipSticks} alt="ShipSticks" className="h-12 md:h-16 object-contain shrink-0" />
+        <img src={LOGOS.shipSticks} alt="ShipSticks" className="h-10 md:h-14 object-contain shrink-0" />
       </div>
       <div className="text-center px-4 mt-1">
         <div className="text-[9px] md:text-[10px] text-[#5C6B5E] font-bold tracking-wider block leading-relaxed">
@@ -240,12 +240,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-[#1C2B21] font-sans antialiased flex flex-col justify-between overflow-x-hidden pt-1 pb-4 px-4">
-      <main className="flex-1 max-w-md mx-auto w-full flex flex-col justify-center my-auto space-y-2">
+      <main className={`flex-1 mx-auto w-full flex flex-col justify-center my-auto space-y-2 ${step === "OFFER" ? "max-w-[720px]" : "max-w-md"}`}>
         {step === "OPT_IN" && (
           <div className="space-y-0 w-full animate-fade-in">
             <Card className="border-0 shadow-none bg-transparent rounded-none">
               <CardContent className="p-0 space-y-2">
-                <div className="text-center space-y-2 -translate-y-6 mb-2">
+                <div className="text-center space-y-2 -translate-y-10 mb-10">
                   <h1 className="text-2xl md:text-3xl font-sans font-black tracking-tight text-black leading-tight">
                     The next time <br />
                     your precious clubs <br />
@@ -269,7 +269,7 @@ export default function Home() {
                     <Input id="phone" type="tel" placeholder="(555) 123-4567" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="h-11 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] focus:ring-0 rounded-none font-medium placeholder:text-[#C1C9C3]" />
                   </div>
                   <Button type="submit" disabled={isSubmitting} className="w-full min-h-12 py-3 px-4 bg-[#107C41] hover:bg-[#0C6233] active:scale-[0.98] transition-all text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md flex items-center justify-center gap-2 mt-2 cursor-pointer whitespace-normal text-center leading-normal">
-                    <span>{isSubmitting ? "Securing..." : "ACTIVATE MY $75 SHIPSTICKS REBATE!"}</span>
+                    <span>{isSubmitting ? "Securing..." : "ACTIVATE YOUR $75 SHIP STICKS REBATE NOW!"}</span>
                     <ChevronRight className="w-3.5 h-3.5 shrink-0" />
                   </Button>
                 </form>
@@ -305,70 +305,70 @@ export default function Home() {
         )}
 
         {step === "OFFER" && (
-          <div className="w-full max-w-[760px] mx-auto space-y-3 animate-fade-in">
+          <div className="w-full space-y-4 animate-fade-in py-4 md:py-8">
             <Card className="border-0 shadow-none bg-transparent rounded-none">
-              <CardContent className="p-0 space-y-3">
-                <div className="text-center space-y-1.5">
-                  <h1 className="text-3xl md:text-5xl font-sans font-black tracking-tight text-black leading-tight max-w-4xl mx-auto">
+              <CardContent className="p-0 space-y-4 md:space-y-5">
+                <div className="text-center space-y-2 max-w-[560px] mx-auto">
+                  <h1 className="text-2xl md:text-4xl font-sans font-black tracking-tight text-black leading-tight">
                     Good job — you now have a plan to get your clubs home safely.
                   </h1>
-                  <div className="h-[3px] w-24 bg-[#E5C158] mx-auto my-3" />
-                  <p className="text-base md:text-2xl text-[#3A4A3D] font-serif font-bold max-w-3xl mx-auto leading-snug px-1">
-                    Travel Protection Club Members also have an annual plan that helps their family members know who to call first and what steps to take if something happens away from home.
+                  <div className="h-[3px] w-20 bg-[#E5C158] mx-auto" />
+                  <p className="text-sm md:text-xl text-[#3A4A3D] font-serif font-bold leading-snug px-2">
+                    Travel Protection Club Members also have an annual plan that helps their family members know who to call first if something happens away from home.
                   </p>
                 </div>
 
-                <div className="max-w-[740px] mx-auto border-[4px] border-[#13263A] bg-white shadow-md rounded-none overflow-hidden">
-                  <div className="bg-[#13263A] text-white text-center py-4 text-base md:text-2xl font-black uppercase tracking-[0.25em]">
+                <div className="w-full max-w-[560px] mx-auto border-[3px] border-[#13263A] bg-white shadow-md rounded-none overflow-hidden">
+                  <div className="bg-[#13263A] text-white text-center py-3 px-2 text-xs md:text-lg font-black uppercase tracking-[0.18em]">
                     Your First Year TPC Member Scorecard
                   </div>
-                  <div className="grid grid-cols-[1.45fr_0.85fr_0.9fr_0.85fr] bg-[#FDFBF7] border-b-[4px] border-[#13263A] text-[#13263A]">
-                    <div className="p-3 border-r-[3px] border-[#13263A]" />
-                    <div className="p-3 border-r-[3px] border-[#13263A] flex items-center justify-center text-center font-serif text-xl md:text-3xl font-black uppercase tracking-wide">Gross</div>
-                    <div className="p-3 border-r-[3px] border-[#13263A] flex items-center justify-center text-center font-serif text-xl md:text-3xl font-black uppercase tracking-wide">HCP</div>
-                    <div className="p-3 flex items-center justify-center text-center font-serif text-xl md:text-3xl font-black uppercase tracking-wide">Net</div>
+                  <div className="grid grid-cols-[1.3fr_0.85fr_0.85fr_0.85fr] bg-[#FDFBF7] border-b-[3px] border-[#13263A] text-[#13263A]">
+                    <div className="p-2 border-r-2 border-[#13263A]" />
+                    <div className="p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center font-serif text-sm md:text-xl font-black uppercase">Gross</div>
+                    <div className="p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center font-serif text-sm md:text-xl font-black uppercase">HCP</div>
+                    <div className="p-2 flex items-center justify-center text-center font-serif text-sm md:text-xl font-black uppercase">Net</div>
                   </div>
-                  <div className="grid grid-cols-[1.45fr_0.85fr_0.9fr_0.85fr] min-h-[92px] md:min-h-[112px] text-[#1C2B21] border-b-[3px] border-[#13263A]">
-                    <div className="p-2 border-r-[3px] border-[#13263A] flex items-center justify-center text-center text-2xl md:text-4xl font-black text-black -rotate-2 leading-tight" style={pencilScoreStyle}>Non-Member</div>
-                    <div className="p-2 border-r-[3px] border-[#13263A] flex items-center justify-center text-center text-3xl md:text-5xl font-black text-black" style={pencilScoreStyle}>${NON_MEMBER_SCORE}</div>
-                    <div className="p-2 border-r-[3px] border-[#13263A] flex items-center justify-center text-center">
-                      <span className="block w-20 md:w-28 h-2 md:h-3 bg-[#13263A] rounded-full rotate-[-28deg] shadow-sm" />
+                  <div className="grid grid-cols-[1.3fr_0.85fr_0.85fr_0.85fr] min-h-[78px] md:min-h-[96px] text-[#1C2B21] border-b-2 border-[#13263A]">
+                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-base md:text-2xl font-black text-black leading-tight" style={pencilScoreStyle}>Non-<br />Member</div>
+                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-xl md:text-3xl font-black text-black" style={pencilScoreStyle}>${NON_MEMBER_SCORE}</div>
+                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center">
+                      <span className="block w-10 md:w-16 h-1.5 md:h-2 bg-[#13263A] rounded-full rotate-[-28deg] shadow-sm" />
                     </div>
-                    <div className="p-2 flex items-center justify-center text-center text-3xl md:text-5xl font-black text-black" style={pencilScoreStyle}>${NON_MEMBER_SCORE}</div>
+                    <div className="p-1.5 md:p-2 flex items-center justify-center text-center text-xl md:text-3xl font-black text-black" style={pencilScoreStyle}>${NON_MEMBER_SCORE}</div>
                   </div>
-                  <div className="grid grid-cols-[1.45fr_0.85fr_0.9fr_0.85fr] min-h-[105px] md:min-h-[130px] bg-[#EAF7EE] text-[#107C41]">
-                    <div className="p-2 border-r-[3px] border-[#13263A] flex items-center justify-center gap-2">
-                      <img src={LOGOS.tpc} alt="TPC" className="h-12 w-12 md:h-16 md:w-16 object-contain shrink-0" />
-                      <span className="text-2xl md:text-4xl font-black text-[#107C41] -rotate-2 leading-tight" style={pencilScoreStyle}>Member<br />Year 1</span>
+                  <div className="grid grid-cols-[1.3fr_0.85fr_0.85fr_0.85fr] min-h-[86px] md:min-h-[104px] bg-[#EAF7EE] text-[#107C41]">
+                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center gap-1 md:gap-2">
+                      <img src={LOGOS.tpc} alt="TPC" className="h-8 w-8 md:h-12 md:w-12 object-contain shrink-0" />
+                      <span className="text-base md:text-2xl font-black text-[#107C41] leading-tight" style={pencilScoreStyle}>Member<br />Year 1</span>
                     </div>
-                    <div className="p-2 border-r-[3px] border-[#13263A] flex items-center justify-center text-center text-3xl md:text-5xl font-black text-[#107C41]" style={pencilScoreStyle}>${SALE_PRICE}</div>
-                    <div className="p-2 border-r-[3px] border-[#13263A] flex items-center justify-center text-center text-3xl md:text-5xl font-black text-red-600" style={pencilScoreStyle}>-${GOLF_SHIPPING_CREDIT}</div>
-                    <div className="p-1 flex items-center justify-center text-center relative overflow-visible">
-                      <span className="relative inline-flex items-center justify-center text-3xl md:text-5xl font-black text-[#107C41] px-2 py-2" style={pencilScoreStyle}>
+                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-xl md:text-3xl font-black text-[#107C41]" style={pencilScoreStyle}>${SALE_PRICE}</div>
+                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-xl md:text-3xl font-black text-red-600" style={pencilScoreStyle}>-${GOLF_SHIPPING_CREDIT}</div>
+                    <div className="p-1 flex items-center justify-center text-center relative overflow-hidden">
+                      <span className="relative inline-flex items-center justify-center text-xl md:text-3xl font-black text-[#107C41] px-1.5 py-1" style={pencilScoreStyle}>
                         ${EFFECTIVE_FIRST_YEAR_COST}
-                        <span className="absolute -inset-x-2 -inset-y-1 border-[5px] border-red-600 rounded-[20%] rotate-[3deg] pointer-events-none" />
+                        <span className="absolute -inset-x-1 -inset-y-0.5 border-[3px] border-red-600 rounded-[20%] rotate-[3deg] pointer-events-none" />
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-1.5 pt-0.5 max-w-[740px] mx-auto">
-                  <Button onClick={handleCheckoutStart} className="w-full min-h-[72px] p-0 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-sm md:text-2xl tracking-wider uppercase rounded-none shadow-md flex items-stretch justify-center gap-0 cursor-pointer whitespace-normal text-center leading-tight active:scale-[0.97] transition-all overflow-hidden">
-                    <span className="bg-[#13263A] px-4 md:px-8 py-3 flex items-center justify-center shrink-0 min-w-[135px] md:min-w-[220px]">
-                      <img src={LOGOS.shipSticks} alt="ShipSticks" className="h-10 md:h-16 object-contain" />
+                <div className="space-y-2 max-w-[560px] mx-auto">
+                  <Button onClick={handleCheckoutStart} className="w-full min-h-[56px] md:min-h-[64px] p-0 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-xs md:text-lg tracking-wider uppercase rounded-none shadow-md flex items-stretch justify-center gap-0 cursor-pointer whitespace-normal text-center leading-tight active:scale-[0.97] transition-all overflow-hidden">
+                    <span className="bg-[#13263A] px-2 md:px-5 py-2 flex items-center justify-center shrink-0 min-w-[96px] md:min-w-[150px]">
+                      <img src={LOGOS.shipSticks} alt="ShipSticks" className="h-8 md:h-12 object-contain" />
                     </span>
-                    <span className="flex-1 px-3 md:px-6 py-2 flex items-center justify-center" style={pencilScoreStyle}>ACTIVATE MY TPC MEMBERSHIP + $75 SHIPSTICKS REBATE</span>
-                    <ChevronRight className="w-6 h-6 shrink-0 self-center mr-4" />
+                    <span className="flex-1 px-2 md:px-4 py-2 flex items-center justify-center" style={pencilScoreStyle}>ACTIVATE MY TPC MEMBERSHIP + $75 SHIPSTICKS REBATE</span>
+                    <ChevronRight className="w-5 h-5 shrink-0 self-center mr-3" />
                   </Button>
                 </div>
 
-                <div className="space-y-2 pt-4 max-w-[740px] mx-auto">
-                  <h3 className="text-sm md:text-xl font-bold text-[#5C6B5E] uppercase tracking-[0.25em] text-center">YOUR ANNUAL TPC MEMBER PLAN INCLUDES:</h3>
-                  <div className="space-y-3">
+                <div className="space-y-2 pt-2 max-w-[560px] mx-auto">
+                  <h3 className="text-xs md:text-base font-bold text-[#5C6B5E] uppercase tracking-[0.18em] text-center">Your Annual TPC Member Plan Includes:</h3>
+                  <div className="space-y-2">
                     {includedBenefits.map((benefit) => (
-                      <div key={benefit.title} className="flex gap-4 items-start bg-[#FAF8F5] p-4 md:p-6 border border-[#E8E4DC] rounded-none">
-                        <div className="p-1.5 bg-[#EAF7EE] rounded-full text-[#107C41] shrink-0 mt-0.5"><Check className="w-4 h-4 md:w-6 md:h-6" /></div>
-                        <div><h4 className="text-lg md:text-2xl font-bold text-black uppercase tracking-wider">{benefit.title}</h4><p className="text-base md:text-xl text-[#5C6B5E] leading-normal mt-2 font-serif">{benefit.body}</p></div>
+                      <div key={benefit.title} className="flex gap-3 items-start bg-[#FAF8F5] p-3 md:p-4 border border-[#E8E4DC] rounded-none">
+                        <div className="p-1 bg-[#EAF7EE] rounded-full text-[#107C41] shrink-0 mt-0.5"><Check className="w-4 h-4" /></div>
+                        <div><h4 className="text-sm md:text-lg font-bold text-black uppercase tracking-wider">{benefit.title}</h4><p className="text-sm md:text-base text-[#5C6B5E] leading-normal mt-1 font-serif">{benefit.body}</p></div>
                       </div>
                     ))}
                   </div>
