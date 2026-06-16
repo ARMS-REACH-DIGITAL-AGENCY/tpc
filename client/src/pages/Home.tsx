@@ -70,10 +70,10 @@ const quizQuestions = [
   }
 ];
 
-const pencilScoreStyle: React.CSSProperties = {
-  fontFamily: "'Comic Sans MS', 'Bradley Hand', 'Segoe Print', cursive",
-  textShadow: "0.5px 1px 1px rgba(0,0,0,0.22)",
-  letterSpacing: "0.01em"
+const scorecardTextStyle: React.CSSProperties = {
+  fontFamily: "'Arial Black', Impact, Inter, system-ui, sans-serif",
+  letterSpacing: "0.01em",
+  fontVariantNumeric: "tabular-nums"
 };
 
 export default function Home() {
@@ -146,7 +146,6 @@ export default function Home() {
     setIsSubmitting(true);
     await sendLeadToLiveWebhook("Opt-In", "Golf Travel Lead Captured", {}, { lead_type: "front_end_rebate_opt_in" });
     setIsSubmitting(false);
-    toast.success("Contact info saved!");
     setDemoStep("QUIZ");
   };
 
@@ -240,7 +239,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-[#1C2B21] font-sans antialiased flex flex-col justify-between overflow-x-hidden pt-1 pb-4 px-4">
-      <main className={`flex-1 mx-auto w-full flex flex-col justify-center my-auto space-y-2 ${step === "OFFER" ? "max-w-[720px]" : "max-w-md"}`}>
+      <main className={`flex-1 mx-auto w-full flex flex-col space-y-2 ${step === "QUIZ" ? "justify-start my-0 pt-5" : "justify-center my-auto"} ${step === "OFFER" ? "max-w-[720px]" : "max-w-md"}`}>
         {step === "OPT_IN" && (
           <div className="space-y-0 w-full animate-fade-in">
             <Card className="border-0 shadow-none bg-transparent rounded-none">
@@ -280,17 +279,19 @@ export default function Home() {
         )}
 
         {step === "QUIZ" && (
-          <div className="w-full space-y-2 animate-fade-in">
-            <div className="flex justify-between items-center text-[10px] font-bold text-[#5C6B5E] uppercase tracking-wider px-1 pt-1">
-              <span>Golf Travel Planner</span>
-              <span>Question {currentQuestionIndex + 1} of {quizQuestions.length}</span>
-            </div>
-            <div className="h-1 w-full bg-[#E8E4DC] rounded-none overflow-hidden">
-              <div className="h-full bg-[#107C41] transition-all duration-300" style={{ width: `${((currentQuestionIndex + 1) / quizQuestions.length) * 100}%` }} />
+          <div className="w-full min-h-screen animate-fade-in">
+            <div className="sticky top-0 z-20 bg-[#FDFBF7] pt-5 pb-4 border-b border-transparent">
+              <div className="flex justify-between items-center text-[10px] font-bold text-[#5C6B5E] uppercase tracking-wider px-1">
+                <span>Golf Travel Planner</span>
+                <span>Question {currentQuestionIndex + 1} of {quizQuestions.length}</span>
+              </div>
+              <div className="h-1 w-full bg-[#E8E4DC] rounded-none overflow-hidden mt-4">
+                <div className="h-full bg-[#107C41] transition-all duration-300" style={{ width: `${((currentQuestionIndex + 1) / quizQuestions.length) * 100}%` }} />
+              </div>
             </div>
             <Card className="border-0 shadow-none bg-transparent rounded-none">
-              <CardContent className="p-2.5 space-y-4">
-                <h2 className="text-2xl md:text-3xl font-sans font-black tracking-tight text-black text-center leading-tight max-w-xs mx-auto pt-2">{quizQuestions[currentQuestionIndex].question}</h2>
+              <CardContent className="p-2.5 pt-12 space-y-6">
+                <h2 className="text-2xl md:text-3xl font-sans font-black tracking-tight text-black text-center leading-tight max-w-xs mx-auto">{quizQuestions[currentQuestionIndex].question}</h2>
                 <div className="space-y-2 max-w-sm mx-auto pt-2">
                   {quizQuestions[currentQuestionIndex].options.map((option) => (
                     <button key={option} onClick={() => handleQuizAnswer(option)} className="w-full p-3 text-left border border-[#E8E4DC] hover:border-[#107C41] hover:bg-[#EAF7EE]/20 active:scale-[0.99] transition-all rounded-none text-xs font-bold text-[#1C2B21] flex items-center justify-between group cursor-pointer bg-white">
@@ -329,22 +330,22 @@ export default function Home() {
                     <div className="p-2 flex items-center justify-center text-center font-serif text-sm md:text-xl font-black uppercase">Net</div>
                   </div>
                   <div className="grid grid-cols-[1.3fr_0.85fr_0.85fr_0.85fr] min-h-[78px] md:min-h-[96px] text-[#1C2B21] border-b-2 border-[#13263A]">
-                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-base md:text-2xl font-black text-black leading-tight" style={pencilScoreStyle}>Non-<br />Member</div>
-                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-xl md:text-3xl font-black text-black" style={pencilScoreStyle}>${NON_MEMBER_SCORE}</div>
+                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-base md:text-2xl font-black text-black leading-tight" style={scorecardTextStyle}>Non-<br />Member</div>
+                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-xl md:text-3xl font-black text-black" style={scorecardTextStyle}>${NON_MEMBER_SCORE}</div>
                     <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center">
                       <span className="block w-10 md:w-16 h-1.5 md:h-2 bg-[#13263A] rounded-full rotate-[-28deg] shadow-sm" />
                     </div>
-                    <div className="p-1.5 md:p-2 flex items-center justify-center text-center text-xl md:text-3xl font-black text-black" style={pencilScoreStyle}>${NON_MEMBER_SCORE}</div>
+                    <div className="p-1.5 md:p-2 flex items-center justify-center text-center text-xl md:text-3xl font-black text-black" style={scorecardTextStyle}>${NON_MEMBER_SCORE}</div>
                   </div>
                   <div className="grid grid-cols-[1.3fr_0.85fr_0.85fr_0.85fr] min-h-[86px] md:min-h-[104px] bg-[#EAF7EE] text-[#107C41]">
                     <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center gap-1 md:gap-2">
                       <img src={LOGOS.tpc} alt="TPC" className="h-8 w-8 md:h-12 md:w-12 object-contain shrink-0" />
-                      <span className="text-base md:text-2xl font-black text-[#107C41] leading-tight" style={pencilScoreStyle}>Member<br />Year 1</span>
+                      <span className="text-base md:text-2xl font-black text-[#107C41] leading-tight" style={scorecardTextStyle}>Member<br />Year 1</span>
                     </div>
-                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-xl md:text-3xl font-black text-[#107C41]" style={pencilScoreStyle}>${SALE_PRICE}</div>
-                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-xl md:text-3xl font-black text-red-600" style={pencilScoreStyle}>-${GOLF_SHIPPING_CREDIT}</div>
+                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-xl md:text-3xl font-black text-[#107C41]" style={scorecardTextStyle}>${SALE_PRICE}</div>
+                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-xl md:text-3xl font-black text-red-600" style={scorecardTextStyle}>-${GOLF_SHIPPING_CREDIT}</div>
                     <div className="p-1 flex items-center justify-center text-center relative overflow-hidden">
-                      <span className="relative inline-flex items-center justify-center text-xl md:text-3xl font-black text-[#107C41] px-1.5 py-1" style={pencilScoreStyle}>
+                      <span className="relative inline-flex items-center justify-center text-xl md:text-3xl font-black text-[#107C41] px-1.5 py-1" style={scorecardTextStyle}>
                         ${EFFECTIVE_FIRST_YEAR_COST}
                         <span className="absolute -inset-x-1 -inset-y-0.5 border-[3px] border-red-600 rounded-[20%] rotate-[3deg] pointer-events-none" />
                       </span>
@@ -357,7 +358,7 @@ export default function Home() {
                     <span className="bg-[#13263A] px-2 md:px-5 py-2 flex items-center justify-center shrink-0 min-w-[96px] md:min-w-[150px]">
                       <img src={LOGOS.shipSticks} alt="ShipSticks" className="h-8 md:h-12 object-contain" />
                     </span>
-                    <span className="flex-1 px-2 md:px-4 py-2 flex items-center justify-center" style={pencilScoreStyle}>ACTIVATE MY TPC MEMBERSHIP + $75 SHIPSTICKS REBATE</span>
+                    <span className="flex-1 px-2 md:px-4 py-2 flex items-center justify-center" style={scorecardTextStyle}>ACTIVATE MY TPC MEMBERSHIP + $75 SHIPSTICKS REBATE</span>
                     <ChevronRight className="w-5 h-5 shrink-0 self-center mr-3" />
                   </Button>
                 </div>
