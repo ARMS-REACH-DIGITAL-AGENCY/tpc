@@ -285,54 +285,58 @@ export default function Home() {
             <Card className="border-0 shadow-none bg-transparent rounded-none">
               <CardContent className="p-0 space-y-3">
                 <div className="text-center space-y-1.5">
-                  <p className="text-[10px] font-bold text-[#107C41] uppercase tracking-[0.22em]">Scorecard Offer</p>
-                  <h1 className="text-xl md:text-2xl font-sans font-black tracking-tight text-black leading-snug">Good job.</h1>
+                  <h1 className="text-xl md:text-2xl font-sans font-black tracking-tight text-black leading-snug">
+                    Good job — you now have a plan to get your clubs home safely.
+                  </h1>
                   <div className="h-[2px] w-12 bg-[#E5C158] mx-auto my-1" />
                   <p className="text-[10px] md:text-xs text-[#3A4A3D] font-bold max-w-sm mx-auto leading-normal px-1">
-                    You now have a plan to get your clubs home safely. Now let us protect the traveler.
+                    Travel Protection Club Members also have an annual plan that helps their family members know who to call first and what steps to take if something happens away from home.
                   </p>
                 </div>
 
                 <div className="max-w-sm mx-auto border-2 border-[#13263A] bg-white shadow-sm rounded-none overflow-hidden">
-                  <div className="bg-[#13263A] text-white text-center py-2 text-[10px] font-black uppercase tracking-[0.2em]">
-                    Your Golf Travel Scorecard
+                  <div className="bg-[#13263A] text-white text-center py-2 text-[10px] font-black uppercase tracking-[0.18em]">
+                    Your First Year TPC Member Scorecard
                   </div>
-                  <div className="grid grid-cols-[1.3fr_0.8fr_0.9fr_0.8fr] bg-[#FDFBF7] border-b-2 border-[#13263A] text-[9px] font-black uppercase tracking-wider text-[#13263A]">
-                    <div className="p-2 border-r border-[#13263A]">Player</div>
+                  <div className="grid grid-cols-[1.35fr_0.85fr_0.9fr_0.8fr] bg-[#FDFBF7] border-b-2 border-[#13263A] text-[8px] font-black uppercase tracking-wider text-[#13263A]">
+                    <div className="p-2 border-r border-[#13263A]">Annual Score</div>
                     <div className="p-2 text-right border-r border-[#13263A]">Gross</div>
                     <div className="p-2 text-right border-r border-[#13263A]">Handicap</div>
                     <div className="p-2 text-right">Net</div>
                   </div>
-                  <div className="grid grid-cols-[1.3fr_0.8fr_0.9fr_0.8fr] text-[11px] border-b border-[#13263A] text-[#1C2B21]">
-                    <div className="p-2 font-bold border-r border-[#13263A]">Typical Golfer</div>
+                  <div className="grid grid-cols-[1.35fr_0.85fr_0.9fr_0.8fr] text-[10px] border-b border-[#13263A] text-[#1C2B21]">
+                    <div className="p-2 font-bold border-r border-[#13263A]">Annual Score for Non-Member</div>
                     <div className="p-2 text-right border-r border-[#13263A]">${TYPICAL_GOLFER_COST}</div>
                     <div className="p-2 text-right border-r border-[#13263A]">0</div>
                     <div className="p-2 text-right font-bold">${TYPICAL_GOLFER_COST}</div>
                   </div>
-                  <div className="grid grid-cols-[1.3fr_0.8fr_0.9fr_0.8fr] text-[11px] bg-[#EAF7EE] text-[#107C41]">
-                    <div className="p-2 font-black border-r border-[#13263A]">TPC Member</div>
-                    <div className="p-2 text-right border-r border-[#13263A] font-bold">${SALE_PRICE}</div>
-                    <div className="p-2 text-right border-r border-[#13263A] font-bold">-${GOLF_SHIPPING_CREDIT}</div>
-                    <div className="p-2 text-right font-black">${EFFECTIVE_FIRST_YEAR_COST}</div>
+                  <div className="grid grid-cols-[1.35fr_0.85fr_0.9fr_0.8fr] text-[10px] bg-[#EAF7EE] text-[#107C41]">
+                    <div className="p-2 font-black border-r border-[#13263A]">Year 1 Score for TPC Member</div>
+                    <div className="p-2 text-right border-r border-[#13263A] font-bold flex items-center justify-end gap-1">
+                      <img src="/manus-storage/57885_120b932a.png" alt="TPC" className="h-5 w-5 object-contain shrink-0" />
+                      <span>${SALE_PRICE}</span>
+                    </div>
+                    <div className="p-2 text-right border-r border-[#13263A] font-bold flex items-center justify-end gap-1">
+                      <img src="/manus-storage/shipsticks_logo_perfect_2_768183cb.png" alt="Ship Sticks" className="h-4 w-5 object-contain shrink-0" />
+                      <span>-${GOLF_SHIPPING_CREDIT}</span>
+                    </div>
+                    <div className="p-2 text-right font-black flex items-center justify-end">
+                      <span className="inline-flex items-center justify-center border-2 border-red-600 text-red-700 rounded-full px-2 py-1 -rotate-6 bg-white/70 leading-none">
+                        ${EFFECTIVE_FIRST_YEAR_COST}/yr
+                      </span>
+                    </div>
                   </div>
-                </div>
-
-                <div className="max-w-sm mx-auto bg-[#EAF7EE] border border-[#107C41] p-2 text-center text-[10px] font-bold text-[#107C41] uppercase tracking-wider">
-                  Ship Sticks rebate handicap: -${GOLF_SHIPPING_CREDIT}
                 </div>
 
                 <div className="space-y-1.5 pt-0.5 max-w-sm mx-auto">
                   <Button onClick={handleCheckoutStart} className="w-full min-h-10 py-2 px-3 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-[10px] tracking-wider uppercase rounded-none shadow-sm flex items-center justify-center gap-1.5 cursor-pointer whitespace-normal text-center leading-normal active:scale-[0.97] transition-all">
-                    <span>PLAY THE SMARTER ROUND — ACTIVATE MY TPC BENEFITS</span>
+                    <span>ACTIVATE MY TPC MEMBERSHIP + $75 SHIPSTICKS REBATE</span>
                     <ChevronRight className="w-3.5 h-3.5 shrink-0" />
                   </Button>
-                  <p className="text-[9px] text-[#5C6B5E] text-center leading-normal max-w-sm mx-auto px-1">
-                    Converts price into score logic: $199 gross, minus your $75 Ship Sticks rebate handicap, for a $124 net first-year value.
-                  </p>
                 </div>
 
                 <div className="space-y-1.5 pt-1 max-w-sm mx-auto">
-                  <h3 className="text-[9px] font-bold text-[#5C6B5E] uppercase tracking-widest text-center">SUPPORTING BENEFIT PACKAGE:</h3>
+                  <h3 className="text-[9px] font-bold text-[#5C6B5E] uppercase tracking-widest text-center">YOUR ANNUAL TPC MEMBER PLAN INCLUDES:</h3>
                   <div className="space-y-1.5">
                     {includedBenefits.map((benefit) => (
                       <div key={benefit.title} className="flex gap-2 items-start bg-[#FAF8F5] p-2 border border-[#E8E4DC] rounded-none">
@@ -353,7 +357,7 @@ export default function Home() {
             <Card className="border border-[#E8E4DC] shadow-[0_8px_30px_rgba(28,43,33,0.02)] bg-white rounded-none overflow-hidden">
               <div className="bg-[#FAF8F5] border-b border-[#E8E4DC] p-2.5 flex items-center justify-between"><div className="flex items-center gap-1.5"><Lock className="w-3 h-3 text-[#107C41]" /><span className="text-[10px] font-bold text-[#1C2B21] tracking-wider uppercase">Secure Stripe Checkout</span></div><div className="text-[8px] font-bold text-[#107C41] bg-[#EAF7EE] px-1.5 py-0.5 rounded-none">SSL Encrypted</div></div>
               <CardContent className="p-3 space-y-2.5">
-                <div className="bg-[#FAF8F5] border border-[#E8E4DC] rounded-none p-2.5 space-y-1"><div className="flex justify-between text-[11px] text-[#5C6B5E]"><span>Golf Travel Benefits Package</span><span>${SALE_PRICE.toFixed(2)}</span></div><div className="flex justify-between text-[11px] text-[#107C41] font-bold"><span>Golf Club Shipping Credit</span><span>-${GOLF_SHIPPING_CREDIT.toFixed(2)} Rebate Held</span></div><div className="border-t border-[#E8E4DC] pt-1 flex justify-between text-xs font-bold text-[#1C2B21]"><span>Total Due Today</span><span>${SALE_PRICE.toFixed(2)}</span></div></div>
+                <div className="bg-[#FAF8F5] border border-[#E8E4DC] rounded-none p-2.5 space-y-1"><div className="flex justify-between text-[11px] text-[#5C6B5E]"><span>Annual TPC Membership</span><span>${SALE_PRICE.toFixed(2)}</span></div><div className="flex justify-between text-[11px] text-[#107C41] font-bold"><span>Golf Club Shipping Credit</span><span>-${GOLF_SHIPPING_CREDIT.toFixed(2)} Rebate Held</span></div><div className="border-t border-[#E8E4DC] pt-1 flex justify-between text-xs font-bold text-[#1C2B21]"><span>Total Due Today</span><span>${SALE_PRICE.toFixed(2)}</span></div></div>
                 <form onSubmit={handleStripeSubmit} className="space-y-2.5">
                   <div className="space-y-0.5"><Label htmlFor="cardNumber" className="text-[9px] font-bold text-[#5C6B5E] uppercase tracking-wider">Card Number</Label><Input id="cardNumber" type="text" placeholder="4242 4242 4242 4242" value={stripeData.cardNumber} onChange={(e) => setStripeData({ ...stripeData, cardNumber: e.target.value })} required className="h-9 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] rounded-none transition-all" /></div>
                   <div className="grid grid-cols-2 gap-2.5"><div className="space-y-0.5"><Label htmlFor="expiry" className="text-[9px] font-bold text-[#5C6B5E] uppercase tracking-wider">Expiration</Label><Input id="expiry" type="text" placeholder="MM/YY" value={stripeData.expiry} onChange={(e) => setStripeData({ ...stripeData, expiry: e.target.value })} required className="h-9 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] rounded-none transition-all" /></div><div className="space-y-0.5"><Label htmlFor="cvc" className="text-[9px] font-bold text-[#5C6B5E] uppercase tracking-wider">CVC</Label><Input id="cvc" type="text" placeholder="123" value={stripeData.cvc} onChange={(e) => setStripeData({ ...stripeData, cvc: e.target.value })} required className="h-9 text-xs border-[#E8E4DC] bg-[#FAF8F5] focus:bg-white focus:border-[#107C41] rounded-none transition-all" /></div></div>
@@ -368,13 +372,13 @@ export default function Home() {
           <div className="w-full space-y-4 animate-fade-in pb-6">
             <Card className="border-0 shadow-none bg-transparent rounded-none">
               <CardContent className="p-0 space-y-5">
-                <div className="text-center space-y-2"><div className="p-2 bg-[#EAF7EE] text-[#107C41] inline-flex rounded-full mb-1"><CheckCircle2 className="w-10 h-10" /></div><h1 className="text-2xl font-sans font-black tracking-tight text-black leading-tight">Your Golf Travel Benefits Are Activated</h1><div className="h-[2px] w-16 bg-[#E5C158] mx-auto mt-2" /></div>
+                <div className="text-center space-y-2"><div className="p-2 bg-[#EAF7EE] text-[#107C41] inline-flex rounded-full mb-1"><CheckCircle2 className="w-10 h-10" /></div><h1 className="text-2xl font-sans font-black tracking-tight text-black leading-tight">Your Annual TPC Membership Is Activated</h1><div className="h-[2px] w-16 bg-[#E5C158] mx-auto mt-2" /></div>
                 <div className="bg-[#FAF8F5] border border-[#E8E4DC] p-4 text-center space-y-3 rounded-none"><p className="text-xs md:text-sm text-[#1C2B21] font-semibold leading-relaxed">We have emailed your welcome details and golf club shipping credit instructions to <span className="text-[#107C41] font-bold">{formData.email || "your inbox"}</span>.</p><div className="h-[1px] bg-[#E8E4DC] w-full" /><p className="text-[11px] text-[#5C6B5E] leading-relaxed">Your Benefit Buddies package is designed to help with travel assistance, roadside issues, first-call family guidance, and practical member benefits before the next trip.</p></div>
                 <div className="bg-white border border-[#107C41] p-4 text-center space-y-2 rounded-none shadow-sm"><span className="text-[9px] font-bold text-[#107C41] tracking-widest uppercase block">Your Active Golf Shipping Credit Code</span><div className="text-xl font-mono font-extrabold text-[#107C41] bg-[#EAF7EE]/30 py-1.5 px-3 border border-dashed border-[#107C41]/30 tracking-wider select-all inline-block rounded-none">TPC-GOLF-75-{formData.email ? formData.email.split("@")[0].substring(0, 4).toUpperCase() + Math.floor(1000 + Math.random() * 9000) : "A8B9D"}</div><p className="text-[10px] text-[#5C6B5E] leading-relaxed">Use this code according to the shipping-credit instructions in your welcome email. Supplier and redemption terms apply.</p><div className="text-[9px] text-[#8C9B8E] bg-[#FAF8F5] border border-[#E8E4DC] p-2 rounded-none leading-normal text-left mt-1"><span className="font-bold text-[#5C6B5E] block uppercase tracking-wider text-[8px] mb-0.5">SECURED BY ARMS CRM API</span>This unique code is linked to <strong>{formData.email || "your email"}</strong> and should be used only by the activated member.</div></div>
                 <div className="bg-[#FAF8F5] border border-[#E5C158] p-4 rounded-none space-y-3 shadow-sm"><div className="flex gap-2.5 items-start"><Shield className="w-5 h-5 text-[#107C41] shrink-0 mt-0.5" /><div><h4 className="text-xs font-bold text-black uppercase tracking-wider">Your Travel Benefits Portal</h4><p className="text-[11px] text-[#5C6B5E] leading-relaxed mt-1">Review benefit access instructions, emergency contact guidance, roadside assistance details, telehealth/savings resources, and family first-call steps before your next trip.</p></div></div><a href="https://armsreach-global360.manus.space/" target="_blank" rel="noopener noreferrer" className="w-full h-11 border border-[#107C41] hover:bg-[#EAF7EE]/20 active:scale-[0.98] transition-all text-[#107C41] font-bold text-xs tracking-wider uppercase rounded-none flex items-center justify-center gap-1.5 cursor-pointer mt-1"><span>Review Golf Travel Benefits</span><ArrowRight className="w-3.5 h-3.5" /></a></div>
                 <div className="space-y-2 pt-2">
                   <div className="border-b border-[#E8E4DC] pb-2"><button onClick={() => setFaqOpen(!faqOpen)} className="w-full flex justify-between items-center py-2 text-left text-xs font-bold text-[#5C6B5E] uppercase tracking-wider cursor-pointer"><span className="flex items-center gap-1.5"><HelpCircle className="w-3.5 h-3.5 text-[#107C41]" />Frequently Asked Questions</span><ChevronDown className={`w-4 h-4 text-[#5C6B5E] transition-transform ${faqOpen ? "rotate-180" : ""}`} /></button>{faqOpen && (<div className="pt-2 pb-1 text-[11px] text-[#5C6B5E] space-y-3 leading-relaxed animate-fade-in"><div><p className="font-bold text-black">Q: Is this only for repatriation?</p><p className="mt-0.5">A: No. The package now positions repatriation/return coordination as one serious-family-protection benefit inside a broader golf travel package.</p></div><div><p className="font-bold text-black">Q: What travel benefits are represented?</p><p className="mt-0.5">A: The page represents global travel assistance, roadside assistance, lost document support, emergency coordination, telehealth/savings-style resources, identity support, and golf shipping credit value.</p></div><div><p className="font-bold text-black">Q: Is this insurance?</p><p className="mt-0.5">A: This page intentionally describes the offer as a membership and non-insured benefit package. Final supplier-approved language should be used before launch.</p></div></div>)}</div>
-                  <div className="border-b border-[#E8E4DC] pb-2"><button onClick={() => setTermsOpen(!termsOpen)} className="w-full flex justify-between items-center py-2 text-left text-xs font-bold text-[#5C6B5E] uppercase tracking-wider cursor-pointer"><span className="flex items-center gap-1.5"><FileText className="w-3.5 h-3.5 text-[#107C41]" />Membership Terms & Disclosures</span><ChevronDown className={`w-4 h-4 text-[#5C6B5E] transition-transform ${termsOpen ? "rotate-180" : ""}`} /></button>{termsOpen && (<div className="pt-2 pb-1 text-[10px] text-[#5C6B5E] leading-relaxed space-y-2 animate-fade-in"><p>By enrolling in the Travel Protection Club Golf Travel Benefits Package, you agree to the displayed ${SALE_PRICE.toFixed(2)} membership fee and renewal terms shown during final checkout.</p><p>Benefits are subject to supplier terms, eligibility rules, geographic limits, activation requirements, and availability. Services must be coordinated through the designated benefit provider when applicable.</p><p>The golf club shipping credit is a promotional benefit and is subject to redemption instructions, supplier rules, and expiration terms.</p></div>)}</div>
+                  <div className="border-b border-[#E8E4DC] pb-2"><button onClick={() => setTermsOpen(!termsOpen)} className="w-full flex justify-between items-center py-2 text-left text-xs font-bold text-[#5C6B5E] uppercase tracking-wider cursor-pointer"><span className="flex items-center gap-1.5"><FileText className="w-3.5 h-3.5 text-[#107C41]" />Membership Terms & Disclosures</span><ChevronDown className={`w-4 h-4 text-[#5C6B5E] transition-transform ${termsOpen ? "rotate-180" : ""}`} /></button>{termsOpen && (<div className="pt-2 pb-1 text-[10px] text-[#5C6B5E] leading-relaxed space-y-2 animate-fade-in"><p>By enrolling in the annual Travel Protection Club Golf Travel Benefits Package, you agree to the displayed ${SALE_PRICE.toFixed(2)} membership fee and renewal terms shown during final checkout.</p><p>Benefits are subject to supplier terms, eligibility rules, geographic limits, activation requirements, and availability. Services must be coordinated through the designated benefit provider when applicable.</p><p>The golf club shipping credit is a promotional benefit and is subject to redemption instructions, supplier rules, and expiration terms.</p></div>)}</div>
                 </div>
                 <Button onClick={handleShare} className="w-full h-11 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md flex items-center justify-center gap-2 cursor-pointer mt-1"><Share2 className="w-4 h-4" />Share This Offer with Partners</Button>
               </CardContent>
