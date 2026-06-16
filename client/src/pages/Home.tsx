@@ -218,9 +218,8 @@ export default function Home() {
       </div>
       <div className="text-center px-4">
         <span className="text-[9px] md:text-[10px] text-[#5C6B5E] font-bold tracking-wider uppercase block leading-relaxed">
-          Compliments of <br />
-          THE TRAVEL PROTECTION CLUB & BENEFIT BUDDIES <br />
-          <span className="text-[#A4B3A7] font-medium text-[8px] md:text-[9px]">in conjunction with SHIP STICKS</span>
+          Compliments of The TRAVEL PROTECTION CLUB by BENEFIT BUDDIES <br />
+          <span className="text-[#A4B3A7] font-medium text-[8px] md:text-[9px]">in conjunction with ShipSticks</span>
         </span>
       </div>
     </div>
@@ -230,7 +229,7 @@ export default function Home() {
     <div className="min-h-screen bg-[#FDFBF7] text-[#1C2B21] font-sans antialiased flex flex-col justify-between overflow-x-hidden pt-1 pb-4 px-4">
       <main className="flex-1 max-w-md mx-auto w-full flex flex-col justify-center my-auto space-y-2">
         {step === "OPT_IN" && (
-          <div className="space-y-2 w-full animate-fade-in">
+          <div className="space-y-0 w-full animate-fade-in">
             <Card className="border-0 shadow-none bg-transparent rounded-none">
               <CardContent className="p-0 space-y-4">
                 <div className="text-center space-y-2">
