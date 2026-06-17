@@ -19,6 +19,7 @@ const EFFECTIVE_FIRST_YEAR_COST = SALE_PRICE - GOLF_SHIPPING_CREDIT;
 const NON_MEMBER_SCORE = 445;
 const NON_MEMBER_HCP = 75;
 const NON_MEMBER_NET = NON_MEMBER_SCORE + NON_MEMBER_HCP;
+const ESTIMATED_MONTHLY_BENEFIT_COST = 9.88;
 
 const LOGOS = {
   tpc: "/assets/logos/tpc-shield-logo.png",
@@ -28,24 +29,52 @@ const LOGOS = {
 
 const includedBenefits = [
   {
-    title: "Global Travel Assistance",
-    body: "Emergency travel support for medical referrals, lost or stolen travel documents, legal/referral needs, evacuation coordination, and other away-from-home problems."
-  },
-  {
-    title: "Away-From-Home Return Coordination",
-    body: "If the worst happens while traveling, the package helps the family understand who to call first and how covered return-of-remains support is coordinated, subject to plan terms."
-  },
-  {
     title: "Roadside Assistance",
     body: "Road-trip support for golf weekends, tournaments, snowbird travel, airport drives, and course-to-course trips."
   },
   {
-    title: "Telehealth + Everyday Savings",
-    body: "Useful non-emergency value such as virtual care, travel savings, lifestyle discounts, and other bundled member benefits when available in the selected package."
+    title: "Global Travel Assistance",
+    body: "Emergency travel support for medical referrals, lost or stolen travel documents, legal/referral needs, evacuation coordination, and other away-from-home problems."
   },
   {
-    title: "Identity + Document Support",
-    body: "Protection-minded help for lost documents, identity-related disruptions, and travel-security concerns."
+    title: "Legal Services",
+    body: "Access to legal support resources for travel, family, identity, document, and everyday personal matters, subject to program terms."
+  },
+  {
+    title: "Teladoc",
+    body: "Virtual care access for non-emergency medical questions when members are home, traveling, or away for golf weekends."
+  },
+  {
+    title: "Counseling Services",
+    body: "Confidential support resources for stress, family, work, and life situations that can come up before, during, or after travel."
+  },
+  {
+    title: "WorkLife Services",
+    body: "Everyday guidance resources designed to help members manage family, work, caregiving, and personal-life logistics."
+  },
+  {
+    title: "Health Advocate Solutions",
+    body: "Healthcare navigation support to help members understand options, coordinate next steps, and make better use of available resources."
+  },
+  {
+    title: "Retail & Mail Order Pharmacy",
+    body: "Included pharmacy savings resources for members and families, with access and savings subject to program availability."
+  },
+  {
+    title: "Vitamins",
+    body: "Included wellness-value access for vitamins and related everyday health savings through the member benefit program."
+  },
+  {
+    title: "Diabetic Supplies",
+    body: "Included savings resources for eligible diabetic supplies, subject to provider terms and program availability."
+  },
+  {
+    title: "MRI & CT Scan Savings",
+    body: "Included imaging-savings resources that may help members compare or reduce eligible MRI and CT scan costs."
+  },
+  {
+    title: "$75 ShipSticks Voucher",
+    body: "After activation, members receive a $75 ShipSticks voucher to help with golf club shipping on a future trip."
   }
 ];
 
@@ -114,6 +143,8 @@ export default function Home() {
       sale_price: SALE_PRICE,
       golf_shipping_credit: GOLF_SHIPPING_CREDIT,
       effective_first_year_cost: EFFECTIVE_FIRST_YEAR_COST,
+      estimated_monthly_benefit_cost: ESTIMATED_MONTHLY_BENEFIT_COST,
+      selected_benefits: includedBenefits.map((benefit) => benefit.title),
       quiz_answers: answers,
       page_url: window.location.href,
       referrer: document.referrer,
@@ -308,16 +339,16 @@ export default function Home() {
         )}
 
         {step === "OFFER" && (
-          <div className="w-full space-y-4 animate-fade-in py-4 md:py-8">
+          <div className="w-full space-y-3 animate-fade-in py-2 md:py-5">
             <Card className="border-0 shadow-none bg-transparent rounded-none">
-              <CardContent className="p-0 space-y-4 md:space-y-5">
+              <CardContent className="p-0 space-y-3 md:space-y-4">
                 <div className="text-center space-y-2 max-w-[560px] mx-auto">
                   <h1 className="text-2xl md:text-4xl font-sans font-black tracking-tight text-black leading-tight">
-                    Good job — you now have a plan to get your clubs home safely.
+                    Your clubs have a way home. Now make sure you do too.
                   </h1>
                   <div className="h-[3px] w-20 bg-[#E5C158] mx-auto" />
-                  <p className="text-sm md:text-xl text-[#3A4A3D] font-serif font-bold leading-snug px-2">
-                    Travel Protection Club Members also have an annual plan that helps their family members know who to call first if something happens away from home.
+                  <p className="text-sm md:text-lg text-[#3A4A3D] font-serif font-bold leading-snug px-2">
+                    TPC Members get year-round travel support, family-first call guidance, everyday member benefits, and a $75 ShipSticks voucher after activation.
                   </p>
                 </div>
 
@@ -334,7 +365,7 @@ export default function Home() {
                   <div className="grid grid-cols-[1.3fr_0.85fr_0.85fr_0.85fr] min-h-[78px] md:min-h-[96px] text-[#1C2B21] border-b-2 border-[#13263A]">
                     <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-base md:text-2xl font-black text-black leading-tight" style={scorecardTextStyle}>Non-<br />Member</div>
                     <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-xl md:text-3xl font-black text-black" style={scorecardTextStyle}>${NON_MEMBER_SCORE}</div>
-                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-lg md:text-2xl font-black text-red-600" style={scorecardTextStyle}>+${NON_MEMBER_HCP}</div>
+                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-lg md:text-2xl font-black text-black" style={scorecardTextStyle}>+${NON_MEMBER_HCP}</div>
                     <div className="p-1.5 md:p-2 flex items-center justify-center text-center text-xl md:text-3xl font-black text-black" style={scorecardTextStyle}>${NON_MEMBER_NET}</div>
                   </div>
                   <div className="grid grid-cols-[1.3fr_0.85fr_0.85fr_0.85fr] min-h-[86px] md:min-h-[104px] bg-[#EAF7EE] text-[#107C41]">
@@ -357,11 +388,12 @@ export default function Home() {
                     <span>Activate My TPC Membership</span>
                     <ChevronRight className="w-5 h-5 shrink-0" />
                   </Button>
-                  <p className="text-[10px] md:text-xs text-center text-[#5C6B5E] font-bold uppercase tracking-wider">Includes your $75 ShipSticks voucher after activation.</p>
+                  <p className="text-[10px] md:text-xs text-center text-[#5C6B5E] font-bold uppercase tracking-wider">Activate now to unlock your $75 ShipSticks voucher after enrollment.</p>
                 </div>
 
                 <div className="space-y-2 pt-2 max-w-[560px] mx-auto">
-                  <h3 className="text-xs md:text-base font-bold text-[#5C6B5E] uppercase tracking-[0.18em] text-center">Your Annual TPC Member Course Includes:</h3>
+                  <h3 className="text-xs md:text-base font-bold text-[#5C6B5E] uppercase tracking-[0.18em] text-center">Your Annual TPC Member Benefits</h3>
+                  <p className="text-[10px] md:text-xs text-center text-[#5C6B5E] font-bold uppercase tracking-wider leading-relaxed">A 12-hole member course of travel support, health resources, everyday savings, and golf shipping value.</p>
                   <div className="space-y-2">
                     {includedBenefits.map((benefit, index) => (
                       <div key={benefit.title} className="flex gap-3 items-start bg-[#FAF8F5] p-3 md:p-4 border border-[#E8E4DC] rounded-none">
@@ -411,8 +443,8 @@ export default function Home() {
                 <div className="bg-white border border-[#107C41] p-4 text-center space-y-2 rounded-none shadow-sm"><span className="text-[9px] font-bold text-[#107C41] tracking-widest uppercase block">Your Active Golf Shipping Credit Code</span><div className="text-xl font-mono font-extrabold text-[#107C41] bg-[#EAF7EE]/30 py-1.5 px-3 border border-dashed border-[#107C41]/30 tracking-wider select-all inline-block rounded-none">TPC-GOLF-75-{formData.email ? formData.email.split("@")[0].substring(0, 4).toUpperCase() + Math.floor(1000 + Math.random() * 9000) : "A8B9D"}</div><p className="text-[10px] text-[#5C6B5E] leading-relaxed">Use this code according to the shipping-credit instructions in your welcome email. Supplier and redemption terms apply.</p><div className="text-[9px] text-[#8C9B8E] bg-[#FAF8F5] border border-[#E8E4DC] p-2 rounded-none leading-normal text-left mt-1"><span className="font-bold text-[#5C6B5E] block uppercase tracking-wider text-[8px] mb-0.5">SECURED BY ARMS CRM API</span>This unique code is linked to <strong>{formData.email || "your email"}</strong> and should be used only by the activated member.</div></div>
                 <div className="bg-[#FAF8F5] border border-[#E5C158] p-4 rounded-none space-y-3 shadow-sm"><div className="flex gap-2.5 items-start"><FileText className="w-5 h-5 text-[#107C41] shrink-0 mt-0.5" /><div><h4 className="text-xs font-bold text-black uppercase tracking-wider">Your Travel Benefits Portal</h4><p className="text-[11px] text-[#5C6B5E] leading-relaxed mt-1">Review benefit access instructions, emergency contact guidance, roadside assistance details, telehealth/savings resources, and family first-call steps before your next trip.</p></div></div></div>
                 <div className="space-y-2 pt-2">
-                  <div className="border-b border-[#E8E4DC] pb-2"><button onClick={() => setFaqOpen(!faqOpen)} className="w-full flex justify-between items-center py-2 text-left text-xs font-bold text-[#5C6B5E] uppercase tracking-wider cursor-pointer"><span className="flex items-center gap-1.5"><HelpCircle className="w-3.5 h-3.5 text-[#107C41]" />Frequently Asked Questions</span><ChevronDown className={`w-4 h-4 text-[#5C6B5E] transition-transform ${faqOpen ? "rotate-180" : ""}`} /></button>{faqOpen && (<div className="pt-2 pb-1 text-[11px] text-[#5C6B5E] space-y-3 leading-relaxed animate-fade-in"><div><p className="font-bold text-black">Q: Is this only for repatriation?</p><p className="mt-0.5">A: No. The package now positions repatriation/return coordination as one serious-family-protection benefit inside a broader golf travel package.</p></div><div><p className="font-bold text-black">Q: What travel benefits are represented?</p><p className="mt-0.5">A: The page represents global travel assistance, roadside assistance, lost document support, emergency coordination, telehealth/savings-style resources, identity support, and golf shipping credit value.</p></div><div><p className="font-bold text-black">Q: Is this insurance?</p><p className="mt-0.5">A: This page intentionally describes the offer as a membership and non-insured benefit package. Final supplier-approved language should be used before launch.</p></div></div>)}</div>
-                  <div className="border-b border-[#E8E4DC] pb-2"><button onClick={() => setTermsOpen(!termsOpen)} className="w-full flex justify-between items-center py-2 text-left text-xs font-bold text-[#5C6B5E] uppercase tracking-wider cursor-pointer"><span className="flex items-center gap-1.5"><FileText className="w-3.5 h-3.5 text-[#107C41]" />Membership Terms & Disclosures</span><ChevronDown className={`w-4 h-4 text-[#5C6B5E] transition-transform ${termsOpen ? "rotate-180" : ""}`} /></button>{termsOpen && (<div className="pt-2 pb-1 text-[10px] text-[#5C6B5E] leading-relaxed space-y-2 animate-fade-in"><p>By enrolling in the annual Travel Protection Club Golf Travel Benefits Package, you agree to the displayed ${SALE_PRICE.toFixed(2)} membership fee and renewal terms shown during final checkout.</p><p>Benefits are subject to supplier terms, eligibility rules, geographic limits, activation requirements, and availability. Services must be coordinated through the designated benefit provider when applicable.</p><p>The golf club shipping credit is a promotional benefit and is subject to redemption instructions, supplier rules, and expiration terms.</p></div>)}</div>
+                  <div className="border-b border-[#E8E4DC] pb-2"><button onClick={() => setFaqOpen(!faqOpen)} className="w-full flex justify-between items-center py-2 text-left text-xs font-bold text-[#5C6B5E] uppercase tracking-wider cursor-pointer"><span className="flex items-center gap-1.5"><HelpCircle className="w-3.5 h-3.5 text-[#107C41]" />Frequently Asked Questions</span><ChevronDown className={`w-4 h-4 text-[#5C6B5E] transition-transform ${faqOpen ? "rotate-180" : ""}`} /></button>{faqOpen && (<div className="pt-2 pb-1 text-[11px] text-[#5C6B5E] space-y-3 leading-relaxed animate-fade-in"><div><p className="font-bold text-black">Q: Is this only for repatriation?</p><p className="mt-0.5">A: No. The package now positions repatriation/return coordination as one serious-family-protection benefit inside a broader golf travel package.</p></div><div><p className="font-bold text-black">Q: What travel benefits are represented?</p><p className="mt-0.5">A: The page represents travel assistance, roadside assistance, legal support resources, telehealth, counseling, WorkLife, health advocacy, everyday savings, and golf shipping value.</p></div><div><p className="font-bold text-black">Q: Is this insurance?</p><p className="mt-0.5">A: This page intentionally describes the offer as a membership and non-insured benefit package. Final supplier-approved language should be used before launch.</p></div></div>)}</div>
+                  <div className="border-b border-[#E8E4DC] pb-2"><button onClick={() => setTermsOpen(!termsOpen)} className="w-full flex justify-between items-center py-2 text-left text-xs font-bold text-[#5C6B5E] uppercase tracking-wider cursor-pointer"><span className="flex items-center gap-1.5"><FileText className="w-3.5 h-3.5 text-[#107C41]" />Membership Terms & Disclosures</span><ChevronDown className={`w-4 h-4 text-[#5C6B5E] transition-transform ${termsOpen ? "rotate-180" : ""}`} /></button>{termsOpen && (<div className="pt-2 pb-1 text-[10px] text-[#5C6B5E] leading-relaxed space-y-2 animate-fade-in"><p>By enrolling in the annual Travel Protection Club Golf Travel Benefits Package, you agree to the displayed ${SALE_PRICE.toFixed(2)} membership fee and renewal terms shown during final checkout.</p><p>Benefits are subject to supplier terms, eligibility rules, geographic limits, activation requirements, and availability. Services must be coordinated through the designated benefit provider when applicable.</p><p>The golf club shipping voucher is a promotional benefit and is subject to redemption instructions, supplier rules, and expiration terms.</p></div>)}</div>
                 </div>
                 <Button onClick={handleShare} className="w-full h-11 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-xs tracking-wider uppercase rounded-none shadow-md flex items-center justify-center gap-2 cursor-pointer mt-1"><Share2 className="w-4 h-4" />Share This Offer with Partners</Button>
               </CardContent>
