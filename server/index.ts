@@ -10,6 +10,52 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
+  app.use(express.json({ limit: "1mb" }));
+
+  app.post("/api/arms-webhook", async (req, res) => {
+    const webhookUrl = process.env.ARMS_WEBHOOK_URL || process.env.VITE_ARMS_WEBHOOK_URL;
+
+    if (!webhookUrl) {
+      return res.status(500).json({
+        ok: false,
+        error: "Missing ARMS_WEBHOOK_URL environment variable"
+      });
+    }
+
+    try {
+      const upstreamResponse = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(req.body)
+      });
+
+      const responseText = await upstreamResponse.text();
+
+      if (!upstreamResponse.ok) {
+        return res.status(502).json({
+          ok: false,
+          error: "ARMS webhook returned an error",
+          status: upstreamResponse.status,
+          response: responseText
+        });
+      }
+
+      return res.json({
+        ok: true,
+        status: upstreamResponse.status,
+        response: responseText
+      });
+    } catch (error) {
+      console.error("ARMS webhook proxy failed:", error);
+      return res.status(500).json({
+        ok: false,
+        error: "ARMS webhook proxy failed"
+      });
+    }
+  });
+
   // Serve static files from dist/public in production
   const staticPath =
     process.env.NODE_ENV === "production"
