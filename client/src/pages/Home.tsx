@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Check, CheckCircle2, ChevronDown, ChevronRight, FileText, HelpCircle, Lock, Share2 } from "lucide-react";
+import { CheckCircle2, ChevronDown, ChevronRight, FileText, HelpCircle, Lock, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
 type DemoStep = "OPT_IN" | "QUIZ" | "OFFER" | "STRIPE_CHECKOUT" | "SUCCESS";
@@ -17,6 +17,8 @@ const SALE_PRICE = 199;
 const GOLF_SHIPPING_CREDIT = 75;
 const EFFECTIVE_FIRST_YEAR_COST = SALE_PRICE - GOLF_SHIPPING_CREDIT;
 const NON_MEMBER_SCORE = 445;
+const NON_MEMBER_HCP = 75;
+const NON_MEMBER_NET = NON_MEMBER_SCORE + NON_MEMBER_HCP;
 
 const LOGOS = {
   tpc: "/assets/logos/tpc-shield-logo.png",
@@ -332,15 +334,12 @@ export default function Home() {
                   <div className="grid grid-cols-[1.3fr_0.85fr_0.85fr_0.85fr] min-h-[78px] md:min-h-[96px] text-[#1C2B21] border-b-2 border-[#13263A]">
                     <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-base md:text-2xl font-black text-black leading-tight" style={scorecardTextStyle}>Non-<br />Member</div>
                     <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-xl md:text-3xl font-black text-black" style={scorecardTextStyle}>${NON_MEMBER_SCORE}</div>
-                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center">
-                      <span className="block w-10 md:w-16 h-1.5 md:h-2 bg-[#13263A] rounded-full rotate-[-28deg] shadow-sm" />
-                    </div>
-                    <div className="p-1.5 md:p-2 flex items-center justify-center text-center text-xl md:text-3xl font-black text-black" style={scorecardTextStyle}>${NON_MEMBER_SCORE}</div>
+                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-lg md:text-2xl font-black text-red-600" style={scorecardTextStyle}>+${NON_MEMBER_HCP}</div>
+                    <div className="p-1.5 md:p-2 flex items-center justify-center text-center text-xl md:text-3xl font-black text-black" style={scorecardTextStyle}>${NON_MEMBER_NET}</div>
                   </div>
                   <div className="grid grid-cols-[1.3fr_0.85fr_0.85fr_0.85fr] min-h-[86px] md:min-h-[104px] bg-[#EAF7EE] text-[#107C41]">
-                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center gap-1 md:gap-2">
-                      <img src={LOGOS.tpc} alt="TPC" className="h-8 w-8 md:h-12 md:w-12 object-contain shrink-0" />
-                      <span className="text-base md:text-2xl font-black text-[#107C41] leading-tight" style={scorecardTextStyle}>Member<br />Year 1</span>
+                    <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center">
+                      <img src={LOGOS.tpc} alt="TPC" className="h-14 w-14 md:h-20 md:w-20 object-contain" />
                     </div>
                     <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-xl md:text-3xl font-black text-[#107C41]" style={scorecardTextStyle}>${SALE_PRICE}</div>
                     <div className="p-1.5 md:p-2 border-r-2 border-[#13263A] flex items-center justify-center text-center text-xl md:text-3xl font-black text-red-600" style={scorecardTextStyle}>-${GOLF_SHIPPING_CREDIT}</div>
@@ -354,22 +353,24 @@ export default function Home() {
                 </div>
 
                 <div className="space-y-2 max-w-[560px] mx-auto">
-                  <Button onClick={handleCheckoutStart} className="w-full min-h-[56px] md:min-h-[64px] p-0 bg-[#107C41] hover:bg-[#0C6233] text-white font-bold text-xs md:text-lg tracking-wider uppercase rounded-none shadow-md flex items-stretch justify-center gap-0 cursor-pointer whitespace-normal text-center leading-tight active:scale-[0.97] transition-all overflow-hidden">
-                    <span className="bg-[#13263A] px-2 md:px-5 py-2 flex items-center justify-center shrink-0 min-w-[96px] md:min-w-[150px]">
-                      <img src={LOGOS.shipSticks} alt="ShipSticks" className="h-8 md:h-12 object-contain" />
-                    </span>
-                    <span className="flex-1 px-2 md:px-4 py-2 flex items-center justify-center" style={scorecardTextStyle}>ACTIVATE MY TPC MEMBERSHIP + $75 SHIPSTICKS REBATE</span>
-                    <ChevronRight className="w-5 h-5 shrink-0 self-center mr-3" />
+                  <Button onClick={handleCheckoutStart} className="w-full min-h-[58px] md:min-h-[64px] bg-[#107C41] hover:bg-[#0C6233] text-white font-black text-sm md:text-xl tracking-wider uppercase rounded-none shadow-md flex items-center justify-center gap-3 cursor-pointer whitespace-normal text-center leading-tight active:scale-[0.97] transition-all px-4 py-3">
+                    <span>Activate My TPC Membership</span>
+                    <ChevronRight className="w-5 h-5 shrink-0" />
                   </Button>
+                  <p className="text-[10px] md:text-xs text-center text-[#5C6B5E] font-bold uppercase tracking-wider">Includes your $75 ShipSticks voucher after activation.</p>
                 </div>
 
                 <div className="space-y-2 pt-2 max-w-[560px] mx-auto">
-                  <h3 className="text-xs md:text-base font-bold text-[#5C6B5E] uppercase tracking-[0.18em] text-center">Your Annual TPC Member Plan Includes:</h3>
+                  <h3 className="text-xs md:text-base font-bold text-[#5C6B5E] uppercase tracking-[0.18em] text-center">Your Annual TPC Member Course Includes:</h3>
                   <div className="space-y-2">
-                    {includedBenefits.map((benefit) => (
+                    {includedBenefits.map((benefit, index) => (
                       <div key={benefit.title} className="flex gap-3 items-start bg-[#FAF8F5] p-3 md:p-4 border border-[#E8E4DC] rounded-none">
-                        <div className="p-1 bg-[#EAF7EE] rounded-full text-[#107C41] shrink-0 mt-0.5"><Check className="w-4 h-4" /></div>
-                        <div><h4 className="text-sm md:text-lg font-bold text-black uppercase tracking-wider">{benefit.title}</h4><p className="text-sm md:text-base text-[#5C6B5E] leading-normal mt-1 font-serif">{benefit.body}</p></div>
+                        <div className="h-9 w-9 md:h-10 md:w-10 bg-[#EAF7EE] text-[#107C41] shrink-0 mt-0.5 flex items-center justify-center rounded-full border border-[#107C41]/20 font-black text-sm md:text-base" style={scorecardTextStyle}>{index + 1}</div>
+                        <div>
+                          <div className="text-[9px] md:text-[10px] text-[#107C41] font-black uppercase tracking-[0.22em] mb-1">Hole {index + 1}</div>
+                          <h4 className="text-sm md:text-lg font-bold text-black uppercase tracking-wider">{benefit.title}</h4>
+                          <p className="text-sm md:text-base text-[#5C6B5E] leading-normal mt-1 font-serif">{benefit.body}</p>
+                        </div>
                       </div>
                     ))}
                   </div>
