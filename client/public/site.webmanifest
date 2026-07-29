@@ -1,0 +1,18 @@
+{
+  "name": "THE TRAVEL PROTECTION CLUB by BENEFIT BUDDIES",
+  "short_name": "TPC Benefits",
+  "description": "The Travel Protection Club by Benefit Buddies golf travel membership with a ShipSticks rebate.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fdfbf7",
+  "theme_color": "#107C41",
+  "icons": [
+    {
+      "src": "/assets/Favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
